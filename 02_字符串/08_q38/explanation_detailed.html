@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>LeetCode 38: 基于代码的逐句可视化</title>
+    <style>
+        body { 
+            background: #1e1e1e; color: #d4d4d4; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 20px; 
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex; flex-direction: column;
+        }
+        .header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;}
+        h1 { margin: 0; font-size: 24px; color: #fff;}
+        select { background: #333; color: white; border: 1px solid #555; padding: 5px; border-radius: 4px;}
+        
+        .container { display: flex; gap: 20px; flex: 1; min-height: 0; }
+        .pane { 
+            background: #252526; border-radius: 8px; padding: 20px; 
+            width: 50%; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        /* Code Editor Style */
+        .code-container { font-family: 'Consolas', 'Courier New', monospace; font-size: 16px; margin: 0; }
+        .line { padding: 4px 0; border-left: 3px solid transparent; display: flex;}
+        .line.active { background: #264f78; border-left-color: #007acc; }
+        .no { color: #858585; width: 40px; user-select: none; display: inline-block; text-align: right; margin-right: 15px;}
+        .kw { color: #9cdcfe; } .cb { color: #c586c0; } .fn { color: #dcdcaa; } .st { color: #ce9178; }
+        
+        /* Widgets */
+        h3 { margin-top: 0; font-size: 18px; color: #fff; border-bottom: 1px solid #444; padding-bottom: 10px;}
+        
+        .vars-panel { background: #1e1e1e; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-family: 'Consolas', monospace; font-size: 16px;}
+        .vars-panel div { margin-bottom: 10px; }
+        .var-name { display: inline-block; width: 80px; color: #9cdcfe;}
+        .var-val { color: #b5cea8; font-weight: bold;}
+        
+        .explanation { 
+            background: #333333; padding: 15px; border-radius: 6px; font-size: 16px; 
+            line-height: 1.6; margin-bottom: 30px; border-left: 4px solid #007acc; min-height: 80px; 
+        }
+        
+        /* Diagram Wrapper */
+        .char-wrapper { position: relative; display: flex; gap: 10px; margin-top: 20px;}
+        .char-box {
+            width: 50px; height: 50px; border-radius: 8px; background: #333;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-family: monospace; position: relative;
+            border: 1px solid #555; transition: background 0.2s;
+        }
+        .highlighted { background: #006eb3; border-color: #00a8ff; box-shadow: 0 0 10px rgba(0, 168, 255, 0.4);}
+        .char-box .index-lab {
+            position: absolute; top: -22px; font-size: 12px; color: #888;
+        }
+        .pointer {
+            position: absolute; bottom: -35px; transform: translateX(-50%);
+            background: #f48771; color: #000; padding: 2px 8px; border-radius: 4px;
+            font-size: 14px; font-weight: bold; transition: left 0.3s ease; white-space: nowrap;
+        }
+        .pointer::after {
+            content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+            border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 5px solid #f48771;
+        }
+        
+        /* Controls */
+        .controls { display: flex; gap: 10px; position: sticky; bottom: 0; background: #252526; padding-top: 15px;}
+        button { background: #0e639c; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; flex: 1; transition: background 0.1s;}
+        button:disabled { background: #454545; color: #777; cursor: not-allowed; }
+        button:hover:not(:disabled) { background: #1177bb; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>代码逐句映射图解神器（完美同步版）</h1>
+    <div>
+        更换输入用例参数 res = 
+        <select id="input-selector" onchange="runSim()">
+            <option value="1">"1" (推导下一项)</option>
+            <option value="11" selected>"11" (推导下一项)</option>
+            <option value="21">"21" (推导下一项)</option>
+            <option value="111221">"111221" (推导下一项)</option>
+        </select>
+    </div>
+</div>
+
+<div class="container">
+    <div class="pane">
+        <h3>1. 你的内层推导循环代码</h3>
+        <pre class="code-container">
+<div class="line" id="line-1"><span class="no"> 1</span> <span class="kw">parts</span> = []</div>
+<div class="line" id="line-2"><span class="no"> 2</span> <span class="kw">i</span> = 0</div>
+<div class="line" id="line-3"><span class="no"> 3</span> <span class="cb">while</span> <span class="kw">i</span> &lt; <span class="fn">len</span>(res):</div>
+<div class="line" id="line-4"><span class="no"> 4</span>     <span class="kw">count</span> = 1</div>
+<div class="line" id="line-5"><span class="no"> 5</span>     <span class="cb">while</span> <span class="kw">i</span> + 1 &lt; <span class="fn">len</span>(res) <span class="cb">and</span> res[<span class="kw">i</span>] == res[<span class="kw">i</span> + 1]:</div>
+<div class="line" id="line-6"><span class="no"> 6</span>         <span class="kw">count</span> += 1</div>
+<div class="line" id="line-7"><span class="no"> 7</span>         <span class="kw">i</span> += 1</div>
+<div class="line" id="line-8"><span class="no"> 8</span>     <span class="kw">parts</span>.<span class="fn">append</span>(<span class="fn">str</span>(<span class="kw">count</span>) + res[<span class="kw">i</span>])</div>
+<div class="line" id="line-9"><span class="no"> 9</span>     <span class="kw">i</span> += 1</div>
+<div class="line" id="line-10"><span class="no">10</span> res = <span class="st">''</span>.<span class="fn">join</span>(<span class="kw">parts</span>)</div>
+        </pre>
+        <p style="color:#888; font-size: 14px; margin-top:20px;">* 当你在右侧点击「下一步」时，上面这块代码将会像打断点（Debug）一样对应高亮，完全精准重构执行路径。</p>
+    </div>
+    
+    <div class="pane">
+        <h3>2. 对应这句代码，内存里长啥样？</h3>
+        <div class="vars-panel">
+            <div><span class="var-name">res</span> = <span class="var-val" id="v-res">""</span></div>
+            <div><span class="var-name">len(res)</span>= <span class="var-val" id="v-len">0</span></div>
+            <div><span class="var-name">i</span> = <span class="var-val" id="v-i">0</span></div>
+            <div><span class="var-name">count</span> = <span class="var-val" id="v-count">1</span></div>
+            <div><span class="var-name">parts</span> = <span class="var-val" id="v-parts">[]</span></div>
+        </div>
+        
+        <h3>3. 大白话解释正在执行的这一步：</h3>
+        <div class="explanation" id="v-desc"></div>
+        
+        <h3>4. 图解指针 i 和字符串</h3>
+        <div id="diagram-container" style="padding-bottom: 50px; overflow-x: auto; min-height: 80px;"></div>
+        
+        <div class="controls">
+            <button id="btn-prev" onclick="step(-1)">❮ 倒回上一句执行</button>
+            <button id="btn-next" onclick="step(1)">单步执行下一步 ❯</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let states = [];
+let idx = 0;
+
+function runSim() {
+    let res = document.getElementById('input-selector').value;
+    states = [];
+    idx = 0;
+    
+    let parts = [];
+    let i = 0;
+    
+    states.push({
+        lines: [1, 2], res: res, parts: [...parts], i: i, count: null, pointerShow: true,
+        desc: "【初始化】外层大循环开始了一次新的推演。我们新建了一个空的数组 <span style='color:#cdb'>parts</span> 来装等会收集的各个“计数字符”。把游标/双指针的探路指针 <span style='color:#cdb'>i</span> 归零，指向第一个字符。"
+    });
+    
+    while (i < res.length) {
+        states.push({
+            lines: [3], res: res, parts: [...parts], i: i, count: null, pointerShow: true,
+            desc: "【最外层 while】判定 <span style='color:#cdb'>i < len(res)</span>，此时 i 是 " + i + "，总长度是 " + res.length + "，条件成立！这就意味着：我们还有没处理完的字符段。进循环。"
+        });
+        
+        let startChar = res[i];
+        let count = 1;
+        
+        states.push({
+            lines: [4], res: res, parts: [...parts], i: i, count: count, pointerShow: true,
+            desc: "一碰面，无论如何我们都至少看到了 1 个 '" + startChar + "'。所以默认把记录重复次数的 <span style='color:#cdb'>count 设为 1</span>。"
+        });
+        
+        while (true) {
+            let cond1 = i + 1 < res.length;
+            let cond2 = cond1 ? res[i] === res[i+1] : false;
+            
+            if (!cond1) {
+                states.push({
+                    lines: [5], res: res, parts: [...parts], i: i, count: count, pointerShow: true,
+                    desc: "【内层 while 的第一项探测】看前面是否走到了头：一看 <span style='color:#cdb'>i+1=" + (i+1) + "</span>，已经和长度 " + res.length + " 一样大了，越出边界了！那连续相等就断了，内层 while 被阻断。"
+                });
+                break;
+            }
+            
+            if (cond2) {
+                states.push({
+                    lines: [5], res: res, parts: [...parts], i: i, count: count, pointerShow: true,
+                    desc: "【内层 while 双项探测】不但前面路没走到头，而且一看当前位置 res[" + i + "]=<span style='color:#cdb'>'" + res[i] + "'</span> 和 前方 res[" + (i+1) + "]=<span style='color:#cdb'>'" + res[i+1] + "'</span> 长得一模一样！循环成立，进里面。"
+                });
+                count++;
+                states.push({
+                    lines: [6], res: res, parts: [...parts], i: i, count: count, pointerShow: true,
+                    desc: "因为连在了一起，属于同一个“群体”，所以记录群体的数值 <span style='color:#cdb'>count 计数器 +1 的结果变成了 " + count + "。</span>"
+                });
+                i++;
+                states.push({
+                    lines: [7], res: res, parts: [...parts], i: i, count: count, pointerShow: true,
+                    desc: "指针跟着转移目标，把 <span style='color:#cdb'>i 往后推一格（变成 " + i + "）</span>，为下一轮循环探测它后续的元素做准备。"
+                });
+            } else {
+                states.push({
+                    lines: [5], res: res, parts: [...parts], i: i, count: count, pointerShow: true,
+                    desc: "【内层 while 判断断档】我们把 i 的位置（值为 '"+res[i]+"'）和它下一个 i+1（值为 '"+res[i+1]+"'）进行比对。发现不一样！这说明连续的串到这里断了。不进循环了，打破内层 while 即将执行下文。"
+                });
+                break;
+            }
+        }
+        
+        parts.push(count + startChar);
+        states.push({
+            lines: [8], res: res, parts: [...parts], i: i, count: count, pointerShow: true,
+            desc: "【封装录入结果】刚刚内循环断了退出，最终清点得到该字符连串信息是：<span style='color:#cdb'>" + count + "</span> 个字符 <span style='color:#cdb'>'" + startChar + "'</span>。把它俩拼接起来变成字符串 '" + (count+startChar) + "' 塞入 <span style='color:#cdb'>parts</span> 集装箱列表中保存！"
+        });
+        
+        i++;
+        states.push({
+            lines: [9], res: res, parts: [...parts], i: i, count: count, pointerShow: true,
+            desc: "这一批相同字符算是被彻底结案了。指针 <span style='color:#cdb'>i 大踏步再前进一格变成了 " + i + "</span>，让光标去寻找下一批未处理的新字符。"
+        });
+    }
+    
+    states.push({
+        lines: [3], res: res, parts: [...parts], i: i, count: null, pointerShow: true,
+        desc: "【最外层 while 退出】回到最开头准备再次启动探测。一对比：<span style='color:#cdb'>i 已经是 " + i + "</span> 了，再也不小于长度 " + res.length +"。全部字符串都被处理完啦。while 大循环结束出局。"
+    });
+    
+    let finalRes = parts.join('');
+    states.push({
+        lines: [10], res: finalRes, parts: [...parts], i: i, count: null, pointerShow: false,
+        desc: "【收网大一统】所有的零碎结果刚才都存在了 parts 列表里。现在利用 Python 字符串非常快的 <span style='color:#cdb'>''.join()</span> 特性，一次性把列表拼装组合出来！新字符串下一项就是 <span style='color:#cdb'>'" + finalRes + "'</span>"
+    });
+    
+    render();
+}
+
+function render() {
+    let s = states[idx];
+    
+    // 代码高亮
+    document.querySelectorAll('.code-container .line').forEach(el => el.classList.remove('active'));
+    s.lines.forEach(l => document.getElementById('line-' + l).classList.add('active'));
+    
+    // 变量板
+    let isEnd = (idx === states.length -1);
+    document.getElementById('v-res').innerText = '"' + (isEnd ? states[idx-1].res : s.res) + '"';
+    document.getElementById('v-len').innerText = (isEnd ? states[idx-1].res.length : s.res.length);
+    document.getElementById('v-i').innerText = s.i;
+    document.getElementById('v-count').innerText = s.count !== null ? s.count : '- (重置准备)';
+    document.getElementById('v-parts').innerText = JSON.stringify(s.parts).replace(/,/g, ', ');
+    
+    // 解释板
+    document.getElementById('v-desc').innerHTML = s.desc;
+    
+    // 图像化
+    let diag = document.getElementById('diagram-container');
+    diag.innerHTML = '';
+    let currRes = isEnd ? states[idx-1].res : s.res;
+    
+    let wrapper = document.createElement('div');
+    wrapper.className = 'char-wrapper';
+    
+    for (let k = 0; k < currRes.length; k++) {
+        let box = document.createElement('div');
+        box.className = 'char-box';
+        box.innerText = currRes[k];
+        
+        let indexLab = document.createElement('div');
+        indexLab.className = 'index-lab';
+        indexLab.innerText = k;
+        box.appendChild(indexLab);
+        
+        // 当我们在清点这段时高亮这几个框子
+        if (s.count !== null && k <= s.i && k >= s.i - s.count + 1) {
+            box.classList.add('highlighted');
+        }
+        wrapper.appendChild(box);
+    }
+    
+    if (s.pointerShow) {
+        let ptr = document.createElement('div');
+        ptr.className = 'pointer';
+        ptr.innerText = 'i = ' + s.i;
+        ptr.style.left = (s.i * 60 + 25) + 'px'; // 50 width + 10 gap = 60 offset, 25 is center
+        wrapper.appendChild(ptr);
+    }
+    
+    diag.appendChild(wrapper);
+    
+    // 按钮
+    document.getElementById('btn-prev').disabled = (idx === 0);
+    document.getElementById('btn-next').disabled = (idx === states.length - 1);
+}
+
+function step(delta) {
+    let nextIdx = idx + delta;
+    if (nextIdx >= 0 && nextIdx < states.length) {
+        idx = nextIdx;
+        render();
+    }
+}
+
+// init
+window.onload = runSim;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 142 动态演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 5px;
+        }
+        p {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .container {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            background-color: #2d2d2d;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #fff;
+            transition: all 0.3s ease;
+        }
+        .pointer {
+            position: absolute;
+            width: 70px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: bold;
+            z-index: 20;
+            transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #slow {
+            background-color: #2196F3;
+            color: white;
+        }
+        #fast {
+            background-color: #f44336;
+            color: white;
+        }
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            width: 800px;
+        }
+        .status {
+            background-color: #333;
+            padding: 15px 25px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 18px;
+            line-height: 1.6;
+            min-height: 100px;
+            margin-bottom: 20px;
+            border-left: 5px solid #2196F3;
+            transition: all 0.3s;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+        .controls button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background-color: #4caf50;
+            color: white;
+            font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .controls button:hover:not(:disabled) {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        .controls button:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        code {
+            background: #444;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>LeetCode 142. 环形链表 II (快慢指针法)</h1>
+    <p>示例：节点 `head = [3, 2, 0, -4]`, 环入口位于索引 `pos = 1`（节点值为 2）</p>
+
+    <!-- 图形展示区 -->
+    <div class="container" id="canvas">
+        <!-- SVG 画箭头连线 -->
+        <svg>
+            <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="36" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#888" />
+                </marker>
+            </defs>
+            <line x1="150" y1="250" x2="350" y2="250" stroke="#888" stroke-width="4" marker-end="url(#arrow)" />
+            <line x1="350" y1="250" x2="550" y2="150" stroke="#888" stroke-width="4" marker-end="url(#arrow)" />
+            <line x1="550" y1="150" x2="550" y2="350" stroke="#888" stroke-width="4" marker-end="url(#arrow)" />
+            <line x1="550" y1="350" x2="350" y2="250" stroke="#888" stroke-width="4" marker-end="url(#arrow)" />
+        </svg>
+
+        <!-- 节点定义 -->
+        <div class="node" style="left: 120px; top: 220px;">3</div>
+        <div class="node" id="entryNode" style="left: 320px; top: 220px;">2</div>
+        <div class="node" style="left: 520px; top: 120px;">0</div>
+        <div class="node" style="left: 520px; top: 320px;">-4</div>
+
+        <!-- 动态指针 -->
+        <div class="pointer" id="fast">fast</div>
+        <div class="pointer" id="slow">slow</div>
+    </div>
+
+    <!-- 控制台与信息展示 -->
+    <div class="dashboard">
+        <div class="status" id="statusBox">
+            点击“下一步”开始动画演示！
+        </div>
+        <div class="controls">
+            <button id="prevBtn" onclick="prevStep()" disabled>上一步</button>
+            <button id="nextBtn" onclick="nextStep()">下一步</button>
+            <button id="resetBtn" onclick="reset()">重置过程</button>
+        </div>
+    </div>
+
+<script>
+    // 节点的中心坐标位置，用来定位指针
+    // 索引0: 3, 索引1: 2(环入口), 索引2: 0, 索引3: -4
+    const nodes = [
+        { x: 150, y: 250 }, // val: 3  (Node 0)
+        { x: 350, y: 250 }, // val: 2  (Node 1)
+        { x: 550, y: 150 }, // val: 0  (Node 2)
+        { x: 550, y: 350 }  // val: -4 (Node 3)
+    ];
+
+    // 完整的快慢指针步进过程
+    const steps = [
+        {
+            slow: 0, fast: 0,
+            desc: "<b>初始状态</b>：<br>设置两个指针 <code>slow</code> 和 <code>fast</code>，它们最初都指向头节点 (值为 3)。"
+        },
+        {
+            slow: 1, fast: 2,
+            desc: "<b>阶段一：第 1 步 (判断有环)</b>：<br><code>slow</code> 走一步到达节点 2。<br><code>fast</code> 走两步，先到 2 再到节点 0。"
+        },
+        {
+            slow: 2, fast: 1,
+            desc: "<b>阶段一：第 2 步 (判断有环)</b>：<br><code>slow</code> 走一步到达节点 0。<br><code>fast</code> 走两步，先到 -4，因为循环指向 2，所以最终落在节点 2。"
+        },
+        {
+            slow: 3, fast: 3,
+            desc: "<b>阶段一：第 3 步 (相遇点)</b>：<br><code>slow</code> 走一步到达节点 -4。<br><code>fast</code> 走两步，先到 0，再到节点 -4。<br><span style='color:#ff5252; font-weight:bold;'>发现相遇！说明链表存在环。跳出阶段一的循环。</span>"
+        },
+        {
+            slow: 3, fast: 0,
+            desc: "<b>阶段二：准备寻找入口</b>：<br>将 <code>fast</code> 指针重置为指向头节点 (值为 3)。<code>slow</code> 停留在相遇点(-4)。<br>接下来的规则变更：两者都每次 <b style='color:#ff9800'>只走一步</b>。"
+        },
+        {
+            slow: 1, fast: 1,
+            desc: "<b>阶段二：共同迈步 (找到入口)</b>：<br><code>slow</code> 走下一步到节点 2，<code>fast</code> 走下一步也到节点 2。<br><span style='color:#4caf50; font-weight:bold;'>两指针再次相遇！这里就是环的入口。</span>根据数学推导完美命中，返回该节点(2)结束。"
+        }
+    ];
+
+    let currentStep = 0;
+
+    const slowPtr = document.getElementById('slow');
+    const fastPtr = document.getElementById('fast');
+    const statusBox = document.getElementById('statusBox');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const entryNode = document.getElementById('entryNode');
+
+    function updatePointers() {
+        const step = steps[currentStep];
+        
+        // 设置慢指针位置：挂在节点下方
+        const slowTarget = nodes[step.slow];
+        slowPtr.style.left = (slowTarget.x - 35) + 'px';
+        slowPtr.style.top = (slowTarget.y + 45) + 'px'; 
+
+        // 设置快指针位置：挂在节点上方
+        const fastTarget = nodes[step.fast];
+        fastPtr.style.left = (fastTarget.x - 35) + 'px';
+        fastPtr.style.top = (fastTarget.y - 75) + 'px'; 
+
+        // 更新控制台描述
+        statusBox.innerHTML = step.desc;
+
+        // 按钮状态禁用处理
+        prevBtn.disabled = (currentStep === 0);
+        nextBtn.disabled = (currentStep === steps.length - 1);
+
+        // 第四步开始，fast进入步数为1的阶段
+        if (currentStep >= 4) {
+             fastPtr.style.backgroundColor = "#ff9800"; // 橙色代表速度变成 1
+             fastPtr.innerHTML = "fast(步频1)";
+        } else {
+             fastPtr.style.backgroundColor = "#f44336"; 
+             fastPtr.innerHTML = "fast";
+        }
+        
+        // 最终步骤高亮显示入口节点
+        if (currentStep === steps.length - 1) {
+            entryNode.style.boxShadow = "0 0 20px 10px #ffeb3b";
+            entryNode.style.border = "3px solid #ffeb3b";
+        } else {
+            entryNode.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+            entryNode.style.border = "2px solid #fff";
+        }
+    }
+
+    function nextStep() {
+        if (currentStep < steps.length - 1) {
+            currentStep++;
+            updatePointers();
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 0) {
+            currentStep--;
+            updatePointers();
+        }
+    }
+
+    function reset() {
+        currentStep = 0;
+        updatePointers();
+    }
+
+    // 初始化渲染
+    updatePointers();
+
+</script>
+</body>
+</html>

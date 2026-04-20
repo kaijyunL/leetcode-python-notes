@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z 字形变换 - 动态执行演示</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent-1: #38bdf8;
+            --accent-2: #818cf8;
+            --accent-3: #e879f9;
+            --highlight: rgba(56, 189, 248, 0.2);
+            --border-radius: 12px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-color));
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 24px;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 24px;
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* 可视化区域 */
+        .visualization-panel {
+            flex: 1.5;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 顶部输入字符串 */
+        .input-string-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .char-box {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .char-box.active {
+            background: var(--accent-1);
+            color: #0f172a;
+            transform: translateY(-4px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .char-box.processed {
+            opacity: 0.3;
+        }
+
+        /* 行可视化 */
+        .rows-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            position: relative;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 48px;
+            transition: all 0.3s;
+        }
+
+        .row.active-row {
+            border-color: var(--accent-2);
+            background: rgba(129, 140, 248, 0.1);
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.2);
+        }
+
+        .row-label {
+            font-family: 'Fira Code', monospace;
+            color: var(--text-dim);
+            width: 70px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .row-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        
+        .row-char {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+            color: white;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-weight: bold;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 状态指示器 */
+        .state-panel {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .state-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .state-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-3);
+            margin-top: 4px;
+        }
+
+        /* 代码区域 */
+        .code-panel {
+            flex: 1;
+            background: #1e1e1e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 24px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-play { background: var(--accent-1); color: #0f172a; }
+        .btn-play:hover { background: #7dd3fc; }
+        
+        .btn-step { background: var(--accent-2); color: white; }
+        .btn-step:hover { background: #a5b4fc; }
+        
+        .btn-reset { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-reset:hover { background: rgba(255,255,255,0.2); }
+
+        pre {
+            margin: 0;
+            color: #d4d4d4;
+        }
+
+        .code-line {
+            padding: 2px 8px;
+            border-radius: 4px;
+            border-left: 3px solid transparent;
+            margin: 2px 0;
+            transition: all 0.2s;
+        }
+
+        .code-line.active {
+            background: var(--highlight);
+            border-left-color: var(--accent-1);
+        }
+
+        /* 语法高亮简易版 */
+        .kw { color: #569cd6; } /* keyword */
+        .fn { color: #dcdcaa; } /* function */
+        .str { color: #ce9178; } /* string */
+        .num { color: #b5cea8; } /* number */
+        .op { color: #d4d4d4; } /* operator */
+        .var { color: #9cdcfe; } /* variable */
+
+        .final-result {
+            margin-top: 20px;
+            padding: 16px;
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.1), rgba(232, 121, 249, 0.1));
+            border: 1px solid var(--accent-2);
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 24px;
+            word-break: break-all;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Z 字形变换 - 核心逻辑动画执行仪 (解法二)</h1>
+        <p style="color: var(--text-dim); margin-top: 8px;">按行排序：通过一个游标 <code>i</code> 和方向 <code>flag</code> 决定当前字符落入哪一行</p>
+    </header>
+
+    <div class="container">
+        <!-- 面板 1：可视化区 -->
+        <div class="visualization-panel">
+            <div class="input-string-container" id="input-container">
+                <!-- 字符将通过 JS 生成 -->
+            </div>
+
+            <div class="rows-container" id="rows-container">
+                <!-- 行槽位将通过 JS 生成 -->
+            </div>
+
+            <div class="state-panel">
+                <div class="state-item">
+                    <span>当前字符 <code>ch</code></span>
+                    <span class="state-value" id="state-ch">''</span>
+                </div>
+                <div class="state-item">
+                    <span>行指针 <code>i</code></span>
+                    <span class="state-value" id="state-i">0</span>
+                </div>
+                <div class="state-item">
+                    <span>方向 <code>flag</code></span>
+                    <span class="state-value" id="state-flag">-1</span>
+                </div>
+            </div>
+
+            <div class="final-result" id="final-result">
+                <!-- 最终合并的字符串 -->
+            </div>
+        </div>
+
+        <!-- 面板 2：代码区 -->
+        <div class="code-panel">
+            <div class="controls">
+                <button class="btn-reset" onclick="reset()">🔄 重置</button>
+                <button class="btn-step" id="btn-step" onclick="step()">⏭️ 单步执行</button>
+                <button class="btn-play" id="btn-play" onclick="togglePlay()">▶️ 自动播放</button>
+            </div>
+            
+            <pre id="code-content">
+<div class="code-line" id="line-1"><span class="kw">class</span> <span class="fn">Solution</span>:</div>
+<div class="code-line" id="line-2">    <span class="kw">def</span> <span class="fn">convert</span>(<span class="kw">self</span>, <span class="var">s</span>: <span class="kw">str</span>, <span class="var">numRows</span>: <span class="kw">int</span>) -> <span class="kw">str</span>:</div>
+<div class="code-line" id="line-3">        <span class="kw">if</span> <span class="var">numRows</span> <span class="op">==</span> <span class="num">1</span> <span class="kw">or</span> <span class="var">numRows</span> <span class="op">>=</span> <span class="kw">len</span>(<span class="var">s</span>):</div>
+<div class="code-line" id="line-4">            <span class="kw">return</span> <span class="var">s</span></div>
+<div class="code-line" id="line-5">            </div>
+<div class="code-line" id="line-6">        <span class="var">rows</span> <span class="op">=</span> [<span class="str">''</span>] <span class="op">*</span> <span class="var">numRows</span></div>
+<div class="code-line" id="line-7">        <span class="var">i</span>, <span class="var">flag</span> <span class="op">=</span> <span class="num">0</span>, <span class="op">-</span><span class="num">1</span></div>
+<div class="code-line" id="line-8">        </div>
+<div class="code-line" id="line-9">        <span class="kw">for</span> <span class="var">ch</span> <span class="kw">in</span> <span class="var">s</span>:</div>
+<div class="code-line" id="line-10">            <span class="var">rows</span>[<span class="var">i</span>] <span class="op">+=</span> <span class="var">ch</span></div>
+<div class="code-line" id="line-11">            <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">or</span> <span class="var">i</span> <span class="op">==</span> <span class="var">numRows</span> <span class="op">-</span> <span class="num">1</span>:</div>
+<div class="code-line" id="line-12">                <span class="var">flag</span> <span class="op">=</span> <span class="op">-</span><span class="var">flag</span></div>
+<div class="code-line" id="line-13">            <span class="var">i</span> <span class="op">+=</span> <span class="var">flag</span></div>
+<div class="code-line" id="line-14">            </div>
+<div class="code-line" id="line-15">        <span class="kw">return</span> <span class="str">""</span>.<span class="fn">join</span>(<span class="var">rows</span>)</div>
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        // 初始化数据
+        const S = "PAYPALISHIRING";
+        const NUM_ROWS = 4;
+        
+        let state = {
+            charIndex: 0,
+            i: 0,
+            flag: -1,
+            rows: Array(NUM_ROWS).fill(""),
+            stepPhase: 0, // 0: for_loop, 1: add_char, 2: check_bounds, 3: flip_flag, 4: update_i
+            isFinished: false
+        };
+
+        let playInterval = null;
+
+        // 生成初始 UI 元素
+        function initUI() {
+            const inputContainer = document.getElementById('input-container');
+            inputContainer.innerHTML = '';
+            for (let idx = 0; idx < S.length; idx++) {
+                const div = document.createElement('div');
+                div.className = 'char-box';
+                div.id = `char-${idx}`;
+                div.textContent = S[idx];
+                inputContainer.appendChild(div);
+            }
+
+            const rowsContainer = document.getElementById('rows-container');
+            rowsContainer.innerHTML = '';
+            for (let r = 0; r < NUM_ROWS; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+                rowDiv.id = `row-${r}`;
+                
+                const label = document.createElement('div');
+                label.className = 'row-label';
+                label.innerHTML = `rows[${r}]`;
+                
+                const content = document.createElement('div');
+                content.className = 'row-content';
+                content.id = `row-content-${r}`;
+
+                rowDiv.appendChild(label);
+                rowDiv.appendChild(content);
+                rowsContainer.appendChild(rowDiv);
+            }
+            
+            updateStateUI();
+        }
+
+        // 高亮代码行
+        function highlightLine(lineNum) {
+            document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+            if (lineNum) {
+                document.getElementById(`line-${lineNum}`).classList.add('active');
+            }
+        }
+
+        // 高亮选中行UI
+        function highlightRow(rowIdx) {
+            document.querySelectorAll('.row').forEach(el => el.classList.remove('active-row'));
+            if (rowIdx !== null && rowIdx >= 0 && rowIdx < NUM_ROWS) {
+                document.getElementById(`row-${rowIdx}`).classList.add('active-row');
+            }
+        }
+
+        // 更新状态面板
+        function updateStateUI() {
+            document.getElementById('state-i').textContent = state.i;
+            document.getElementById('state-flag').textContent = state.flag;
+            if (state.charIndex < S.length) {
+                document.getElementById('state-ch').textContent = `'${S[state.charIndex]}'`;
+            } else {
+                document.getElementById('state-ch').textContent = 'None';
+            }
+        }
+
+        // 核心执行步骤
+        function step() {
+            if (state.isFinished) return;
+
+            if (state.charIndex === 0 && state.stepPhase === 0 && !document.getElementById('line-7').classList.contains('visited')) {
+                // 初始化阶段
+                highlightLine(7);
+                document.getElementById('line-7').classList.add('visited');
+                return;
+            }
+
+            // 当前如果遍历完毕，执行 join
+            if (state.charIndex >= S.length) {
+                highlightLine(15);
+                highlightRow(null);
+                const finalStr = state.rows.join('');
+                const resEl = document.getElementById('final-result');
+                resEl.textContent = `最终结果: "${finalStr}"`;
+                resEl.style.opacity = 1;
+                state.isFinished = true;
+                document.getElementById('btn-step').disabled = true;
+                pause();
+                return;
+            }
+
+            // 开始拆解每一次 for 循环的步骤
+            const ch = S[state.charIndex];
+
+            switch (state.stepPhase) {
+                case 0: // for ch in s:
+                    highlightLine(9);
+                    // UI反馈：高亮原字符串的字母
+                    document.querySelectorAll('.char-box').forEach(el => el.classList.remove('active'));
+                    document.getElementById(`char-${state.charIndex}`).classList.add('active');
+                    highlightRow(state.i);
+                    state.stepPhase = 1;
+                    break;
+                case 1: // rows[i] += ch
+                    highlightLine(10);
+                    // UI反馈：字符落入对应桶
+                    state.rows[state.i] += ch;
+                    const charElem = document.createElement('div');
+                    charElem.className = 'row-char';
+                    charElem.textContent = ch;
+                    document.getElementById(`row-content-${state.i}`).appendChild(charElem);
+                    document.getElementById(`char-${state.charIndex}`).classList.remove('active');
+                    document.getElementById(`char-${state.charIndex}`).classList.add('processed');
+                    state.stepPhase = 2;
+                    break;
+                case 2: // if i == 0 or i == numRows - 1:
+                    highlightLine(11);
+                    if (state.i === 0 || state.i === NUM_ROWS - 1) {
+                        state.stepPhase = 3;
+                    } else {
+                        state.stepPhase = 4;
+                    }
+                    break;
+                case 3: // flag = -flag
+                    highlightLine(12);
+                    state.flag = -state.flag;
+                    updateStateUI();
+                    state.stepPhase = 4;
+                    break;
+                case 4: // i += flag
+                    highlightLine(13);
+                    state.i += state.flag;
+                    updateStateUI();
+                    // 准备下个字符
+                    state.charIndex++;
+                    state.stepPhase = 0;
+                    break;
+            }
+        }
+
+        // 播放控制
+        function togglePlay() {
+            const btn = document.getElementById('btn-play');
+            if (playInterval) {
+                pause();
+            } else {
+                if (state.isFinished) reset();
+                btn.innerHTML = '⏸️ 暂停播放';
+                btn.style.background = '#f59e0b';
+                playInterval = setInterval(step, 600); // 调整速度
+            }
+        }
+
+        function pause() {
+            clearInterval(playInterval);
+            playInterval = null;
+            const btn = document.getElementById('btn-play');
+            btn.innerHTML = '▶️ 自动播放';
+            btn.style.background = 'var(--accent-1)';
+        }
+
+        function reset() {
+            pause();
+            state = {
+                charIndex: 0,
+                i: 0,
+                flag: -1,
+                rows: Array(NUM_ROWS).fill(""),
+                stepPhase: 0,
+                isFinished: false
+            };
+            document.getElementById('btn-step').disabled = false;
+            document.getElementById('final-result').style.opacity = 0;
+            document.getElementById('line-7').classList.remove('visited');
+            initUI();
+            highlightLine(null);
+            highlightRow(null);
+        }
+
+        // 初始化
+        initUI();
+        highlightLine(1); // 停留一下
+    </script>
+</body>
+</html>

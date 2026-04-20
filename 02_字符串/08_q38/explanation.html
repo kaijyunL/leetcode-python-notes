@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 38 - 外观数列可视化</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --accent: #10b981;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            text-align: center;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        input {
+            background: #0f172a;
+            border: 2px solid #334155;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            width: 80px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .sequence-display {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: fadeIn 0.5s ease-out backwards;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .step-num {
+            background: var(--primary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .digit-group {
+            display: flex;
+            background: #0f172a;
+            padding: 5px 15px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .explain-text {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .highlight-count {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .highlight-val {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .visual-pointer-box {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .pointer-stage {
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .char-unit {
+            width: 50px;
+            height: 60px;
+            background: #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .char-unit.active {
+            background: var(--primary);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+            transform: scale(1.1);
+        }
+
+        .pointer-arrow {
+            position: absolute;
+            bottom: 0;
+            font-size: 1.5rem;
+            transition: left 0.3s ease;
+            color: var(--secondary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>外观数列生成器</h1>
+    <p class="description">直观理解 LeetCode 第 38 题的“数一数”逻辑</p>
+
+    <div class="card">
+        <div class="controls">
+            <label for="n-input" style="align-self: center;">输入 N:</label>
+            <input type="number" id="n-input" value="5" min="1" max="20">
+            <button onclick="generateSequence()">开始生成</button>
+        </div>
+
+        <div id="sequence-list" class="sequence-display">
+            <!-- 结果动态生成 -->
+            <div class="step-row" style="animation-delay: 0.1s">
+                <div class="step-num">1</div>
+                <div class="digit-group"><span class="highlight-val">1</span></div>
+                <div class="explain-text">基础：第一项固定为 1</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card visual-pointer-box">
+        <h3>核心逻辑演示：双指针“数数”</h3>
+        <p class="explain-text">演示如何从上一项推导出下一项</p>
+        
+        <div class="pointer-stage" id="pointer-stage">
+            <!-- 演示框 -->
+            <div class="char-unit">1</div>
+            <div class="char-unit">2</div>
+            <div class="char-unit">1</div>
+            <div class="char-unit">1</div>
+            <div id="arrow" class="pointer-arrow" style="left: calc(50% - 100px)">↑</div>
+        </div>
+
+        <div id="current-task-text" style="margin-top: 20px; font-weight: 600; color: var(--text-main);">
+            点击上方“开始生成”查看动画
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="dot" style="background: var(--secondary)"></div> 描述数量 (Count)</div>
+            <div class="legend-item"><div class="dot" style="background: var(--accent)"></div> 数字本身 (Say)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function generateSequence() {
+        const n = parseInt(document.getElementById('n-input').value);
+        const listDiv = document.getElementById('sequence-list');
+        const stage = document.getElementById('pointer-stage');
+        const taskText = document.getElementById('current-task-text');
+        
+        // 重置
+        listDiv.innerHTML = '';
+        listDiv.innerHTML = `
+            <div class="step-row">
+                <div class="step-num">1</div>
+                <div class="digit-group"><span class="highlight-val">1</span></div>
+                <div class="explain-text">基础：第一项固定为 1</div>
+            </div>
+        `;
+
+        if (n === 1) return;
+
+        let currentStr = "1";
+
+        for (let i = 2; i <= n; i++) {
+            taskText.innerHTML = `正在生成第 ${i} 项... 基于上一项 "${currentStr}"`;
+            
+            // 准备可视化舞台
+            stage.innerHTML = '';
+            for(let char of currentStr) {
+                stage.innerHTML += `<div class="char-unit">${char}</div>`;
+            }
+            stage.innerHTML += `<div id="arrow" class="pointer-arrow">↑</div>`;
+            const arrow = document.getElementById('arrow');
+            const units = document.querySelectorAll('.char-unit');
+
+            // 算法模拟逻辑
+            let nextStr = "";
+            let p = 0;
+            let parts = [];
+
+            while (p < currentStr.length) {
+                let start = p;
+                let char = currentStr[p];
+                
+                // 视觉高亮
+                units[p].classList.add('active');
+                updateArrow(arrow, p, currentStr.length);
+                await sleep(500);
+
+                while (p + 1 < currentStr.length && currentStr[p] === currentStr[p+1]) {
+                    p++;
+                    units[p].classList.add('active');
+                    updateArrow(arrow, p, currentStr.length);
+                    await sleep(400);
+                }
+
+                let count = p - start + 1;
+                nextStr += count.toString() + char;
+                parts.push({c: count, v: char});
+
+                taskText.innerHTML = `发现了 <span class="highlight-count">${count}</span> 个 <span class="highlight-val">${char}</span>`;
+                await sleep(600);
+                
+                // 移除高亮
+                for(let k=start; k<=p; k++) units[k].classList.remove('active');
+                p++;
+            }
+
+            // 更新显示列表
+            let explainStr = parts.map(p => `<span class="highlight-count">${p.c}</span>个<span class="highlight-val">${p.v}</span>`).join(' + ');
+            let formattedStr = parts.map(p => `<span class="highlight-count">${p.c}</span><span class="highlight-val">${p.v}</span>`).join('');
+
+            listDiv.innerHTML += `
+                <div class="step-row" style="animation-delay: ${i*0.1}s">
+                    <div class="step-num">${i}</div>
+                    <div class="digit-group">${formattedStr}</div>
+                    <div class="explain-text">描述上一项：${explainStr}</div>
+                </div>
+            `;
+
+            currentStr = nextStr;
+            await sleep(800);
+        }
+        
+        taskText.innerHTML = "生成完毕！✨";
+    }
+
+    function updateArrow(arrow, index, total) {
+        // 计算居中的偏移
+        const unitWidth = 60; // 50px width + 10px gap
+        const offset = (index - (total-1)/2) * unitWidth;
+        arrow.style.left = `calc(50% + ${offset - 10}px)`;
+    }
+
+</script>
+
+</body>
+</html>

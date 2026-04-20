@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 142 进阶演示 (a > c 的情况)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p {
+            color: #ccc;
+            margin-bottom: 20px;
+            max-width: 800px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .container {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            background-color: #2d2d2d;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .node {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 2px solid #fff;
+            transition: all 0.3s ease;
+        }
+
+        .pointer {
+            position: absolute;
+            width: 70px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: bold;
+            z-index: 20;
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #slow {
+            background-color: #2196F3;
+            color: white;
+            /* 调整为在下方显示 */
+            margin-top: 10px;
+        }
+
+        #fast {
+            background-color: #f44336;
+            color: white;
+            /* 调整为在上方显示 */
+            margin-top: -40px;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            width: 800px;
+        }
+
+        .status {
+            background-color: #333;
+            padding: 15px 25px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+            line-height: 1.6;
+            min-height: 100px;
+            margin-bottom: 20px;
+            border-left: 5px solid #2196F3;
+            transition: all 0.3s;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .controls button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background-color: #4caf50;
+            color: white;
+            font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .controls button:hover:not(:disabled) {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .controls button:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        code {
+            background: #444;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #ffeb3b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>LeetCode 142. 长直道小环演示 (需要转圈)</h1>
+    <p>在这个特殊的例子中，我们设计了<b>直道长 $a=5$</b>，而<b>环圈长为 $3$</b>。<br>
+        这会完美展示数学公式 $a = c + (n-1)圈$ 中，留在相遇点的人到达入口后，为什么<b>还要继续多绕圈</b>等待另一个人！</p>
+
+    <!-- 图形展示区 -->
+    <div class="container" id="canvas">
+        <!-- SVG 画箭头连线 -->
+        <svg>
+            <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#888" />
+                </marker>
+            </defs>
+            <!-- 直道部分 (节点半径25，向内收敛一点作为箭头落点) -->
+            <line x1="50" y1="250" x2="105" y2="250" stroke="#888" stroke-width="3" marker-end="url(#arrow)" />
+            <line x1="130" y1="250" x2="185" y2="250" stroke="#888" stroke-width="3" marker-end="url(#arrow)" />
+            <line x1="210" y1="250" x2="265" y2="250" stroke="#888" stroke-width="3" marker-end="url(#arrow)" />
+            <line x1="290" y1="250" x2="345" y2="250" stroke="#888" stroke-width="3" marker-end="url(#arrow)" />
+            <line x1="370" y1="250" x2="425" y2="250" stroke="#888" stroke-width="3" marker-end="url(#arrow)" />
+
+            <!-- 环部分 -->
+            <!-- 5 到 6 -->
+            <line x1="450" y1="250" x2="628" y2="142" stroke="#888" stroke-width="3" marker-end="url(#arrow)" />
+            <!-- 6 到 7 -->
+            <line x1="650" y1="130" x2="650" y2="345" stroke="#888" stroke-width="3" marker-end="url(#arrow)" />
+            <!-- 7 到 5 -->
+            <line x1="650" y1="370" x2="472" y2="262" stroke="#888" stroke-width="3" marker-end="url(#arrow)" />
+        </svg>
+
+        <!-- 节点定义 (半径25，所以 left=x-25, top=y-25) -->
+        <!-- 直道节点 -->
+        <!-- node 0 -->
+        <div class="node" style="left: 25px; top: 225px;">0</div>
+        <!-- node 1 -->
+        <div class="node" style="left: 105px; top: 225px;">1</div>
+        <!-- node 2 -->
+        <div class="node" style="left: 185px; top: 225px;">2</div>
+        <!-- node 3 -->
+        <div class="node" style="left: 265px; top: 225px;">3</div>
+        <!-- node 4 -->
+        <div class="node" style="left: 345px; top: 225px;">4</div>
+
+        <!-- 环入口节点 -->
+        <!-- node 5 -->
+        <div class="node" id="entryNode" style="left: 425px; top: 225px; border-color: #ffeb3b;">5</div>
+
+        <!-- 环里的节点 -->
+        <!-- node 6 -->
+        <div class="node" style="left: 625px; top: 105px;">6</div>
+        <!-- node 7 -->
+        <div class="node" style="left: 625px; top: 345px;">7</div>
+
+        <!-- 动态指针 -->
+        <div class="pointer" id="fast">fast</div>
+        <div class="pointer" id="slow">slow</div>
+    </div>
+
+    <!-- 控制台与信息展示 -->
+    <div class="dashboard">
+        <div class="status" id="statusBox">
+            点击“下一步”开始动画演示！我们将见证“被迫转圈等待”的名场面！
+        </div>
+        <div class="controls">
+            <button id="prevBtn" onclick="prevStep()" disabled>上一步</button>
+            <button id="nextBtn" onclick="nextStep()">下一步</button>
+            <button id="resetBtn" onclick="reset()">重置过程</button>
+        </div>
+    </div>
+
+    <script>
+        // 节点的中心坐标位置，用来定位指针
+        const nodes = [
+            { x: 50, y: 250 },   // Node 0
+            { x: 130, y: 250 },  // Node 1
+            { x: 210, y: 250 },  // Node 2
+            { x: 290, y: 250 },  // Node 3
+            { x: 370, y: 250 },  // Node 4
+            { x: 450, y: 250 },  // Node 5 (环入口 Entrance)
+            { x: 650, y: 130 },  // Node 6 
+            { x: 650, y: 370 }   // Node 7
+        ];
+
+        // 此时距离配置：
+        // 直道距离 a = 5 步
+        // 环的周长 = 3 步 (5->6->7->5)
+
+        const steps = [
+            {
+                slow: 0, fast: 0,
+                desc: "<b>初始状态</b>：<br>直道长 a=5 (从0到5)。环长=3 (5->6->7->5)。<br><code>slow</code> 和 <code>fast</code> 在头节点准备出发。"
+            },
+            {
+                slow: 1, fast: 2,
+                desc: "<b>阶段一 (寻环)</b>：第 1 步"
+            },
+            {
+                slow: 2, fast: 4,
+                desc: "<b>阶段一 (寻环)</b>：第 2 步"
+            },
+            {
+                slow: 3, fast: 6,
+                desc: "<b>阶段一 (寻环)</b>：第 3 步<br><code>fast</code> 走两步(4->5->6)，率先进入环区！"
+            },
+            {
+                slow: 4, fast: 5,
+                desc: "<b>阶段一 (寻环)</b>：第 4 步<br><code>fast</code> 在环里绕半圈了(6->7->5)，回到了入口节点5。"
+            },
+            {
+                slow: 5, fast: 7,
+                desc: "<b>阶段一 (寻环)</b>：第 5 步<br><code>slow</code> 终于走完总计5步的直道，来到了入口节点5。<br><code>fast</code> 恰好走到了节点7。"
+            },
+            {
+                slow: 6, fast: 6,
+                desc: "<b>阶段一相遇！</b>：第 6 步<br><code>slow</code> 走到节点6，<code>fast</code> 也走到节点6。<br><span style='color:#ff5252; font-weight:bold;'>两人终于相遇，确定链表有环。相遇点为节点 6。</span><br>此时相遇点距离入口差几步？走 c=2 步（6->7->5）就能到入口。"
+            },
+            {
+                slow: 6, fast: 0,
+                desc: "<b>阶段二 (寻入口)</b>：规则改变！<br>将 <code>fast</code> 指针重置为头节点(节点0)。<code>slow</code> 停留在相遇点(节点6)。<br>接下来的规则变更：此时开始两人速度相等，都 <b style='color:#ff9800'>只走一步</b>。"
+            },
+            {
+                slow: 7, fast: 1,
+                desc: "<b>阶段二共同迈步</b>：两人各走1步"
+            },
+            {
+                slow: 5, fast: 2,
+                desc: "<b>阶段二名场面 🌟</b>：<br><code>slow</code> 走了 c=2 步（6->7->5），<b>在此阶段第一次到达了入口（节点5）</b>！<br>但是！！！<code>fast</code> 还在遥远的节点2，直道没走完。<br><span style='color:#ff9800;'>还没相遇，所以 <code>slow</code> 必须继续走，被迫在环里多绕圈！</span>"
+            },
+            {
+                slow: 6, fast: 3,
+                desc: "<b>阶段二共同迈步</b>：<br><code>slow</code> 被迫在环里开启多绕圈模式，来到了节点6。<code>fast</code> 走到节点3。"
+            },
+            {
+                slow: 7, fast: 4,
+                desc: "<b>阶段二共同迈步</b>：<br><code>slow</code> 走到节点7，<code>fast</code> 走到节点4，快见面了！"
+            },
+            {
+                slow: 5, fast: 5,
+                desc: "<b>大结局 (找到入口) 🌟</b>：<br><code>slow</code> 刚好再次转完一整圈，回到了入口(节点5)。<br>就在此时，<code>fast</code> 也恰好走完了漫长的直道(到达节点5)。<br><span style='color:#4caf50; font-weight:bold;'>两者完美碰头！相遇处(节点5)就是环的入口。</span><br>这就解释了：入口距离 $a(5步) = 相遇点到入口距离 c(2步) + 1圈(3步)$！"
+            }
+        ];
+
+        let currentStep = 0;
+
+        const slowPtr = document.getElementById('slow');
+        const fastPtr = document.getElementById('fast');
+        const statusBox = document.getElementById('statusBox');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const entryNode = document.getElementById('entryNode');
+
+        function updatePointers() {
+            const step = steps[currentStep];
+
+            // 设置慢指针位置
+            const slowTarget = nodes[step.slow];
+            slowPtr.style.left = (slowTarget.x - 35) + 'px';
+            slowPtr.style.top = (slowTarget.y + 25) + 'px';
+
+            // 设置快指针位置
+            const fastTarget = nodes[step.fast];
+            fastPtr.style.left = (fastTarget.x - 35) + 'px';
+            fastPtr.style.top = (fastTarget.y - 55) + 'px';
+
+            // 更新控制台描述
+            statusBox.innerHTML = step.desc;
+
+            // 按钮状态禁用处理
+            prevBtn.disabled = (currentStep === 0);
+            nextBtn.disabled = (currentStep === steps.length - 1);
+
+            // 阶段二（第7步开始），fast速度变为1，变色提示
+            if (currentStep >= 7) {
+                fastPtr.style.backgroundColor = "#ff9800";
+                fastPtr.innerHTML = "fast(步频1)";
+            } else {
+                fastPtr.style.backgroundColor = "#f44336";
+                fastPtr.innerHTML = "fast(步频2)";
+            }
+
+            // 如果在入口且不是步骤0，给入口闪烁提示
+            if ((step.slow === 5 && step.fast === 2) || (currentStep === steps.length - 1)) {
+                entryNode.style.boxShadow = "0 0 20px 10px #ffeb3b";
+                entryNode.style.transform = "scale(1.2)";
+            } else {
+                entryNode.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+                entryNode.style.transform = "scale(1)";
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updatePointers();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                updatePointers();
+            }
+        }
+
+        function reset() {
+            currentStep = 0;
+            updatePointers();
+        }
+
+        // 初始化渲染
+        updatePointers();
+
+    </script>
+</body>
+
+</html>

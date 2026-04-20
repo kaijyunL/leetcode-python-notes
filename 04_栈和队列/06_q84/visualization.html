@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 84 - 单调栈可视化解析</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            --accent: #f43f5e;
+            --warning: #fbbf24;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --bar-default: #475569;
+            --bar-active: #38bdf8;
+            --bar-popping: #f43f5e;
+            --bar-boundary: #fbbf24;
+            --bar-sentinel: #334155;
+            --rect-fill: rgba(56, 189, 248, 0.26);
+            --border-color: rgba(148, 163, 184, 0.18);
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.28), 0 10px 10px -5px rgba(0, 0, 0, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(56, 189, 248, 0.18), transparent 28%),
+                linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 0.8rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .container {
+            width: max(100%, 1120px);
+            height: calc(100vh - 1.6rem);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 0.2rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: clamp(1.55rem, 2.2vw, 2.2rem);
+            line-height: 1.15;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.18rem;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.92rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) 360px;
+            gap: 0.75rem;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.96));
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .left-panel,
+        .right-panel {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .visualizer-card {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            padding: 1rem 1rem 0.85rem;
+            overflow: hidden;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem 0.8rem;
+            margin-bottom: 0.65rem;
+            color: var(--text-dim);
+            font-size: 0.82rem;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .legend-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 999px;
+            display: inline-block;
+        }
+
+        .histogram-container {
+            width: 100%;
+            height: clamp(260px, 46vh, 340px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 88px 6px 8px;
+            border-bottom: 2px solid rgba(148, 163, 184, 0.35);
+            position: relative;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            max-width: 66px;
+            min-width: 34px;
+        }
+
+        .bar {
+            width: 100%;
+            min-height: 18px;
+            border-radius: 8px 8px 0 0;
+            background: linear-gradient(180deg, rgba(100, 116, 139, 0.95), rgba(71, 85, 105, 0.95));
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 5px;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .bar.sentinel {
+            background: linear-gradient(180deg, rgba(71, 85, 105, 0.7), rgba(51, 65, 85, 0.7));
+            opacity: 0.72;
+        }
+
+        .bar-value {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+        }
+
+        .bar-index {
+            margin-top: 0.42rem;
+            font-size: 0.74rem;
+            color: var(--text-dim);
+        }
+
+        .bar-role {
+            min-height: 1rem;
+            margin-top: 0.14rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        .bar.active {
+            background: linear-gradient(180deg, #38bdf8, #0284c7);
+            transform: scaleX(1.06);
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+        }
+
+        .bar.popping {
+            background: linear-gradient(180deg, #fb7185, #e11d48);
+            transform: translateY(-6px);
+            box-shadow: 0 0 18px rgba(244, 63, 94, 0.35);
+        }
+
+        .bar.boundary {
+            background: linear-gradient(180deg, #fcd34d, #f59e0b);
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.28);
+        }
+
+        #rect-overlay {
+            position: absolute;
+            display: none;
+            pointer-events: none;
+            z-index: 6;
+            background-color: var(--rect-fill);
+            border: 2px dashed var(--primary);
+            border-radius: 10px 10px 0 0;
+            transition: all 0.25s ease;
+        }
+
+        .stack-container {
+            position: absolute;
+            top: 0.95rem;
+            right: 0.9rem;
+            width: 78px;
+            padding: 0.65rem;
+            border-radius: 0.85rem;
+            background: rgba(15, 23, 42, 0.84);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(6px);
+        }
+
+        .stack-label {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-bottom: 0.45rem;
+        }
+
+        .stack-items {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 0.35rem;
+            min-height: 32px;
+        }
+
+        .stack-item {
+            width: 100%;
+            min-height: 28px;
+            border-radius: 0.45rem;
+            background: linear-gradient(180deg, #818cf8, #6366f1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            animation: slideIn 0.22s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(14px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.6rem;
+            flex-shrink: 0;
+        }
+
+        button {
+            appearance: none;
+            border: 1px solid var(--border-color);
+            background: rgba(30, 41, 59, 0.96);
+            color: var(--text-main);
+            border-radius: 0.75rem;
+            padding: 0.72rem 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #082f49;
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .play-btn.playing {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .info-card,
+        .code-preview {
+            padding: 0.95rem 1rem;
+        }
+
+        .section-title {
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            margin-bottom: 0.45rem;
+            letter-spacing: 0.02em;
+        }
+
+        #step-title {
+            font-size: 1.05rem;
+            color: var(--primary);
+            margin-bottom: 0.42rem;
+        }
+
+        #step-desc {
+            font-size: 0.92rem;
+            color: var(--text-main);
+            min-height: 5.6rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.55rem;
+            margin-top: 0.8rem;
+        }
+
+        .stat-box {
+            padding: 0.72rem 0.6rem;
+            border-radius: 0.8rem;
+            background: rgba(2, 6, 23, 0.58);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        .stat-label {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.74rem;
+            margin-bottom: 0.18rem;
+        }
+
+        .stat-value {
+            display: block;
+            color: var(--primary);
+            font-size: 1.08rem;
+            font-weight: 800;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        .stat-box.max .stat-value {
+            color: var(--accent);
+        }
+
+        .code-preview {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            background: linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.98));
+        }
+
+        .code-list {
+            list-style: none;
+            display: grid;
+            gap: 0.18rem;
+            font-family: 'Fira Code', 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .code-line {
+            display: grid;
+            grid-template-columns: 1.9rem 1fr;
+            gap: 0.75rem;
+            padding: 0.2rem 0.42rem;
+            border-radius: 0.55rem;
+            white-space: pre-wrap;
+        }
+
+        .line-number {
+            color: #64748b;
+            text-align: right;
+            user-select: none;
+        }
+
+        .code-line.highlight {
+            background: rgba(56, 189, 248, 0.14);
+            outline: 1px solid rgba(56, 189, 248, 0.24);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>LeetCode 84 单调栈可视化</h1>
+        <p class="subtitle">固定左右布局：左边看图和动画，右边看讲解和代码，不再上下堆叠</p>
+    </header>
+
+    <div class="main-content">
+        <section class="left-panel">
+            <div class="panel visualizer-card">
+                <div class="legend">
+                    <span class="legend-item"><span class="legend-dot" style="background: var(--bar-active);"></span>当前柱子</span>
+                    <span class="legend-item"><span class="legend-dot" style="background: var(--bar-popping);"></span>出栈柱子</span>
+                    <span class="legend-item"><span class="legend-dot" style="background: var(--bar-boundary);"></span>左边界</span>
+                    <span class="legend-item"><span class="legend-dot" style="background: var(--bar-sentinel);"></span>哨兵</span>
+                </div>
+
+                <div class="stack-container" id="stack-container">
+                    <div class="stack-label">单调栈</div>
+                    <div class="stack-items" id="stack-items"></div>
+                </div>
+
+                <div class="histogram-container" id="histogram">
+                    <div id="rect-overlay"></div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="prev-btn">上一步</button>
+                <button class="play-btn" id="play-btn">自动播放</button>
+                <button id="next-btn">下一步</button>
+                <button id="reset-btn">重置</button>
+            </div>
+        </section>
+
+        <aside class="right-panel">
+            <div class="panel info-card">
+                <div class="section-title">当前讲解</div>
+                <h3 id="step-title">准备开始</h3>
+                <p id="step-desc">点击“下一步”或“自动播放”，观察左边的柱子变化、单调栈状态和阴影矩形如何与右边讲解逐步对应。</p>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">当前索引 i</span>
+                        <span class="stat-value" id="stat-i">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">当前面积</span>
+                        <span class="stat-value" id="stat-current">0</span>
+                    </div>
+                    <div class="stat-box max">
+                        <span class="stat-label">最大面积</span>
+                        <span class="stat-value" id="stat-max">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel code-preview">
+                <div class="section-title">对应代码</div>
+                <ol class="code-list">
+                    <li class="code-line" id="line-1"><span class="line-number">1</span><span>heights = [0] + heights + [0]</span></li>
+                    <li class="code-line" id="line-2"><span class="line-number">2</span><span>stack = []</span></li>
+                    <li class="code-line" id="line-3"><span class="line-number">3</span><span>for i in range(len(heights)):</span></li>
+                    <li class="code-line" id="line-4"><span class="line-number">4</span><span>    while stack and heights[i] &lt; heights[stack[-1]]:</span></li>
+                    <li class="code-line" id="line-5"><span class="line-number">5</span><span>        h = heights[stack.pop()]</span></li>
+                    <li class="code-line" id="line-6"><span class="line-number">6</span><span>        w = i - stack[-1] - 1</span></li>
+                    <li class="code-line" id="line-7"><span class="line-number">7</span><span>        max_area = max(max_area, w * h)</span></li>
+                    <li class="code-line" id="line-8"><span class="line-number">8</span><span>    stack.append(i)</span></li>
+                </ol>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+    const originalHeights = [2, 1, 5, 6, 2, 3];
+    const heights = [0, ...originalHeights, 0];
+    const maxHeight = Math.max(...heights);
+    const chartHeight = 320;
+
+    const histogram = document.getElementById('histogram');
+    const stackItems = document.getElementById('stack-items');
+    const stepTitle = document.getElementById('step-title');
+    const stepDesc = document.getElementById('step-desc');
+    const statI = document.getElementById('stat-i');
+    const statMax = document.getElementById('stat-max');
+    const statCurrent = document.getElementById('stat-current');
+    const playButton = document.getElementById('play-btn');
+    const prevButton = document.getElementById('prev-btn');
+    const nextButton = document.getElementById('next-btn');
+    const resetButton = document.getElementById('reset-btn');
+
+    let history = [];
+    let currentStep = 0;
+    let isPlaying = false;
+    let timer = null;
+
+    function getBarHeight(value) {
+        return Math.round((Math.max(value, 0.6) / maxHeight) * chartHeight);
+    }
+
+    function createBars() {
+        histogram.replaceChildren();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'rect-overlay';
+        histogram.appendChild(overlay);
+
+        heights.forEach((value, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'bar-wrapper';
+
+            const roleText = index === 0 || index === heights.length - 1 ? '哨兵' : '';
+            wrapper.innerHTML = `
+                <div class="bar ${roleText ? 'sentinel' : ''}" id="bar-${index}" style="height: ${getBarHeight(value)}px;">
+                    <span class="bar-value">${value}</span>
+                </div>
+                <div class="bar-index">索引 ${index}</div>
+                <div class="bar-role" id="role-${index}">${roleText}</div>
+            `;
+            histogram.appendChild(wrapper);
+        });
+    }
+
+    function buildStackHtml(stack) {
+        if (stack.length === 0) {
+            return '<div class="stack-item" style="background: rgba(71, 85, 105, 0.65);">空</div>';
+        }
+        return stack.map((idx) => `<div class="stack-item">${idx}</div>`).join('');
+    }
+
+    function precomputeSteps() {
+        const steps = [];
+        const stack = [];
+        let maxArea = 0;
+
+        steps.push({
+            type: 'init',
+            i: null,
+            stack: [],
+            maxArea: 0,
+            currentArea: 0,
+            line: 1,
+            title: '准备阶段',
+            desc: '先在数组头尾补 0，这样左右边界统一由“更矮的柱子”处理，后面算宽度更顺。'
+        });
+
+        for (let i = 0; i < heights.length; i++) {
+            steps.push({
+                type: 'visit',
+                i,
+                stack: [...stack],
+                maxArea,
+                currentArea: 0,
+                line: 3,
+                title: `遍历索引 ${i}`,
+                desc: `当前来到索引 ${i}，高度是 ${heights[i]}。先看它会不会让栈顶柱子出栈。`
+            });
+
+            while (stack.length > 0 && heights[i] < heights[stack[stack.length - 1]]) {
+                const popIdx = stack.pop();
+                const height = heights[popIdx];
+                const leftIdx = stack[stack.length - 1];
+                const width = i - leftIdx - 1;
+                const currentArea = height * width;
+                const nextMax = Math.max(maxArea, currentArea);
+
+                steps.push({
+                    type: 'pop',
+                    i,
+                    popIdx,
+                    leftIdx,
+                    rightIdx: i,
+                    stack: [...stack],
+                    height,
+                    width,
+                    currentArea,
+                    maxArea: nextMax,
+                    line: 4,
+                    title: '出栈并结算面积',
+                    desc: `当前高度 ${heights[i]} 小于栈顶高度 ${height}，所以索引 ${popIdx} 出栈。它决定矩形的高；左边界是 ${leftIdx}，右边界是 ${i}，宽度 = ${i} - ${leftIdx} - 1 = ${width}，面积 = ${height} × ${width} = ${currentArea}。`
+                });
+
+                maxArea = nextMax;
+            }
+
+            stack.push(i);
+            steps.push({
+                type: 'push',
+                i,
+                stack: [...stack],
+                maxArea,
+                currentArea: 0,
+                line: 8,
+                title: '入栈',
+                desc: `当前柱子已经满足递增关系，把索引 ${i} 入栈。注意：栈里存的是索引，不是高度。`
+            });
+        }
+
+        steps.push({
+            type: 'end',
+            i: heights.length - 1,
+            stack: [...stack],
+            maxArea,
+            currentArea: 0,
+            line: 0,
+            title: '遍历完成',
+            desc: `所有柱子都处理完成，最终最大矩形面积为 ${maxArea}。`
+        });
+
+        return steps;
+    }
+
+    function resetVisualState() {
+        document.querySelectorAll('.bar').forEach((bar) => {
+            bar.classList.remove('active', 'popping', 'boundary');
+        });
+        document.querySelectorAll('.bar-role').forEach((label, index) => {
+            label.textContent = index === 0 || index === heights.length - 1 ? '哨兵' : '';
+        });
+        document.querySelectorAll('.code-line').forEach((line) => {
+            line.classList.remove('highlight');
+        });
+
+        const overlay = document.getElementById('rect-overlay');
+        overlay.style.display = 'none';
+    }
+
+    function showRectangle(step) {
+        const overlay = document.getElementById('rect-overlay');
+        const leftBar = document.getElementById(`bar-${step.leftIdx}`);
+        const rightBar = document.getElementById(`bar-${step.rightIdx}`);
+
+        if (!leftBar || !rightBar) {
+            return;
+        }
+
+        const histogramRect = histogram.getBoundingClientRect();
+        const leftRect = leftBar.getBoundingClientRect();
+        const rightRect = rightBar.getBoundingClientRect();
+        const left = leftRect.right - histogramRect.left + 4;
+        const right = rightRect.left - histogramRect.left - 4;
+
+        overlay.style.display = 'block';
+        overlay.style.left = `${left}px`;
+        overlay.style.width = `${Math.max(right - left, 10)}px`;
+        overlay.style.height = `${getBarHeight(step.height)}px`;
+        overlay.style.bottom = '6px';
+    }
+
+    function renderStep(stepIndex) {
+        if (stepIndex < 0 || stepIndex >= history.length) {
+            return;
+        }
+
+        const step = history[stepIndex];
+        resetVisualState();
+
+        stepTitle.textContent = step.title;
+        stepDesc.textContent = step.desc;
+        statI.textContent = step.i ?? '-';
+        statCurrent.textContent = String(step.currentArea ?? 0);
+        statMax.textContent = String(step.maxArea);
+        stackItems.innerHTML = buildStackHtml(step.stack);
+
+        if (step.line) {
+            const line = document.getElementById(`line-${step.line}`);
+            if (line) {
+                line.classList.add('highlight');
+                line.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            }
+        }
+
+        if (step.type === 'visit' || step.type === 'push') {
+            const currentBar = document.getElementById(`bar-${step.i}`);
+            const role = document.getElementById(`role-${step.i}`);
+            if (currentBar) currentBar.classList.add('active');
+            if (role && step.i !== null) role.textContent = '当前';
+        }
+
+        if (step.type === 'pop') {
+            const currentBar = document.getElementById(`bar-${step.i}`);
+            const popBar = document.getElementById(`bar-${step.popIdx}`);
+            const leftBar = document.getElementById(`bar-${step.leftIdx}`);
+            const roleCurrent = document.getElementById(`role-${step.i}`);
+            const rolePop = document.getElementById(`role-${step.popIdx}`);
+            const roleLeft = document.getElementById(`role-${step.leftIdx}`);
+
+            if (currentBar) currentBar.classList.add('active');
+            if (popBar) popBar.classList.add('popping');
+            if (leftBar) leftBar.classList.add('boundary');
+            if (roleCurrent) roleCurrent.textContent = '右边界';
+            if (rolePop) rolePop.textContent = '高';
+            if (roleLeft) roleLeft.textContent = '左边界';
+
+            showRectangle(step);
+        }
+
+        prevButton.disabled = stepIndex === 0;
+        nextButton.disabled = stepIndex === history.length - 1;
+    }
+
+    function stopAutoPlay() {
+        isPlaying = false;
+        clearInterval(timer);
+        playButton.textContent = '自动播放';
+        playButton.classList.remove('playing');
+    }
+
+    function goToNextStep() {
+        if (currentStep < history.length - 1) {
+            currentStep += 1;
+            renderStep(currentStep);
+        } else {
+            stopAutoPlay();
+        }
+    }
+
+    nextButton.addEventListener('click', goToNextStep);
+
+    prevButton.addEventListener('click', () => {
+        if (currentStep > 0) {
+            currentStep -= 1;
+            renderStep(currentStep);
+        }
+    });
+
+    resetButton.addEventListener('click', () => {
+        stopAutoPlay();
+        currentStep = 0;
+        renderStep(currentStep);
+    });
+
+    playButton.addEventListener('click', () => {
+        if (isPlaying) {
+            stopAutoPlay();
+            return;
+        }
+
+        isPlaying = true;
+        playButton.textContent = '暂停播放';
+        playButton.classList.add('playing');
+        timer = setInterval(goToNextStep, 1100);
+    });
+
+    window.addEventListener('resize', () => {
+        const step = history[currentStep];
+        if (step && step.type === 'pop') {
+            showRectangle(step);
+        }
+    });
+
+    createBars();
+    history = precomputeSteps();
+    renderStep(0);
+</script>
+</body>
+</html>

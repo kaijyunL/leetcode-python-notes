@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 739. 每日温度 - 算法可视化讲解</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent: #38bdf8;
+            --stack-color: #f472b6;
+            --highlight: #22c55e;
+            --code-bg: #000000;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        p.desc {
+            color: var(--text-dim);
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 代码区域 */
+        .code-section {
+            background: var(--code-bg);
+            padding: 1rem 0;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-line {
+            display: block;
+            padding: 0 1rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: pre;
+            color: #d1d5db;
+        }
+
+        .code-line.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-left-color: var(--accent);
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* 可视化区域 */
+        .viz-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .box-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .label {
+            font-weight: bold;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .array-display {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cell {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.4rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            font-weight: 500;
+        }
+
+        .cell.active {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.3);
+            color: var(--accent);
+        }
+
+        .cell.solved {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: var(--highlight);
+            color: var(--highlight);
+        }
+
+        .idx {
+            position: absolute;
+            top: -22px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        /* 栈的样式 */
+        .stack-wrapper {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .stack-display {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            justify-content: flex-start;
+            height: 200px;
+            width: 100px;
+            border-bottom: 4px solid var(--text-dim);
+            border-left: 2px solid #334155;
+            border-right: 2px solid #334155;
+            padding-bottom: 5px;
+            gap: 5px;
+            overflow-y: auto;
+        }
+
+        .stack-item {
+            width: 80px;
+            height: 32px;
+            background: var(--stack-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            animation: pushIn 0.3s ease-out;
+            flex-shrink: 0;
+        }
+
+        @keyframes pushIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* 控制按钮 */
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        button {
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: var(--accent);
+            color: var(--bg-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        button:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            color: #94a3b8;
+        }
+
+        .status-box {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 0.3rem;
+            margin-top: 1rem;
+        }
+
+        .status-text {
+            color: var(--accent);
+            font-weight: 500;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        .status-progress {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>LeetCode 739. 可视化解析</h1>
+    <p class="desc">单调栈：栈内存放尚未找到更高温的日期下标。当遇到比栈顶高的温度时，依次弹出并计算天数差。</p>
+
+    <div class="container">
+        <!-- 代码展示 -->
+        <div class="code-section" id="code-container">
+<div class="code-line" id="line-1">def dailyTemperatures(temperatures):</div>
+<div class="code-line" id="line-2">    n = len(temperatures)</div>
+<div class="code-line" id="line-3">    ans = [0] * n</div>
+<div class="code-line" id="line-4">    stack = []</div>
+<div class="code-line" id="line-5">    for i in range(n):</div>
+<div class="code-line" id="line-6">        while stack and temperatures[i] > temperatures[stack[-1]]:</div>
+<div class="code-line" id="line-7">            prev_index = stack.pop()</div>
+<div class="code-line" id="line-8">            ans[prev_index] = i - prev_index</div>
+<div class="code-line" id="line-9">        stack.append(i)</div>
+<div class="code-line" id="line-10">    return ans</div>
+        </div>
+
+        <!-- 动画展示 -->
+        <div class="viz-section">
+            <div class="box-container">
+                <div class="label">输入温度 (Temperatures)</div>
+                <div class="array-display" id="temp-array"></div>
+            </div>
+
+            <div class="stack-wrapper">
+                <div class="box-container">
+                    <div class="label">单调栈 (Stack)</div>
+                    <div class="stack-display" id="stack-view"></div>
+                </div>
+
+                <div class="box-container">
+                    <div class="label">结果数组 (Answer)</div>
+                    <div class="array-display" id="ans-array"></div>
+                </div>
+            </div>
+            
+            <div class="status-box">
+                <div class="status-text" id="status">点击“下一步”开始演示...</div>
+                <div class="status-progress" id="progress">进度: 0 / 0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn" disabled>上一步</button>
+        <button id="nextBtn">下一步</button>
+        <button id="resetBtn">重置</button>
+    </div>
+
+    <script>
+        // 🌟 核心改进：你现在可以随意修改这里的数组，动画步骤会自动生成！
+        const temps = [73, 74, 75, 71, 69, 72, 76, 73];
+        
+        let currentStep = 0;
+        let steps = [];
+
+        // 动态生成动画步骤 (引擎)
+        function generateSteps(temperatures) {
+            const n = temperatures.length;
+            const generatedSteps = [];
+            let ans = new Array(n).fill(0);
+            let stack = [];
+
+            function addStep(line, i_val, status_msg) {
+                generatedSteps.push({
+                    line: line,
+                    stack: [...stack],
+                    ans: [...ans],
+                    i: i_val,
+                    status: status_msg
+                });
+            }
+
+            addStep(1, -1, "传入温度数组");
+            addStep(2, -1, `获取数组长度 n = ${n}`);
+            addStep(3, -1, `初始化结果数组 ans 为 ${n} 个 0`);
+            addStep(4, -1, "初始化单调栈 stack (用于存放下标)");
+
+            for (let i = 0; i < n; i++) {
+                addStep(5, i, `外层循环：遍历第 ${i} 天，温度为 ${temperatures[i]}°`);
+                
+                addStep(6, i, stack.length > 0 
+                    ? `判断：当前 ${temperatures[i]}° 是否大于 栈顶第 ${stack[stack.length-1]} 天的 ${temperatures[stack[stack.length-1]]}°？` 
+                    : "栈为空，直接跳过 while 循环");
+
+                while (stack.length > 0 && temperatures[i] > temperatures[stack[stack.length - 1]]) {
+                    const topIdx = stack[stack.length - 1];
+                    addStep(6, i, `条件成立！当前 ${temperatures[i]}° > 栈顶 ${temperatures[topIdx]}°`);
+                    
+                    let prev_index = stack.pop();
+                    addStep(7, i, `将栈顶下标 ${prev_index} 弹出栈`);
+                    
+                    ans[prev_index] = i - prev_index;
+                    addStep(8, i, `计算等待天数: ${i} - ${prev_index} = ${ans[prev_index]} 天，填入 ans[${prev_index}]`);
+                    
+                    addStep(6, i, stack.length > 0 
+                        ? `继续判断：当前 ${temperatures[i]}° 是否还大于 新栈顶的 ${temperatures[stack[stack.length-1]]}°？` 
+                        : "栈已空，退出 while 循环");
+                }
+                
+                if (stack.length > 0 && temperatures[i] <= temperatures[stack[stack.length - 1]]) {
+                    addStep(6, i, `条件不成立：${temperatures[i]}° <= 栈顶 ${temperatures[stack[stack.length-1]]}°，退出循环`);
+                }
+
+                stack.push(i);
+                addStep(9, i, `将当前下标 ${i} (温度 ${temperatures[i]}°) 入栈等待`);
+            }
+            
+            addStep(10, -1, "遍历结束，返回最终答案数组！");
+            return generatedSteps;
+        }
+
+        function init() {
+            // 1. 动态生成所有步骤
+            steps = generateSteps(temps);
+            
+            // 2. 初始化 DOM
+            const tempDiv = document.getElementById('temp-array');
+            const ansDiv = document.getElementById('ans-array');
+            
+            // 避免数组过长导致布局问题，按需换行
+            tempDiv.innerHTML = temps.map((t, idx) => `
+                <div class="cell" id="temp-${idx}">
+                    <span class="idx">${idx}</span>${t}
+                </div>`).join('');
+                
+            ansDiv.innerHTML = temps.map((_, idx) => `
+                <div class="cell" id="ans-${idx}">
+                    <span class="idx">${idx}</span>0
+                </div>`).join('');
+                
+            render();
+        }
+
+        function render() {
+            const step = steps[currentStep];
+            
+            // 高亮代码行
+            document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+            if(document.getElementById(`line-${step.line}`)) {
+                document.getElementById(`line-${step.line}`).classList.add('active');
+            }
+
+            // 更新状态文本
+            document.getElementById('status').innerText = step.status;
+            document.getElementById('progress').innerText = `步骤: ${currentStep + 1} / ${steps.length}`;
+
+            // 高亮输入数组
+            document.querySelectorAll('#temp-array .cell').forEach((el, idx) => {
+                el.classList.remove('active');
+                if (idx === step.i) el.classList.add('active');
+            });
+
+            // 更新结果数组
+            step.ans.forEach((val, idx) => {
+                const cell = document.getElementById(`ans-${idx}`);
+                cell.lastChild.textContent = val;
+                if (val > 0) cell.classList.add('solved');
+                else cell.classList.remove('solved');
+            });
+
+            // 更新栈视图
+            const stackView = document.getElementById('stack-view');
+            stackView.innerHTML = step.stack.map(idx => `
+                <div class="stack-item">idx:${idx} (${temps[idx]}°)</div>
+            `).join('');
+
+            // 按钮状态
+            document.getElementById('prevBtn').disabled = currentStep === 0;
+            document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
+        }
+
+        // 绑定事件
+        document.getElementById('nextBtn').onclick = () => { 
+            if (currentStep < steps.length - 1) { 
+                currentStep++; 
+                render(); 
+            } 
+        };
+        document.getElementById('prevBtn').onclick = () => { 
+            if (currentStep > 0) { 
+                currentStep--; 
+                render(); 
+            } 
+        };
+        document.getElementById('resetBtn').onclick = () => { 
+            currentStep = 0; 
+            render(); 
+        };
+
+        // 启动应用
+        init();
+        
+        // 支持键盘左右键控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && currentStep < steps.length - 1) {
+                currentStep++;
+                render();
+            } else if (e.key === 'ArrowLeft' && currentStep > 0) {
+                currentStep--;
+                render();
+            }
+        });
+    </script>
+</body>
+</html>

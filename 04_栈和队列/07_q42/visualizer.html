@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 42. 接雨水 - 算法可视化</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --water-color: rgba(56, 189, 248, 0.65);
+            --water-border: #38bdf8;
+            --bar-color: #475569;
+            --bar-highlight: #94a3b8;
+            --primary: #8b5cf6;
+            --accent: #ec4899;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+            height: 550px;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 动画可视化区域 */
+        .visualizer-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 40px;
+            border-radius: 8px;
+            border-bottom: 2px solid var(--bar-color);
+            padding-bottom: 40px;
+            margin-bottom: 20px;
+        }
+
+        .max-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            border-bottom: 2px dashed;
+            transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 2px;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        .max-line.left-line {
+            border-color: var(--accent);
+            color: var(--accent);
+            width: 50%;
+        }
+
+        .max-line.right-line {
+            border-color: var(--primary);
+            color: var(--primary);
+            width: 50%;
+            left: 50%;
+            justify-content: flex-end;
+        }
+
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 32px;
+            margin: 0 4px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .bar {
+            width: 100%;
+            background: linear-gradient(to top, var(--bar-color), #64748b);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+        }
+
+        .water {
+            width: 100%;
+            background: var(--water-color);
+            border-top: 2px solid var(--water-border);
+            position: absolute;
+            bottom: 0;
+            z-index: 1;
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0 0 2px 2px;
+            backdrop-filter: blur(2px);
+        }
+
+        .pointer-icon {
+            position: absolute;
+            bottom: -35px;
+            font-size: 14px;
+            font-weight: 800;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pointer-icon::before {
+            content: "▲";
+            font-size: 12px;
+            margin-bottom: -4px;
+        }
+
+        .pointer-l { color: var(--accent); }
+        .pointer-r { color: var(--primary); }
+
+        /* 状态与控制区域 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .val-l { color: var(--accent); }
+        .val-r { color: var(--primary); }
+        .val-ans { color: #38bdf8; }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        button.primary:hover {
+            box-shadow: 0 6px 16px rgba(236, 72, 153, 0.4);
+        }
+
+        /* 代码面板 */
+        .window-header {
+            display: flex;
+            gap: 8px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background-color: #ff5f56; }
+        .dot.yellow { background-color: #ffbd2e; }
+        .dot.green { background-color: #27c93f; }
+
+        .code-content {
+            font-family: 'Fira Code', 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            overflow-y: auto;
+        }
+
+        .code-line {
+            display: flex;
+            padding: 2px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            color: #e2e8f0;
+            border-left: 3px solid transparent;
+        }
+
+        .line-num {
+            color: #64748b;
+            min-width: 24px;
+            margin-right: 16px;
+            text-align: right;
+            user-select: none;
+        }
+
+        .code-line.highlight {
+            background-color: rgba(56, 189, 248, 0.15);
+            border-left-color: #38bdf8;
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* 语法高亮伪实现 */
+        .kw { color: #c678dd; } /* 关键字 */
+        .fn { color: #61afef; } /* 函数 */
+        .vr { color: #e06c75; } /* 变量 */
+        .op { color: #56b6c2; } /* 操作符 */
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>接雨水可视化</h1>
+        <p class="subtitle">优雅地理解最经典的双指针解法</p>
+    </div>
+
+    <div class="container">
+        <!-- 左侧：动态图 -->
+        <div class="card">
+            <div class="visualizer-wrapper" id="visualizer">
+                <div class="max-line left-line" id="line-lmax" style="bottom: 40px;">Left Max</div>
+                <div class="max-line right-line" id="line-rmax" style="bottom: 40px;">Right Max</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Left Max</div>
+                    <div class="stat-value val-l" id="lmax-val">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Right Max</div>
+                    <div class="stat-value val-r" id="rmax-val">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Water</div>
+                    <div class="stat-value val-ans" id="ans-val">0</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button onclick="reset()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    重置
+                </button>
+                <button onclick="step()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v18l15-9L5 3z"/></svg>
+                    单步执行
+                </button>
+                <button id="autoBtn" class="primary" onclick="toggleAuto()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                    自动运行
+                </button>
+            </div>
+        </div>
+
+        <!-- 右侧：代码 -->
+        <div class="card">
+            <div class="window-header">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="code-content" id="code-panel">
+                <div class="code-line" id="line-1"><span class="line-num">1</span><span><span class="kw">while</span> <span class="vr">left</span> <span class="op">&lt;</span> <span class="vr">right</span>:</span></div>
+                <div class="code-line" id="line-2"><span class="line-num">2</span><span>&nbsp;&nbsp;left_max <span class="op">=</span> <span class="fn">max</span>(left_max, height[left])</span></div>
+                <div class="code-line" id="line-3"><span class="line-num">3</span><span>&nbsp;&nbsp;right_max <span class="op">=</span> <span class="fn">max</span>(right_max, height[right])</span></div>
+                <div class="code-line" id="line-4"><span class="line-num">4</span><span>&nbsp;&nbsp;<span class="kw">if</span> left_max <span class="op">&lt;</span> right_max:</span></div>
+                <div class="code-line" id="line-5"><span class="line-num">5</span><span>&nbsp;&nbsp;&nbsp;&nbsp;ans <span class="op">+=</span> left_max <span class="op">-</span> height[left]</span></div>
+                <div class="code-line" id="line-6"><span class="line-num">6</span><span>&nbsp;&nbsp;&nbsp;&nbsp;left <span class="op">+=</span> <span class="vr">1</span></span></div>
+                <div class="code-line" id="line-7"><span class="line-num">7</span><span>&nbsp;&nbsp;<span class="kw">else</span>:</span></div>
+                <div class="code-line" id="line-8"><span class="line-num">8</span><span>&nbsp;&nbsp;&nbsp;&nbsp;ans <span class="op">+=</span> right_max <span class="op">-</span> height[right]</span></div>
+                <div class="code-line" id="line-9"><span class="line-num">9</span><span>&nbsp;&nbsp;&nbsp;&nbsp;right <span class="op">-=</span> <span class="vr">1</span></span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const height = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1];
+        const UNIT_HEIGHT = 40; // 每个单位高度的像素值
+        const BASE_BOTTOM = 40; // 距离底部的基础偏移
+
+        let left = 0;
+        let right = height.length - 1;
+        let left_max = 0;
+        let right_max = 0;
+        let ans = 0;
+        let isAuto = false;
+        let timer = null;
+        let subStep = 0;
+
+        function init() {
+            const visualizer = document.getElementById('visualizer');
+            // 清理旧的 bar
+            document.querySelectorAll('.bar-container').forEach(e => e.remove());
+            
+            height.forEach((h, i) => {
+                const container = document.createElement('div');
+                container.className = 'bar-container';
+                
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = (h * UNIT_HEIGHT) + 'px';
+                bar.id = `bar-${i}`;
+
+                const water = document.createElement('div');
+                water.className = 'water';
+                water.id = `water-${i}`;
+                water.style.height = (h * UNIT_HEIGHT) + 'px'; // 初始水位等于柱子高度
+                water.style.opacity = '0'; // 隐藏无水状态
+
+                const label = document.createElement('div');
+                label.className = 'pointer-icon';
+                label.id = `label-${i}`;
+                
+                container.appendChild(water);
+                container.appendChild(bar);
+                container.appendChild(label);
+                visualizer.appendChild(container);
+            });
+            updateUI();
+        }
+
+        function updateUI() {
+            // 更新指针图标
+            document.querySelectorAll('.pointer-icon').forEach(el => {
+                el.innerText = '';
+                el.className = 'pointer-icon';
+            });
+            
+            const lLabel = document.getElementById(`label-${left}`);
+            if(lLabel) {
+                lLabel.innerText = 'L';
+                lLabel.classList.add('pointer-l');
+            }
+            
+            const rLabel = document.getElementById(`label-${right}`);
+            if(rLabel) {
+                rLabel.innerText = 'R';
+                rLabel.classList.add('pointer-r');
+            }
+            
+            // 更新柱子高亮
+            document.querySelectorAll('.bar').forEach((el, i) => {
+                if (i === left) el.style.background = 'linear-gradient(to top, var(--accent), #fbcfe8)';
+                else if (i === right) el.style.background = 'linear-gradient(to top, var(--primary), #ddd6fe)';
+                else el.style.background = 'linear-gradient(to top, var(--bar-color), #64748b)';
+            });
+
+            // 更新数据面板
+            document.getElementById('lmax-val').innerText = left_max;
+            document.getElementById('rmax-val').innerText = right_max;
+            document.getElementById('ans-val').innerText = ans;
+
+            // 更新水平辅助线
+            document.getElementById('line-lmax').style.bottom = (BASE_BOTTOM + left_max * UNIT_HEIGHT) + 'px';
+            document.getElementById('line-rmax').style.bottom = (BASE_BOTTOM + right_max * UNIT_HEIGHT) + 'px';
+        }
+
+        function highlightLine(lineId) {
+            document.querySelectorAll('.code-line').forEach(el => el.classList.remove('highlight'));
+            if (lineId) {
+                document.getElementById(lineId).classList.add('highlight');
+            }
+        }
+
+        function step() {
+            if (left >= right) {
+                clearInterval(timer);
+                isAuto = false;
+                document.getElementById('autoBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>完成';
+                highlightLine(null);
+                return;
+            }
+
+            switch(subStep) {
+                case 0:
+                    highlightLine('line-1');
+                    subStep = 1;
+                    break;
+                case 1:
+                    left_max = Math.max(left_max, height[left]);
+                    highlightLine('line-2');
+                    subStep = 2;
+                    break;
+                case 2:
+                    right_max = Math.max(right_max, height[right]);
+                    highlightLine('line-3');
+                    subStep = 3;
+                    break;
+                case 3:
+                    highlightLine('line-4');
+                    subStep = 4;
+                    break;
+                case 4:
+                    if (left_max < right_max) {
+                        const waterHeight = left_max - height[left];
+                        if (waterHeight > 0) {
+                            ans += waterHeight;
+                            const waterEl = document.getElementById(`water-${left}`);
+                            waterEl.style.height = (left_max * UNIT_HEIGHT) + 'px';
+                            waterEl.style.opacity = '1';
+                        }
+                        highlightLine('line-5');
+                        subStep = 5;
+                    } else {
+                        const waterHeight = right_max - height[right];
+                        if (waterHeight > 0) {
+                            ans += waterHeight;
+                            const waterEl = document.getElementById(`water-${right}`);
+                            waterEl.style.height = (right_max * UNIT_HEIGHT) + 'px';
+                            waterEl.style.opacity = '1';
+                        }
+                        highlightLine('line-8');
+                        subStep = 6;
+                    }
+                    break;
+                case 5:
+                    left++;
+                    highlightLine('line-6');
+                    subStep = 0;
+                    break;
+                case 6:
+                    right--;
+                    highlightLine('line-9');
+                    subStep = 0;
+                    break;
+            }
+            updateUI();
+        }
+
+        function reset() {
+            left = 0;
+            right = height.length - 1;
+            left_max = 0;
+            right_max = 0;
+            ans = 0;
+            subStep = 0;
+            clearInterval(timer);
+            isAuto = false;
+            document.getElementById('autoBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>自动运行';
+            init();
+            highlightLine(null);
+        }
+
+        function toggleAuto() {
+            if (left >= right && !isAuto) {
+                reset();
+            }
+
+            if (isAuto) {
+                clearInterval(timer);
+                document.getElementById('autoBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>继续运行';
+            } else {
+                timer = setInterval(step, 600); // 放慢一点节奏便于观察
+                document.getElementById('autoBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>暂停';
+            }
+            isAuto = !isAuto;
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>

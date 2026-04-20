@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeetCode 54. 螺旋矩阵 - 动态演示</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: .3rem;
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle { color: #94a3b8; margin-bottom: 1.5rem; }
+
+  /* 矩阵选择 */
+  .size-bar {
+    display: flex; gap: .5rem;
+    background: #1e293b; padding: .4rem; border-radius: 8px;
+    margin-bottom: 1.2rem;
+  }
+  .size-bar button {
+    background: transparent; color: #94a3b8; border: none;
+    padding: .45rem 1rem; border-radius: 6px; cursor: pointer;
+    font-size: .9rem; font-weight: 600; transition: .2s;
+  }
+  .size-bar button.active,
+  .size-bar button:hover { background: #334155; color: #fff; }
+
+  /* 主布局 */
+  .main { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; max-width: 1200px; width: 100%; }
+  .left-panel, .right-panel {
+    background: #1e293b; border-radius: 14px; padding: 1.5rem;
+    border: 1px solid #334155; box-shadow: 0 8px 20px rgba(0,0,0,.4);
+  }
+  .left-panel { min-width: 400px; flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .right-panel { min-width: 420px; flex: 1; max-width: 520px; }
+
+  /* 矩阵网格 */
+  .grid-wrap { position: relative; margin: 1rem 0; padding: 28px; }
+  .grid { display: grid; gap: 6px; }
+  .cell {
+    width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
+    background: #334155; border-radius: 10px; font-size: 1.15rem; font-weight: 700;
+    color: #94a3b8; transition: all .25s ease;
+  }
+  .cell.visited { background: #3b82f6; color: #fff; transform: scale(.92); box-shadow: 0 2px 8px rgba(59,130,246,.4); }
+  .cell.current { background: #10b981; color: #fff; transform: scale(1.08); box-shadow: 0 0 14px rgba(16,185,129,.6); z-index: 2; }
+
+  /* 边界标注 */
+  .bd { position: absolute; transition: all .4s cubic-bezier(.4,0,.2,1); border-radius: 3px; pointer-events: none; }
+  .bd-h { height: 3px; background: #f59e0b; }
+  .bd-v { width: 3px; background: #f59e0b; }
+  .bd-lbl {
+    position: absolute; font-size: .75rem; font-weight: 700; font-family: monospace;
+    color: #fbbf24; background: #1e293b; padding: 1px 5px; border-radius: 4px;
+    border: 1px solid #f59e0b; pointer-events: none; transition: all .4s cubic-bezier(.4,0,.2,1);
+    white-space: nowrap;
+  }
+
+  /* 状态信息 */
+  .info {
+    margin-top: .8rem; padding: .8rem 1rem; width: 100%;
+    background: rgba(245,158,11,.08); border-left: 4px solid #f59e0b;
+    border-radius: 0 8px 8px 0; font-size: .9rem; color: #cbd5e1; min-height: 48px;
+    line-height: 1.5;
+  }
+
+  /* 步骤计数 */
+  .step-counter {
+    margin-top: .6rem; font-size: .85rem; color: #64748b;
+  }
+
+  /* 控制按钮 */
+  .controls { display: flex; gap: .75rem; margin-top: 1rem; flex-wrap: wrap; justify-content: center; }
+  .btn {
+    border: none; padding: .6rem 1.2rem; border-radius: 8px;
+    font-size: .9rem; font-weight: 600; cursor: pointer;
+    transition: all .15s; display: flex; align-items: center; gap: .4rem; color: #fff;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-blue { background: #3b82f6; }
+  .btn-gray { background: #475569; }
+  .btn-amber { background: #f59e0b; color: #000; }
+
+  /* 结果 */
+  .result-box {
+    margin-top: 1rem; width: 100%; background: #0f172a; border-radius: 8px;
+    padding: .8rem 1rem; border: 1px solid #334155;
+  }
+  .result-box .label { font-size: .8rem; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+  .result-box .val { font-family: 'Courier New', monospace; font-size: 1rem; color: #a78bfa; margin-top: .3rem; word-break: break-all; }
+
+  /* 代码区 */
+  pre {
+    background: #0f172a; padding: 1.2rem; border-radius: 8px;
+    font-family: 'Courier New', monospace; font-size: .85rem; line-height: 1.6;
+    border: 1px solid #334155; overflow-x: auto; height: 100%;
+  }
+  .cl { display: block; padding: 1px 6px; border-radius: 4px; transition: background .2s; border-left: 3px solid transparent; }
+  .cl.hi { background: rgba(59,130,246,.18); border-left-color: #3b82f6; }
+  .kw { color: #c678dd; } .fn { color: #61afef; } .cm { color: #5c6370; font-style: italic; }
+  .num { color: #d19a66; } .op { color: #56b6c2; }
+</style>
+</head>
+<body>
+
+<h1>LeetCode 54. 螺旋矩阵</h1>
+<p class="subtitle">边界收缩法（最优解）逐步动态演示</p>
+
+<div class="size-bar" id="sizeBar">
+  <button class="active" data-r="3" data-c="3">3 × 3</button>
+  <button data-r="3" data-c="4">3 × 4</button>
+  <button data-r="4" data-c="4">4 × 4</button>
+  <button data-r="1" data-c="4">1 × 4</button>
+  <button data-r="4" data-c="1">4 × 1</button>
+</div>
+
+<div class="main">
+  <!-- 左：可视化 -->
+  <div class="left-panel">
+    <div class="grid-wrap" id="gridWrap">
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="info" id="info">点击「下一步」或「自动播放」开始演示</div>
+    <div class="step-counter" id="stepCounter">步骤 0 / 0</div>
+    <div class="controls">
+      <button class="btn btn-gray" id="bPrev" disabled>◀ 上一步</button>
+      <button class="btn btn-blue" id="bPlay">▶ 自动播放</button>
+      <button class="btn btn-gray" id="bNext">下一步 ▶</button>
+      <button class="btn btn-gray" id="bReset">↺ 重置</button>
+    </div>
+    <div class="result-box">
+      <div class="label">收集结果 result =</div>
+      <div class="val" id="resVal">[]</div>
+    </div>
+  </div>
+
+  <!-- 右：代码 -->
+  <div class="right-panel">
+<pre><code><span class="kw">def</span> <span class="fn">spiralOrder</span>(matrix):
+<span class="cl" id="L0">    result = []</span>
+<span class="cl" id="L1">    top, bottom = <span class="num">0</span>, len(matrix) - <span class="num">1</span></span>
+<span class="cl" id="L2">    left, right = <span class="num">0</span>, len(matrix[<span class="num">0</span>]) - <span class="num">1</span></span>
+<span class="cl" id="L3">    <span class="kw">while</span> top <span class="op">&lt;=</span> bottom <span class="kw">and</span> left <span class="op">&lt;=</span> right:</span>
+<span class="cl" id="L4">        <span class="cm"># ① 上边：从左到右 →</span></span>
+<span class="cl" id="L5">        <span class="kw">for</span> col <span class="kw">in</span> <span class="fn">range</span>(left, right+<span class="num">1</span>):</span>
+<span class="cl" id="L6">            result.append(matrix[top][col])</span>
+<span class="cl" id="L7">        top += <span class="num">1</span>  <span class="cm"># 上边界下移</span></span>
+<span class="cl" id="L8">        <span class="cm"># ② 右边：从上到下 ↓</span></span>
+<span class="cl" id="L9">        <span class="kw">for</span> row <span class="kw">in</span> <span class="fn">range</span>(top, bottom+<span class="num">1</span>):</span>
+<span class="cl" id="L10">            result.append(matrix[row][right])</span>
+<span class="cl" id="L11">        right -= <span class="num">1</span>  <span class="cm"># 右边界左移</span></span>
+<span class="cl" id="L12">        <span class="cm"># ③ 下边：从右到左 ←</span></span>
+<span class="cl" id="L13">        <span class="kw">if</span> top <span class="op">&lt;=</span> bottom:</span>
+<span class="cl" id="L14">            <span class="kw">for</span> col <span class="kw">in</span> <span class="fn">range</span>(right, left-<span class="num">1</span>, -<span class="num">1</span>):</span>
+<span class="cl" id="L15">                result.append(matrix[bottom][col])</span>
+<span class="cl" id="L16">            bottom -= <span class="num">1</span>  <span class="cm"># 下边界上移</span></span>
+<span class="cl" id="L17">        <span class="cm"># ④ 左边：从下到上 ↑</span></span>
+<span class="cl" id="L18">        <span class="kw">if</span> left <span class="op">&lt;=</span> right:</span>
+<span class="cl" id="L19">            <span class="kw">for</span> row <span class="kw">in</span> <span class="fn">range</span>(bottom, top-<span class="num">1</span>, -<span class="num">1</span>):</span>
+<span class="cl" id="L20">                result.append(matrix[row][left])</span>
+<span class="cl" id="L21">            left += <span class="num">1</span>  <span class="cm"># 左边界右移</span></span>
+<span class="cl" id="L22">    <span class="kw">return</span> result</span>
+</code></pre>
+  </div>
+</div>
+
+<script>
+// ======== 配置常量 ========
+const SZ = 56, GAP = 6, PAD = 28;
+
+// ======== DOM ========
+const $grid = document.getElementById('grid');
+const $wrap = document.getElementById('gridWrap');
+const $info = document.getElementById('info');
+const $res  = document.getElementById('resVal');
+const $cnt  = document.getElementById('stepCounter');
+const $bPrev = document.getElementById('bPrev');
+const $bNext = document.getElementById('bNext');
+const $bPlay = document.getElementById('bPlay');
+const $bReset = document.getElementById('bReset');
+
+// ======== 全局状态 ========
+let R = 3, C = 3, matrix = [], steps = [], cur = 0, timer = null;
+
+// ======== 初始化矩阵 ========
+function init(r, c) {
+  stop();
+  R = r; C = c;
+  matrix = [];
+  let v = 1;
+  for (let i = 0; i < R; i++) {
+    const row = [];
+    for (let j = 0; j < C; j++) row.push(v++);
+    matrix.push(row);
+  }
+  buildGrid();
+  buildSteps();
+  cur = 0;
+  render();
+}
+
+function buildGrid() {
+  $grid.style.gridTemplateColumns = `repeat(${C}, ${SZ}px)`;
+  $grid.innerHTML = '';
+  for (let i = 0; i < R; i++)
+    for (let j = 0; j < C; j++) {
+      const d = document.createElement('div');
+      d.className = 'cell';
+      d.id = 'c' + i + '_' + j;
+      d.textContent = matrix[i][j];
+      $grid.appendChild(d);
+    }
+}
+
+// ======== 预计算所有步骤（纯数据，不含 Set）========
+function buildSteps() {
+  steps = [];
+  let top = 0, bottom = R - 1, left = 0, right = C - 1;
+  const visited = [];   // [[r,c], ...]  已经走过的坐标
+  const result = [];
+
+  // 第 0 步：初始化
+  steps.push({
+    visited: [], current: null, result: [],
+    top, bottom, left, right,
+    lines: ['L0','L1','L2'],
+    msg: `初始化边界 top=${top}, bottom=${bottom}, left=${left}, right=${right}`
+  });
+
+  function snap(lines, msg, cr) {
+    steps.push({
+      visited: visited.slice(),
+      current: cr || null,
+      result: result.slice(),
+      top, bottom, left, right,
+      lines: Array.isArray(lines) ? lines : [lines],
+      msg
+    });
+  }
+
+  while (top <= bottom && left <= right) {
+    // while 判断
+    snap('L3', `while 条件：top(${top}) ≤ bottom(${bottom}) 且 left(${left}) ≤ right(${right}) → 成立 ✓`);
+
+    // ① 上边 →
+    snap(['L4','L5'], `【① 上边 →】遍历第 ${top} 行，列 ${left}→${right}`);
+    for (let col = left; col <= right; col++) {
+      visited.push([top, col]);
+      result.push(matrix[top][col]);
+      snap('L6', `取 matrix[${top}][${col}] = ${matrix[top][col]}`, [top, col]);
+    }
+    top++;
+    snap('L7', `上边界收缩 top++ → top = ${top}`);
+
+    // ② 右边 ↓
+    snap(['L8','L9'], `【② 右边 ↓】遍历第 ${right} 列，行 ${top}→${bottom}`);
+    for (let row = top; row <= bottom; row++) {
+      visited.push([row, right]);
+      result.push(matrix[row][right]);
+      snap('L10', `取 matrix[${row}][${right}] = ${matrix[row][right]}`, [row, right]);
+    }
+    right--;
+    snap('L11', `右边界收缩 right-- → right = ${right}`);
+
+    // ③ 下边 ←
+    if (top <= bottom) {
+      snap(['L12','L13'], `检查 top(${top}) ≤ bottom(${bottom}) → 成立，遍历下边`);
+      snap('L14', `【③ 下边 ←】遍历第 ${bottom} 行，列 ${right}→${left}`);
+      for (let col = right; col >= left; col--) {
+        visited.push([bottom, col]);
+        result.push(matrix[bottom][col]);
+        snap('L15', `取 matrix[${bottom}][${col}] = ${matrix[bottom][col]}`, [bottom, col]);
+      }
+      bottom--;
+      snap('L16', `下边界收缩 bottom-- → bottom = ${bottom}`);
+    } else {
+      snap(['L12','L13'], `检查 top(${top}) > bottom(${bottom}) → 不成立，跳过下边 ✗`);
+    }
+
+    // ④ 左边 ↑
+    if (left <= right) {
+      snap(['L17','L18'], `检查 left(${left}) ≤ right(${right}) → 成立，遍历左边`);
+      snap('L19', `【④ 左边 ↑】遍历第 ${left} 列，行 ${bottom}→${top}`);
+      for (let row = bottom; row >= top; row--) {
+        visited.push([row, left]);
+        result.push(matrix[row][left]);
+        snap('L20', `取 matrix[${row}][${left}] = ${matrix[row][left]}`, [row, left]);
+      }
+      left++;
+      snap('L21', `左边界收缩 left++ → left = ${left}`);
+    } else {
+      snap(['L17','L18'], `检查 left(${left}) > right(${right}) → 不成立，跳过左边 ✗`);
+    }
+  }
+
+  // while 条件不成立
+  snap('L3', `while 条件：top(${top}) ≤ bottom(${bottom}) 且 left(${left}) ≤ right(${right}) → 不成立 ✗，循环结束`);
+  snap('L22', `遍历完成！共收集 ${result.length} 个元素 🎉`);
+}
+
+// ======== 渲染当前步骤 ========
+function render() {
+  const s = steps[cur];
+
+  // 单元格状态
+  const visitedSet = new Set(s.visited.map(p => p[0] + '_' + p[1]));
+  const curKey = s.current ? s.current[0] + '_' + s.current[1] : null;
+
+  for (let i = 0; i < R; i++)
+    for (let j = 0; j < C; j++) {
+      const el = document.getElementById('c' + i + '_' + j);
+      const k = i + '_' + j;
+      el.className = 'cell';
+      if (k === curKey) el.classList.add('current');
+      else if (visitedSet.has(k)) el.classList.add('visited');
+    }
+
+  // 边界线
+  drawBounds(s);
+
+  // 代码高亮
+  for (let i = 0; i <= 22; i++) {
+    const el = document.getElementById('L' + i);
+    if (el) el.classList.toggle('hi', s.lines.includes('L' + i));
+  }
+
+  // 信息
+  $info.textContent = s.msg;
+  $res.textContent = '[' + s.result.join(', ') + ']';
+  $cnt.textContent = `步骤 ${cur} / ${steps.length - 1}`;
+
+  // 按钮
+  $bPrev.disabled = cur === 0;
+  $bNext.disabled = cur === steps.length - 1;
+}
+
+// ======== 绘制边界线 ========
+function drawBounds(s) {
+  // 先删除旧的
+  $wrap.querySelectorAll('.bd, .bd-lbl').forEach(e => e.remove());
+
+  const pos = i => PAD + i * (SZ + GAP);
+  const {top: t, bottom: b, left: l, right: r} = s;
+
+  const validH = t <= b;
+  const validV = l <= r;
+  if (!validH && !validV) return;
+
+  const x1 = pos(Math.max(l, 0));
+  const x2 = pos(Math.min(r, C - 1)) + SZ;
+  const y1 = pos(Math.max(t, 0));
+  const y2 = pos(Math.min(b, R - 1)) + SZ;
+
+  function makeLine(cls, style) {
+    const d = document.createElement('div');
+    d.className = cls;
+    Object.assign(d.style, style);
+    $wrap.appendChild(d);
+  }
+
+  if (validH && validV) {
+    // top line
+    makeLine('bd bd-h', { top: (y1 - 5) + 'px', left: x1 + 'px', width: (x2 - x1) + 'px' });
+    // bottom line
+    makeLine('bd bd-h', { top: (y2 + 2) + 'px', left: x1 + 'px', width: (x2 - x1) + 'px' });
+    // left line
+    makeLine('bd bd-v', { left: (x1 - 5) + 'px', top: y1 + 'px', height: (y2 - y1) + 'px' });
+    // right line
+    makeLine('bd bd-v', { left: (x2 + 2) + 'px', top: y1 + 'px', height: (y2 - y1) + 'px' });
+
+    // labels
+    makeLine('bd-lbl', { top: (y1 - 24) + 'px', left: x1 + 'px', innerHTML: '' });
+    $wrap.lastChild.textContent = 'top=' + t;
+    makeLine('bd-lbl', { top: (y2 + 6) + 'px', left: x1 + 'px' });
+    $wrap.lastChild.textContent = 'bottom=' + b;
+    makeLine('bd-lbl', { left: Math.max(0, x1 - 56) + 'px', top: y1 + 'px' });
+    $wrap.lastChild.textContent = 'left=' + l;
+    makeLine('bd-lbl', { left: (x2 + 8) + 'px', top: y1 + 'px' });
+    $wrap.lastChild.textContent = 'right=' + r;
+  }
+}
+
+// ======== 控制 ========
+function next() { if (cur < steps.length - 1) { cur++; render(); } if (cur === steps.length - 1) stop(); }
+function prev() { if (cur > 0) { cur--; render(); } }
+function reset() { stop(); cur = 0; render(); }
+function stop() {
+  if (timer) { clearInterval(timer); timer = null; }
+  $bPlay.textContent = '▶ 自动播放';
+  $bPlay.className = 'btn btn-blue';
+}
+function togglePlay() {
+  if (timer) { stop(); return; }
+  if (cur === steps.length - 1) { cur = 0; }
+  $bPlay.textContent = '⏸ 暂停';
+  $bPlay.className = 'btn btn-amber';
+  timer = setInterval(() => {
+    if (cur >= steps.length - 1) { stop(); return; }
+    cur++; render();
+  }, 600);
+}
+
+$bNext.addEventListener('click', () => { stop(); next(); });
+$bPrev.addEventListener('click', () => { stop(); prev(); });
+$bReset.addEventListener('click', reset);
+$bPlay.addEventListener('click', togglePlay);
+
+// 尺寸选择
+document.getElementById('sizeBar').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-r]');
+  if (!btn) return;
+  document.querySelectorAll('.size-bar button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  init(+btn.dataset.r, +btn.dataset.c);
+});
+
+// 键盘快捷键
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); stop(); next(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); stop(); prev(); }
+  if (e.key === 'r') reset();
+});
+
+// 启动
+init(3, 3);
+</script>
+</body>
+</html>

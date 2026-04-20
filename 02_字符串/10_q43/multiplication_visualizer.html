@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算法可视化：字符串相乘</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap');
+        
+        :root {
+            --bg: #0f172a;
+            --panel: rgba(30, 41, 59, 0.7);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --pink: #ec4899;
+            --green: #10b981;
+            --yellow: #f59e0b;
+        }
+
+        body {
+            margin: 0; padding: 2rem;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        h1 {
+            font-weight: 700; margin-bottom: 1.5rem; text-align: center;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .controls {
+            background: var(--panel); backdrop-filter: blur(10px);
+            padding: 1rem 2rem; border-radius: 1rem;
+            display: flex; gap: 1.5rem; align-items: center; margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .input-group { display: flex; align-items: center; gap: 0.5rem; }
+        input {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 0.5rem; border-radius: 0.5rem; width: 60px;
+            font-family: 'Fira Code'; font-size: 1.1rem; text-align: center;
+        }
+
+        button {
+            background: var(--primary); color: white; border: none;
+            padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        button:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        button:disabled { background: #475569; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .btn-green { background: var(--green); }
+        .btn-green:hover { background: #059669; }
+
+        .layout {
+            display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem;
+            width: 100%; max-width: 1200px;
+        }
+
+        .panel {
+            background: var(--panel); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem;
+            padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Array Styles */
+        .array-row {
+            display: flex; align-items: center; margin-bottom: 2.5rem;
+            position: relative;
+        }
+        .array-label { width: 80px; font-weight: 600; color: var(--text-muted); }
+        .boxes { display: flex; gap: 0.5rem; }
+        .box-wrapper { position: relative; }
+        
+        .box {
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;
+            font-family: 'Fira Code'; font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .idx-label { position: absolute; bottom: -20px; width: 100%; text-align: center; font-size: 0.75rem; color: var(--text-muted); }
+        
+        .ptr {
+            position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+            font-size: 0.75rem; font-weight: bold; padding: 2px 6px; border-radius: 4px;
+            opacity: 0; transition: opacity 0.3s; z-index: 10;
+        }
+
+        /* Pointer Colors */
+        .hl-i { border-color: var(--pink); box-shadow: 0 0 15px rgba(236,72,153,0.4); transform: scale(1.05); }
+        .ptr-i { background: var(--pink); color: white; opacity: 1; }
+        
+        .hl-j { border-color: var(--primary); box-shadow: 0 0 15px rgba(99,102,241,0.4); transform: scale(1.05); }
+        .ptr-j { background: var(--primary); color: white; opacity: 1; }
+
+        .hl-p1 { border-color: var(--yellow); background: rgba(245,158,11,0.2); }
+        .ptr-p1 { background: var(--yellow); color: black; opacity: 1; }
+
+        .hl-p2 { border-color: var(--green); background: rgba(16,185,129,0.2); }
+        .ptr-p2 { background: var(--green); color: white; opacity: 1; }
+        
+        .flash { animation: flash-bg 0.5s ease-out; }
+        @keyframes flash-bg { 0% { background: white; color: black; } 100% { } }
+
+        /* Calculation Board */
+        .calc-board {
+            background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem;
+            font-family: 'Fira Code'; font-size: 1.2rem;
+            display: flex; justify-content: center; align-items: center; gap: 1.5rem;
+            border: 1px dashed rgba(255,255,255,0.2); margin-top: 1rem;
+        }
+
+        .math-item { display: flex; flex-direction: column; align-items: center; }
+        .math-sub { font-family: 'Inter'; font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;}
+
+        /* Code Block */
+        pre {
+            background: #1e293b; padding: 1rem; border-radius: 0.5rem;
+            font-family: 'Fira Code'; font-size: 0.9rem; overflow-x: auto;
+            margin: 0; line-height: 1.5;
+        }
+        .cl { padding: 2px 8px; border-radius: 4px; border-left: 3px solid transparent; transition: all 0.2s; cursor: default; }
+        .cl.active { background: rgba(99, 102, 241, 0.2); border-left-color: var(--primary); }
+
+        .explanation {
+            margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--green); border-radius: 0 0.5rem 0.5rem 0;
+            font-size: 0.95rem; line-height: 1.6; min-height: 100px;
+        }
+        .code-inline { font-family: 'Fira Code'; color: var(--yellow); background: rgba(0,0,0,0.3); padding: 0 5px; border-radius: 3px;}
+    </style>
+</head>
+<body>
+
+    <h1>✨ 数组累加位映射：动画解析</h1>
+
+    <div class="controls">
+        <div class="input-group">
+            <label>num1:</label>
+            <input type="text" id="inp-num1" value="23" maxlength="3">
+        </div>
+        <div>╳</div>
+        <div class="input-group">
+            <label>num2:</label>
+            <input type="text" id="inp-num2" value="45" maxlength="3">
+        </div>
+        <button onclick="init()">🔄 重置 / 初始化</button>
+        <button id="btn-next" onclick="nextStep()" class="btn-green">⏭ 下一步 (Next)</button>
+        <button id="btn-auto" onclick="toggleAuto()">▶️ 自动播放</button>
+    </div>
+
+    <div class="layout">
+        <!-- 左侧可视化 -->
+        <div class="panel">
+            <div class="array-row">
+                <div class="array-label">num1 =</div>
+                <div class="boxes" id="box-num1"></div>
+            </div>
+            
+            <div class="array-row">
+                <div class="array-label">num2 =</div>
+                <div class="boxes" id="box-num2"></div>
+            </div>
+
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 2rem 0;">
+
+            <div class="array-row">
+                <div class="array-label">res =</div>
+                <div class="boxes" id="box-res"></div>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); padding-left: 80px; margin-top:-1.5rem; margin-bottom: 2rem;">※ 长度固定为 len(num1) + len(num2)</div>
+
+            <div class="calc-board" id="calc-board">
+                <span style="color:var(--text-muted)">点击“下一步”开始计算</span>
+            </div>
+        </div>
+
+        <!-- 右侧代码与解说 -->
+        <div class="panel" style="display: flex; flex-direction: column;">
+            <pre id="code-block">
+<div class="cl" id="cl-0">for i in range(m - 1, -1, -1):</div>
+<div class="cl" id="cl-1">  for j in range(n - 1, -1, -1):</div>
+<div class="cl" id="cl-2">    mul = int(num1[i]) * int(num2[j])</div>
+<div class="cl" id="cl-3">    p1, p2 = i + j, i + j + 1</div>
+<div class="cl" id="cl-4">    total = mul + res[p2]</div>
+<div class="cl" id="cl-5">    res[p2] = total % 10</div>
+<div class="cl" id="cl-6">    res[p1] += total // 10</div>
+            </pre>
+            <div class="explanation" id="explanation">
+                准备就绪。我们将模拟代码核心的双重循环。
+                <br>请留意两个乘数的下标 <span class="code-inline">i</span> 和 <span class="code-inline">j</span>，以及它们如何精准映射到 <span class="code-inline">res</span> 数组的 <span class="code-inline">p1(进位)</span> 和 <span class="code-inline">p2(当前位)</span>。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            n1: "", n2: "", res: [],
+            i: -1, j: -1, 
+            step: 0, // 内部小步骤
+            active: false,
+            done: false,
+            autoTimer: null
+        };
+
+        function renderBoxes(containerId, strOrArr, prefix) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            for (let idx = 0; idx < strOrArr.length; idx++) {
+                const bw = document.createElement('div');
+                bw.className = 'box-wrapper';
+                
+                const ptr = document.createElement('div');
+                ptr.className = 'ptr';
+                ptr.id = `ptr-${prefix}-${idx}`;
+                
+                const box = document.createElement('div');
+                box.className = 'box';
+                box.id = `box-${prefix}-${idx}`;
+                box.innerText = strOrArr[idx];
+                
+                const lb = document.createElement('div');
+                lb.className = 'idx-label';
+                lb.innerText = idx;
+                
+                bw.appendChild(ptr);
+                bw.appendChild(box);
+                bw.appendChild(lb);
+                container.appendChild(bw);
+            }
+        }
+
+        function init() {
+            clearTimeout(state.autoTimer);
+            document.getElementById('btn-auto').innerText = "▶️ 自动播放";
+            state.n1 = document.getElementById('inp-num1').value || "0";
+            state.n2 = document.getElementById('inp-num2').value || "0";
+            state.res = new Array(state.n1.length + state.n2.length).fill(0);
+            
+            state.i = state.n1.length - 1;
+            state.j = state.n2.length - 1;
+            state.step = 0;
+            state.active = true;
+            state.done = false;
+            
+            renderBoxes('box-num1', state.n1, 'n1');
+            renderBoxes('box-num2', state.n2, 'n2');
+            renderBoxes('box-res', state.res, 'res');
+            
+            document.getElementById('btn-next').disabled = false;
+            document.getElementById('calc-board').innerHTML = '<span style="color:var(--text-muted)">开始两层倒序遍历运算</span>';
+            setExpl("初始化完成。数组 `res` 的长度为 `len(num1)+len(num2)` = " + state.res.length + "。<br>开始从最低位往最高位交织相乘。");
+            hlLine(-1);
+            clearHighlights();
+        }
+
+        function hlLine(num) {
+            document.querySelectorAll('.cl').forEach(el => el.classList.remove('active'));
+            if(num >= 0) document.getElementById('cl-'+num).classList.add('active');
+        }
+
+        function setExpl(html) {
+            document.getElementById('explanation').innerHTML = html;
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.box').forEach(el => el.className = 'box');
+            document.querySelectorAll('.ptr').forEach(el => { el.className = 'ptr'; el.innerText = ''; });
+        }
+
+        function setPtr(prefix, idx, type, text) {
+            const ptr = document.getElementById(`ptr-${prefix}-${idx}`);
+            const box = document.getElementById(`box-${prefix}-${idx}`);
+            if(!ptr || !box) return;
+            ptr.className = `ptr ptr-${type}`;
+            ptr.innerText = text;
+            box.classList.add(`hl-${type}`);
+        }
+
+        function updateResBox(idx, val) {
+            const box = document.getElementById(`box-res-${idx}`);
+            box.innerText = val;
+            box.style.animation = 'none';
+            box.offsetHeight; // trigger reflow
+            box.style.animation = 'flash-bg 0.5s ease-out';
+        }
+
+        function nextStep() {
+            if (!state.active || state.done) return;
+
+            clearHighlights();
+
+            // 只在每轮第 0 步时计算一次，存入 state.cur 供后续步骤复用
+            if (state.step === 0) {
+                const x = parseInt(state.n1[state.i]);
+                const y = parseInt(state.n2[state.j]);
+                const mul = x * y;
+                const p1 = state.i + state.j;
+                const p2 = state.i + state.j + 1;
+                const resP2 = state.res[p2];
+                const total = mul + resP2;
+                state.cur = { x, y, mul, p1, p2, resP2, total };
+            }
+
+            const { x, y, mul, p1, p2, resP2, total } = state.cur;
+
+            // 始终显示当前的 i 和 j
+            setPtr('n1', state.i, 'i', 'i');
+            setPtr('n2', state.j, 'j', 'j');
+
+            switch(state.step) {
+                case 0:
+                    hlLine(2);
+                    setExpl(`<b>第 1 步：取位乘积</b><br>从 num1 提取 <span class="code-inline">x=${x}</span> (索引 i=${state.i})<br>从 num2 提取 <span class="code-inline">y=${y}</span> (索引 j=${state.j})<br>临时乘积 <span class="code-inline">mul = x * y = ${mul}</span>`);
+                    document.getElementById('calc-board').innerHTML = `
+                        <div class="math-item"><span>${x} × ${y}</span><span class="math-sub">num1[${state.i}] × num2[${state.j}]</span></div>
+                        <span>=</span>
+                        <div class="math-item"><span style="color:var(--pink)">${mul}</span><span class="math-sub">mul</span></div>
+                    `;
+                    state.step = 1;
+                    break;
+
+                case 1:
+                    hlLine(3);
+                    setPtr('res', p1, 'p1', 'p1=i+j');
+                    setPtr('res', p2, 'p2', 'p2=i+j+1');
+                    setExpl(`<b>第 2 步：计算目标位置</b><br>无论乘积如何，这个乘积影响的结果范围死死锁定在 res 的第 <span class="code-inline">i+j = ${p1}</span> 和第 <span class="code-inline">i+j+1 = ${p2}</span> 位上。`);
+                    state.step = 2;
+                    break;
+
+                case 2:
+                    hlLine(4);
+                    setPtr('res', p1, 'p1', 'p1');
+                    setPtr('res', p2, 'p2', 'p2 (旧值)');
+                    setExpl(`<b>第 3 步：叠加历史进位</b><br>当前位 <span class="code-inline">p2(${p2})</span> 上可能已经累积了之前计算保存下来的值。我们要把新乘积和它加起来。<br><span class="code-inline">total = mul(${mul}) + res[${p2}](${resP2}) = ${total}</span>`);
+                    document.getElementById('calc-board').innerHTML = `
+                        <div class="math-item"><span style="color:var(--pink)">${mul}</span><span class="math-sub">mul</span></div>
+                        <span>+</span>
+                        <div class="math-item"><span style="color:var(--green)">${resP2}</span><span class="math-sub">res[p2] 原值</span></div>
+                        <span>=</span>
+                        <div class="math-item"><span style="color:white">${total}</span><span class="math-sub">total 总和</span></div>
+                    `;
+                    state.step = 3;
+                    break;
+
+                case 3:
+                    hlLine(5);
+                    setPtr('res', p1, 'p1', 'p1');
+                    setPtr('res', p2, 'p2', 'p2 (更新)');
+                    state.res[p2] = total % 10;
+                    updateResBox(p2, state.res[p2]);
+                    setExpl(`<b>第 4 步：存入个位数</b><br>把 total 的个位数留在 <span class="code-inline">p2</span> 位置上：<br><span class="code-inline">total % 10 = ${total} % 10 = ${total % 10}</span><br>放入 <span class="code-inline">res[${p2}]</span>。`);
+                    document.getElementById('calc-board').innerHTML += `
+                     <span style="font-size:0.8em; margin-left:1rem;">个位➡ ${total%10} 存入 p2</span>
+                    `;
+                    state.step = 4;
+                    break;
+
+                case 4: {
+                    hlLine(6);
+                    setPtr('res', p1, 'p1', 'p1 (进位叠加)');
+                    setPtr('res', p2, 'p2', 'p2');
+                    const carry = Math.floor(total / 10);
+                    state.res[p1] += carry;
+                    updateResBox(p1, state.res[p1]);
+                    setExpl(`<b>第 5 步：进位交给高位</b><br>把 total 十位以上的数字直接加到更高一位的 <span class="code-inline">p1</span> 上。<br><span class="code-inline">total // 10 = ${carry}</span><br>让 <span class="code-inline">res[${p1}] += ${carry}</span>。此时 <span class="code-inline">res[${p1}] = ${state.res[p1]}</span>。`);
+                    document.getElementById('calc-board').innerHTML += `
+                     <span style="font-size:0.8em; margin-left:0.5rem; color:var(--yellow);">进位➡ +${carry} 到 p1</span>
+                    `;
+                    
+                    // 准备下一次循环
+                    state.j--;
+                    if (state.j < 0) {
+                        state.j = state.n2.length - 1;
+                        state.i--;
+                    }
+                    
+                    if (state.i < 0) {
+                        state.done = true;
+                    }
+                    state.step = 0;
+                    break;
+                }
+            }
+
+            if (state.done) {
+                document.getElementById('btn-next').disabled = true;
+                clearTimeout(state.autoTimer);
+                document.getElementById('btn-auto').innerText = "▶️ 自动播放";
+                setTimeout(() => {
+                    hlLine(-1);
+                    clearHighlights();
+                    let endResStr = state.res.join('').replace(/^0+/, '');
+                    if(!endResStr) endResStr = '0';
+                    document.getElementById('calc-board').innerHTML = `<span style="color:var(--green)">最终结果：${endResStr}</span>`;
+                    setExpl(`🎉 <b>计算全部完成！</b><br>所有位置累加完毕。我们只需跳过前导零，把数组拼成字符串即可。<br>最终答案就是 <span class="code-inline">${endResStr}</span>。`);
+                }, 800);
+            }
+        }
+
+        function toggleAuto() {
+            const btn = document.getElementById('btn-auto');
+            if (state.autoTimer) {
+                clearTimeout(state.autoTimer);
+                state.autoTimer = null;
+                btn.innerText = "▶️ 自动播放";
+            } else {
+                if (state.done) init();
+                btn.innerText = "⏸ 暂停";
+                runAuto();
+            }
+        }
+
+        function runAuto() {
+            nextStep();
+            if (!state.done) {
+                let speed = state.step === 0 ? 800 : (state.step === 1 ? 400 : 700);
+                state.autoTimer = setTimeout(runAuto, speed);
+            } else {
+                document.getElementById('btn-auto').innerText = "▶️ 自动播放";
+                state.autoTimer = null;
+            }
+        }
+
+        // 初始化
+        window.onload = init;
+    </script>
+</body>
+</html>

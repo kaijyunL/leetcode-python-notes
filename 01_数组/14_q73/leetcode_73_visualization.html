@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 73 矩阵置零 - O(1)算法可视化</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a, #1e1b4b);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: -webkit-linear-gradient(45deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex: 1;
+            width: 100%;
+        }
+
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            flex: 1;
+            min-width: 350px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Matrix Styles */
+        .matrix-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .matrix-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cell {
+            width: 65px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #cbd5e1;
+            position: relative;
+        }
+
+        .cell.scanning {
+            transform: scale(1.1);
+            background: rgba(245, 158, 11, 0.2);
+            border-color: var(--accent-yellow);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            color: white;
+            z-index: 10;
+        }
+
+        .cell.is-zero {
+            color: var(--accent-red);
+        }
+
+        .cell.marker {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: var(--accent-purple);
+            color: #d8b4fe;
+            box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.3);
+        }
+
+        .cell.updated-zero {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent-green);
+            color: #6ee7b7;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+
+        /* Code Styles */
+        .code-container {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            flex: 1;
+        }
+
+        .code-line {
+            padding: 2px 12px;
+            border-radius: 6px;
+            transition: background 0.3s;
+            white-space: pre;
+            color: #a5b4fc;
+        }
+
+        .code-line span.keyword { color: #f472b6; }
+        .code-line span.comment { color: #64748b; font-style: italic; }
+        .code-line span.number { color: #818cf8; }
+
+        .code-line.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid var(--accent-blue);
+            color: white;
+        }
+
+        /* Variables */
+        .variables {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 2rem;
+        }
+
+        .var-box {
+            background: rgba(0,0,0,0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono';
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .var-box.active {
+            border-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .var-name {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .var-val {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .var-val.true { color: var(--accent-red); }
+        .var-val.false { color: var(--accent-green); }
+
+        /* Controls */
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .desc-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #e0e7ff;
+            transition: all 0.3s;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0px);
+        }
+
+        button.primary {
+            background: #3b82f6;
+            border-color: #2563eb;
+        }
+
+        button.primary:hover:not(:disabled) {
+            background: #2563eb;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            max-width: 800px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+        .cell:hover .tooltip { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>LeetCode 73: 矩阵置零</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">O(1) 原地修改空间最优算法演示</p>
+    </div>
+
+    <div class="container">
+        <!-- Left Panel: Matrix Visualization -->
+        <div class="panel">
+            <div class="panel-title">矩阵状态追踪</div>
+            <div class="matrix-wrapper" id="matrixView"></div>
+            
+            <div class="variables">
+                <div class="var-box" id="varFlagCol">
+                    <span class="var-name">flag_col0</span>
+                    <span class="var-val false" id="flagColVal">False</span>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);"></div>正常元素
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="border: 2px solid var(--accent-yellow); background: rgba(245, 158, 11, 0.2);"></div>当前扫描
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(139, 92, 246, 0.15); border: 1px solid var(--accent-purple);"></div>投影标记位
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--accent-green);"></div>根据标记清0
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Code Tracker -->
+        <div class="panel" style="flex: 1.2;">
+            <div class="panel-title">算法代码联动
+                <span style="font-size: 0.8rem; text-transform: none; color: #3b82f6;">Python</span>
+            </div>
+            <div class="code-container" id="codeView">
+                <div class="code-line" data-line="1"><span class="keyword">def</span> setZeroes(matrix):</div>
+                <div class="code-line" data-line="2">    m, n = len(matrix), len(matrix[<span class="number">0</span>])</div>
+                <div class="code-line" data-line="3">    flag_col0 = <span class="keyword">False</span></div>
+                <div class="code-line" data-line="4"></div>
+                <div class="code-line" data-line="5">    <span class="comment"># 阶段一：用第一行/第一列作为标记，遇0则投影打标记</span></div>
+                <div class="code-line" data-line="6">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</div>
+                <div class="code-line" data-line="7">        <span class="comment"># 第一列由专属变量掌管，避免与第一行(matrix[0][0])冲突</span></div>
+                <div class="code-line" data-line="8">        <span class="keyword">if</span> matrix[i][<span class="number">0</span>] == <span class="number">0</span>: </div>
+                <div class="code-line" data-line="9">            flag_col0 = <span class="keyword">True</span></div>
+                <div class="code-line" data-line="10">            </div>
+                <div class="code-line" data-line="11">        <span class="comment"># 扫描剩余元素（第一列以外的）</span></div>
+                <div class="code-line" data-line="12">        <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">1</span>, n):</div>
+                <div class="code-line" data-line="13">            <span class="keyword">if</span> matrix[i][j] == <span class="number">0</span>:</div>
+                <div class="code-line" data-line="14">                matrix[i][<span class="number">0</span>] = <span class="number">0</span>    <span class="comment"># 第一列对应的行头打标记</span></div>
+                <div class="code-line" data-line="15">                matrix[<span class="number">0</span>][j] = <span class="number">0</span>    <span class="comment"># 第一行对应的列头打标记</span></div>
+                <div class="code-line" data-line="16">                </div>
+                <div class="code-line" data-line="17">    <span class="comment"># 阶段二：必须从下往上、从右往左反向修改，防止标记被自己提前覆盖清除</span></div>
+                <div class="code-line" data-line="18">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m - <span class="number">1</span>, -<span class="number">1</span>, -<span class="number">1</span>):</div>
+                <div class="code-line" data-line="19">        <span class="keyword">for</span> j <span class="keyword">in</span> range(n - <span class="number">1</span>, <span class="number">0</span>, -<span class="number">1</span>):</div>
+                <div class="code-line" data-line="20">            <span class="keyword">if</span> matrix[i][<span class="number">0</span>] == <span class="number">0</span> <span class="keyword">or</span> matrix[<span class="number">0</span>][j] == <span class="number">0</span>:</div>
+                <div class="code-line" data-line="21">                matrix[i][j] = <span class="number">0</span></div>
+                <div class="code-line" data-line="22">                </div>
+                <div class="code-line" data-line="23">        <span class="comment"># 最后根据 flag_col0 处理特殊的第一列</span></div>
+                <div class="code-line" data-line="24">        <span class="keyword">if</span> flag_col0:</div>
+                <div class="code-line" data-line="25">            matrix[i][<span class="number">0</span>] = <span class="number">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="desc-box" id="descBox">准备就绪，点击开始逐步演示。</div>
+        <div class="btn-group">
+            <button id="btnReset">⟲ 重置</button>
+            <button id="btnPrev">⮜ 上一步</button>
+            <button id="btnPlay" class="primary">▶ 播放</button>
+            <button id="btnNext" class="primary">下一步 ⮞</button>
+        </div>
+    </div>
+
+    <script>
+        // Initial setup for the interesting test case
+        const initialMatrix = [
+            [1, 2, 0, 3],
+            [4, 0, 5, 2],
+            [1, 3, 1, 5]
+        ];
+        
+        const m = initialMatrix.length;
+        const n = initialMatrix[0].length;
+        
+        // State Machine Generator
+        let steps = [];
+        
+        function generateSteps() {
+            steps = [];
+            // Deep copy utility
+            const clone = (mat) => mat.map(row => [...row]);
+            let currentMat = clone(initialMatrix);
+            let flag = false;
+            let markers = []; // Track [r,c] coordinates of cells used as markers
+            let changedZeros = []; // Track [r,c] of cells newly turned to 0
+            
+            // Initialization step
+            steps.push({
+                matrix: clone(currentMat),
+                flag_col0: flag,
+                lines: [1, 2, 3],
+                desc: `初始化矩阵规模 m=${m}, n=${n}，并且设定专属变量 flag_col0 = False。`,
+                active: [],
+                markers: [],
+                changedZeros: []
+            });
+            
+            steps.push({
+                matrix: clone(currentMat),
+                flag_col0: flag,
+                lines: [5, 6],
+                desc: `【第一阶段：扫描预处理】开始全局遍历。我们将用第一行和第一列来“收纳记录”整个矩阵的 0 分布情况。`,
+                active: [],
+                markers: [],
+                changedZeros: []
+            });
+
+            // Phase 1
+            for (let i = 0; i < m; i++) {
+                // Check col 0
+                let col0Zero = false;
+                if (currentMat[i][0] === 0) {
+                    flag = true;
+                    col0Zero = true;
+                }
+                
+                steps.push({
+                    matrix: clone(currentMat),
+                    flag_col0: flag,
+                    lines: [7, 8, 9],
+                    desc: `检查第一列：发现 matrix[${i}][0] ${col0Zero ? '为 0！由于第一列有特殊变量兜底，我们将 flag_col0 置为 True。' : '不为 0。flag_col0 保持原样。'}`,
+                    active: [[i, 0]],
+                    markers: [...markers],
+                    changedZeros: [...changedZeros]
+                });
+
+                for (let j = 1; j < n; j++) {
+                    const isZero = currentMat[i][j] === 0;
+                    steps.push({
+                        matrix: clone(currentMat),
+                        flag_col0: flag,
+                        lines: [11, 12, 13],
+                        desc: `检查内部元素 matrix[${i}][${j}] = ${currentMat[i][j]}: ${isZero ? '它是 0！即将在对应的第一行与第一列打上标记。' : '非 0，跳过。'}`,
+                        active: [[i, j]],
+                        markers: [...markers],
+                        changedZeros: [...changedZeros]
+                    });
+
+                    if (isZero) {
+                        currentMat[i][0] = 0;
+                        currentMat[0][j] = 0;
+                        if (!markers.some(m => m[0]===i && m[1]===0)) markers.push([i, 0]);
+                        if (!markers.some(m => m[0]===0 && m[1]===j)) markers.push([0, j]);
+                        
+                        steps.push({
+                            matrix: clone(currentMat),
+                            flag_col0: flag,
+                            lines: [14, 15],
+                            desc: `投影打靶标记完毕：将同行的头部 matrix[${i}][0] 和同列的头部 matrix[0][${j}] 都强行设置为 0！此后它们将充当指示灯。`,
+                            active: [[i, 0], [0, j]],
+                            markers: [...markers],
+                            changedZeros: [...changedZeros]
+                        });
+                    }
+                }
+            }
+
+            steps.push({
+                matrix: clone(currentMat),
+                flag_col0: flag,
+                lines: [17],
+                desc: `【第一阶段完成】！此时第一行、第一列记录了所有行与列的存亡情况。现在准备根据指示灯反向肃清（避免指示灯被自身覆盖）。`,
+                active: [],
+                markers: [...markers],
+                changedZeros: [...changedZeros]
+            });
+
+            // Phase 2
+            for (let i = m - 1; i >= 0; i--) {
+                for (let j = n - 1; j >= 1; j--) {
+                    let oldVal = currentMat[i][j];
+                    let willZero = currentMat[i][0] === 0 || currentMat[0][j] === 0;
+                    
+                    steps.push({
+                        matrix: clone(currentMat),
+                        flag_col0: flag,
+                        lines: [18, 19, 20],
+                        desc: `倒序执行到了 matrix[${i}][${j}]。检查它对应的行灯 matrix[${i}][0]=${currentMat[i][0]} 和 列灯 matrix[0][${j}]=${currentMat[0][j]}。`,
+                        active: [[i, j], [i, 0], [0, j]],
+                        markers: [...markers],
+                        changedZeros: [...changedZeros]
+                    });
+
+                    if (willZero && oldVal !== 0) {
+                        currentMat[i][j] = 0;
+                        changedZeros.push([i, j]);
+                        steps.push({
+                            matrix: clone(currentMat),
+                            flag_col0: flag,
+                            lines: [21],
+                            desc: `由于行灯或列灯报警为 0，因此把 matrix[${i}][${j}] 置为 0。`,
+                            active: [[i, j]],
+                            markers: [...markers],
+                            changedZeros: [...changedZeros]
+                        });
+                    }
+                }
+
+                steps.push({
+                    matrix: clone(currentMat),
+                    flag_col0: flag,
+                    lines: [23, 24],
+                    desc: `接下来单独处理第一列的当前行头 matrix[${i}][0]。系统检查终极变量 flag_col0 = ${Math.floor(flag)}`,
+                    active: [[i, 0]],
+                    markers: [...markers],
+                    changedZeros: [...changedZeros]
+                });
+
+                if (flag && currentMat[i][0] !== 0) {
+                    currentMat[i][0] = 0;
+                    changedZeros.push([i, 0]);
+                    steps.push({
+                        matrix: clone(currentMat),
+                        flag_col0: flag,
+                        lines: [25],
+                        desc: `因为 flag_col0 是 True（原始第一列曾含有 0），所以将行首 matrix[${i}][0] 宣判为 0！`,
+                        active: [[i, 0]],
+                        markers: [...markers],
+                        changedZeros: [...changedZeros]
+                    });
+                }
+            }
+
+            steps.push({
+                matrix: clone(currentMat),
+                flag_col0: flag,
+                lines: [],
+                desc: `🎉 算法结束！成功在 O(1) 的额外空间下完成了原地的“矩阵置零”操作。`,
+                active: [],
+                markers: [],
+                changedZeros: [...changedZeros]
+            });
+        }
+
+        generateSteps();
+
+        // UI State
+        let currentStepIdx = 0;
+        let playInterval = null;
+
+        // Dom Elements
+        const matView = document.getElementById('matrixView');
+        const codeView = document.getElementById('codeView');
+        const descBox = document.getElementById('descBox');
+        const flagColVal = document.getElementById('flagColVal');
+        const varFlagCol = document.getElementById('varFlagCol');
+        const progressFill = document.getElementById('progressFill');
+        
+        // Renders
+        function renderStep(idx) {
+            const step = steps[idx];
+            
+            // --- Render Matrix ---
+            matView.innerHTML = '';
+            for (let i = 0; i < m; i++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'matrix-row';
+                for (let j = 0; j < n; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.innerText = step.matrix[i][j];
+                    
+                    // Tooltip
+                    const ttip = document.createElement('div');
+                    ttip.className = 'tooltip';
+                    ttip.innerText = `[${i},${j}]`;
+                    cell.appendChild(ttip);
+
+                    // States styling
+                    if (step.matrix[i][j] === 0 && initialMatrix[i][j] === 0) {
+                        cell.classList.add('is-zero');
+                    }
+                    if (step.markers.some(m => m[0]===i && m[1]===j)) {
+                        cell.classList.add('marker');
+                    }
+                    if (step.changedZeros.some(m => m[0]===i && m[1]===j)) {
+                        cell.classList.add('updated-zero');
+                    }
+                    if (step.active.some(m => m[0]===i && m[1]===j)) {
+                        cell.classList.add('scanning');
+                    }
+                    rowDiv.appendChild(cell);
+                }
+                matView.appendChild(rowDiv);
+            }
+
+            // --- Render Variables ---
+            flagColVal.innerText = step.flag_col0 ? "True" : "False";
+            flagColVal.className = `var-val ${step.flag_col0 ? "true" : "false"}`;
+            
+            // Highlight flag_col div if active
+            const flagWasUpdated = idx > 0 && steps[idx-1].flag_col0 !== step.flag_col0;
+            const flagIsRead = step.lines.includes(24);
+            if (flagWasUpdated || flagIsRead) {
+                varFlagCol.classList.add('active');
+                setTimeout(() => varFlagCol.classList.remove('active'), 800);
+            }
+
+            // --- Render Code Highlight ---
+            document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+            let firstActiveLine = null;
+            step.lines.forEach(l => {
+                const line = document.querySelector(`.code-line[data-line="${l}"]`);
+                if (line) {
+                    line.classList.add('active');
+                    if (!firstActiveLine) firstActiveLine = line;
+                }
+            });
+            if (firstActiveLine) {
+                firstActiveLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // --- Render Desc ---
+            descBox.innerHTML = step.desc;
+
+            // --- Progress ---
+            progressFill.style.width = `${((idx) / (steps.length - 1)) * 100}%`;
+
+            // Button states
+            document.getElementById('btnPrev').disabled = idx === 0;
+            document.getElementById('btnNext').disabled = idx === steps.length - 1;
+            
+            if (idx === steps.length - 1 && playInterval) {
+                togglePlay(); // Stop when finished
+            }
+        }
+
+        // Controls Logic
+        function nextStep() {
+            if (currentStepIdx < steps.length - 1) {
+                currentStepIdx++;
+                renderStep(currentStepIdx);
+            }
+        }
+
+        function prevStep() {
+            if (currentStepIdx > 0) {
+                currentStepIdx--;
+                renderStep(currentStepIdx);
+            }
+        }
+
+        function togglePlay() {
+            const btn = document.getElementById('btnPlay');
+            if (playInterval) {
+                clearInterval(playInterval);
+                playInterval = null;
+                btn.innerHTML = '▶ 播放';
+                btn.classList.add('primary');
+            } else {
+                if(currentStepIdx === steps.length - 1) currentStepIdx = 0; // wrap around
+                playInterval = setInterval(nextStep, 1000); // 1s per step for better seeing
+                btn.innerHTML = '⏸ 暂停';
+                btn.classList.remove('primary');
+            }
+        }
+
+        document.getElementById('btnNext').addEventListener('click', () => {
+            if(playInterval) togglePlay();
+            nextStep();
+        });
+        
+        document.getElementById('btnPrev').addEventListener('click', () => {
+            if(playInterval) togglePlay();
+            prevStep();
+        });
+        
+        document.getElementById('btnPlay').addEventListener('click', togglePlay);
+        
+        document.getElementById('btnReset').addEventListener('click', () => {
+            if(playInterval) togglePlay();
+            currentStepIdx = 0;
+            renderStep(currentStepIdx);
+        });
+
+        // Key bindings
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') { document.getElementById('btnNext').click(); }
+            if (e.key === 'ArrowLeft') { document.getElementById('btnPrev').click(); }
+            if (e.key === ' ') { e.preventDefault(); document.getElementById('btnPlay').click(); }
+        });
+
+        // Initialize First render
+        renderStep(0);
+    </script>
+</body>
+</html>

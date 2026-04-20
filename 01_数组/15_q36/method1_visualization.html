@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 36: 有效的数独 - 三次遍历法演示</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #f0f4f8;
+            --container-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --grid-line: #94a3b8;
+            --grid-thick-line: #1e293b;
+            --cell-bg: #ffffff;
+            --cell-filled: #0f172a;
+            
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            
+            --hl-row: rgba(59, 130, 246, 0.2);
+            --hl-col: rgba(16, 185, 129, 0.2);
+            --hl-box: rgba(139, 92, 246, 0.2);
+            --hl-active: #bae6fd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .right-panel {
+            flex: 1.2;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fafbfc;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        p.desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .status-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: auto;
+        }
+
+        .status-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #status-text {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: white;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* 数独棋盘 */
+        .sudoku-container {
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1;
+            background-color: var(--grid-thick-line);
+            padding: 3px;
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            gap: 1px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .cell {
+            background-color: var(--cell-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--cell-filled);
+            transition: all 0.3s ease;
+        }
+
+        /* 3x3 块加粗边框 */
+        .cell:nth-child(3n) { margin-right: 2px; }
+        .cell:nth-child(9n) { margin-right: 0; }
+        
+        .sudoku-container > :nth-child(n+19):nth-child(-n+27),
+        .sudoku-container > :nth-child(n+46):nth-child(-n+54) {
+            margin-bottom: 2px;
+        }
+
+        /* 状态高亮类 */
+        .cell.hl-row { background-color: var(--hl-row); }
+        .cell.hl-col { background-color: var(--hl-col); }
+        .cell.hl-box { background-color: var(--hl-box); }
+        .cell.scanning { 
+            background-color: var(--hl-active);
+            transform: scale(0.95);
+            border-radius: 4px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-top: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 800px) {
+            .container {
+                flex-direction: column;
+            }
+            .left-panel, .right-panel {
+                border-right: none;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="left-panel">
+            <h1>三次遍历法演示</h1>
+            <p class="desc">
+                解题方法一采用最直观的暴力扫描方案。<br><br>
+                整个过程分为三个截然不同的阶段：<br>
+                1. 扫描校验 9 个独立行<br>
+                2. 扫描校验 9 个独立列<br>
+                3. 扫描校验 9 个 3x3 独立宫<br><br>
+                每次仅校验一组内的数字，如果不出现重复数字，则继续前进直到最后。此方法的空间复杂度固定不变，时间复杂度与方格总数呈线性关联。
+            </p>
+
+            <div class="status-box">
+                <div class="status-title" id="phase-title">当前阶段：准备就绪</div>
+                <div id="status-text">点击播放开始演示校验过程。</div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-outline" onclick="reset()" id="btn-reset">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    重置
+                </button>
+                <button class="btn-primary" onclick="togglePlay()" id="btn-play">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="play-icon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span id="play-text">自动播放</span>
+                </button>
+                <button class="btn-outline" onclick="stepForward()" id="btn-step">
+                    单步执行
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="sudoku-container" id="board">
+                <!-- Cells will be injected by JavaScript -->
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--hl-row)"></div>
+                    <span>行校验</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--hl-col)"></div>
+                    <span>列校验</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--hl-box)"></div>
+                    <span>宫校验</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 力扣第36题示例数独盘面
+        const boardData = [
+            ["5","3",".",".","7",".",".",".","."],
+            ["6",".",".","1","9","5",".",".","."],
+            [".","9","8",".",".",".",".","6","."],
+            ["8",".",".",".","6",".",".",".","3"],
+            ["4",".",".","8",".","3",".",".","1"],
+            ["7",".",".",".","2",".",".",".","6"],
+            [".","6",".",".",".",".","2","8","."],
+            [".",".",".","4","1","9",".",".","5"],
+            [".",".",".",".","8",".",".","7","9"]
+        ];
+
+        const boardEl = document.getElementById('board');
+        const cells = [];
+
+        // 初始化棋盘
+        function initBoard() {
+            boardEl.innerHTML = '';
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const val = boardData[r][c];
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.textContent = val === '.' ? '' : val;
+                    boardEl.appendChild(cell);
+                    cells.push(cell);
+                }
+            }
+        }
+
+        // 定义所有的校验步骤
+        const steps = [];
+        // 1. 生成 9 步：检查行
+        for (let i = 0; i < 9; i++) {
+            steps.push({ phase: 'row', index: i, name: `第 ${i+1} 行` });
+        }
+        // 2. 生成 9 步：检查列
+        for (let j = 0; j < 9; j++) {
+            steps.push({ phase: 'col', index: j, name: `第 ${j+1} 列` });
+        }
+        // 3. 生成 9 步：检查宫
+        for (let b = 0; b < 9; b++) {
+            steps.push({ phase: 'box', index: b, name: `第 ${b+1} 宫` });
+        }
+
+        let currentStep = -1;
+        let isPlaying = false;
+        let playInterval = null;
+
+        const ui = {
+            phaseTitle: document.getElementById('phase-title'),
+            statusText: document.getElementById('status-text'),
+            playBtnText: document.getElementById('play-text'),
+            playIcon: document.getElementById('play-icon'),
+            progressBar: document.getElementById('progress-bar')
+        };
+
+        function clearHighlights() {
+            cells.forEach(c => {
+                c.className = 'cell';
+            });
+        }
+
+        function highlightIndices(indices, cssClass) {
+            indices.forEach(idx => {
+                cells[idx].classList.add(cssClass);
+                // 添加一个小动画效果
+                cells[idx].classList.add('scanning');
+                setTimeout(() => {
+                    if (cells[idx]) {
+                        cells[idx].classList.remove('scanning');
+                    }
+                }, 150);
+            });
+        }
+
+        function executeStep(stepObj) {
+            clearHighlights();
+            const indices = [];
+            let nums = [];
+
+            if (stepObj.phase === 'row') {
+                const r = stepObj.index;
+                for (let c = 0; c < 9; c++) {
+                    indices.push(r * 9 + c);
+                    if (boardData[r][c] !== '.') nums.push(boardData[r][c]);
+                }
+                highlightIndices(indices, 'hl-row');
+                ui.phaseTitle.textContent = "第一阶段：行扫描";
+                ui.phaseTitle.style.color = "var(--primary)";
+
+            } else if (stepObj.phase === 'col') {
+                const c = stepObj.index;
+                for (let r = 0; r < 9; r++) {
+                    indices.push(r * 9 + c);
+                    if (boardData[r][c] !== '.') nums.push(boardData[r][c]);
+                }
+                highlightIndices(indices, 'hl-col');
+                ui.phaseTitle.textContent = "第二阶段：列扫描";
+                ui.phaseTitle.style.color = "var(--success)";
+
+            } else if (stepObj.phase === 'box') {
+                const b = stepObj.index;
+                const startRow = Math.floor(b / 3) * 3;
+                const startCol = (b % 3) * 3;
+                for (let r = startRow; r < startRow + 3; r++) {
+                    for (let c = startCol; c < startCol + 3; c++) {
+                        indices.push(r * 9 + c);
+                        if (boardData[r][c] !== '.') nums.push(boardData[r][c]);
+                    }
+                }
+                highlightIndices(indices, 'hl-box');
+                ui.phaseTitle.textContent = "第三阶段：宫扫描";
+                ui.phaseTitle.style.color = "#8b5cf6";
+            }
+
+            ui.statusText.innerHTML = `正在校验 <strong>${stepObj.name}</strong><br>发现非空数字: <code>[${nums.join(', ')}]</code><br><span style="color:#10b981; font-size:0.9rem; margin-top:8px; display:block;">✔ 无重复块，有效。</span>`;
+
+            // Update Progress
+            const progress = ((currentStep + 1) / steps.length) * 100;
+            ui.progressBar.style.width = `${progress}%`;
+        }
+
+        function stepForward() {
+            if (currentStep >= steps.length - 1) {
+                // Done
+                pausePlay();
+                clearHighlights();
+                ui.phaseTitle.textContent = "✅ 校验完毕";
+                ui.phaseTitle.style.color = "var(--success)";
+                ui.statusText.innerHTML = `经过三个阶段对整个 9x9 棋盘的遍历核查，所有行、列、宫均没有出现重叠重复的数字。<br><br><strong>该数独合法 (返回 True)！</strong>`;
+                ui.progressBar.style.width = `100%`;
+                return;
+            }
+            currentStep++;
+            executeStep(steps[currentStep]);
+        }
+
+        function togglePlay() {
+            if (currentStep >= steps.length - 1) {
+                reset(); // replay if ended
+            }
+
+            if (isPlaying) {
+                pausePlay();
+            } else {
+                startPlay();
+            }
+        }
+
+        function startPlay() {
+            isPlaying = true;
+            ui.playBtnText.textContent = "暂停";
+            ui.playIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+            
+            // Execute immediately if first time or unpausing
+            stepForward();
+            playInterval = setInterval(stepForward, 600); // 600ms per step
+        }
+
+        function pausePlay() {
+            isPlaying = false;
+            ui.playBtnText.textContent = "自动播放";
+            ui.playIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+            clearInterval(playInterval);
+        }
+
+        function reset() {
+            pausePlay();
+            currentStep = -1;
+            ui.phaseTitle.textContent = "当前阶段：准备就绪";
+            ui.phaseTitle.style.color = "var(--primary)";
+            ui.statusText.innerHTML = "点击播放开始演示校验过程。";
+            ui.progressBar.style.width = `0%`;
+            clearHighlights();
+        }
+
+        // Initialize on load
+        window.onload = initBoard;
+
+    </script>
+</body>
+</html>
