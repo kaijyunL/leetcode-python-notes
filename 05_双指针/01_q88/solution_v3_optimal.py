@@ -23,7 +23,10 @@ class Solution:
             
         # 如果 nums2 还有剩余，将其复制到 nums1 前面
         # (如果 nums1 还有剩余则不需要动，因为它们已经在正确的位置上了)
-        nums1[:p2 + 1] = nums2[:p2 + 1]
+        while p2 >= 0:
+            nums1[p] = nums2[p2]
+            p -= 1
+            p2 -= 1
 
 if __name__ == "__main__":
     n1 = [1, 2, 3, 0, 0, 0]
