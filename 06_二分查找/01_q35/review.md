@@ -87,18 +87,18 @@ O(1)
 这题本质上是在找：
 
 ```text
-第一个大于等于 target 的位置
+最后一个小于 target 的位置
 ```
 
-也就是：
+找到这个位置后，插入位置就是它的右边：
 
 ```text
-first index where nums[index] >= target
+right + 1
 ```
 
-如果这个位置存在，它就是 `target` 的位置或插入位置。
+如果没有任何数小于 `target`，`right` 会停在 `-1`，答案就是 `0`。
 
-如果这个位置不存在，说明所有数都小于 `target`，答案就是 `len(nums)`。
+如果所有数都小于 `target`，`right` 会停在 `len(nums) - 1`，答案就是 `len(nums)`。
 
 ### 二分边界
 
@@ -124,34 +124,34 @@ mid = (left + right) // 2
 如果：
 
 ```text
-nums[mid] >= target
-```
-
-说明答案可能是 `mid`，也可能在 `mid` 左边。
-
-所以收缩右边界：
-
-```python
-right = mid - 1
-```
-
-如果：
-
-```text
 nums[mid] < target
 ```
 
-说明 `mid` 以及左边都太小了，答案只能在右边。
+说明 `mid` 是一个满足条件的位置，但可能还有更靠右的位置也小于 `target`。
 
-所以：
+所以继续往右找：
 
 ```python
 left = mid + 1
 ```
 
-循环结束后，`left` 就是第一个大于等于 `target` 的位置。
+如果：
 
-### 为什么最后返回 left
+```text
+nums[mid] >= target
+```
+
+说明 `mid` 太大，最后一个小于 `target` 的位置只能在左边。
+
+所以：
+
+```python
+right = mid - 1
+```
+
+循环结束后，`right` 就是最后一个小于 `target` 的位置。
+
+### 为什么最后返回 right + 1
 
 循环结束时：
 
@@ -159,21 +159,19 @@ left = mid + 1
 right < left
 ```
 
-`left` 会停在第一个满足：
+`right` 会停在最后一个满足：
 
 ```text
-nums[left] >= target
+nums[right] < target
 ```
 
 的位置。
 
-如果 `target` 比所有数都大，`left` 会移动到：
+插入位置应该在它的右边，所以返回：
 
 ```text
-len(nums)
+right + 1
 ```
-
-这正好是插入到末尾的位置。
 
 ### 面试推荐讲法
 
@@ -181,10 +179,11 @@ len(nums)
 
 1. 线性扫描可以做，但复杂度是 `O(n)`。
 2. 数组有序，所以可以使用二分查找。
-3. 这题不是只找等于 `target`，而是找第一个大于等于 `target` 的位置。
-4. 如果 `nums[mid] >= target`，说明当前位置可能是答案，继续向左找。
-5. 如果 `nums[mid] < target`，说明答案只能在右边。
-6. 最后返回 `left`。
+3. 统一模板：找最后一个满足条件的位置。
+4. 这题的条件是 `nums[mid] < target`。
+5. 如果满足，就 `left = mid + 1` 继续向右找。
+6. 如果不满足，就 `right = mid - 1` 向左收缩。
+7. 最后返回 `right + 1`。
 
 ### 复杂度
 
@@ -213,11 +212,11 @@ O(1)
 面试最推荐：
 
 ```text
-二分查找：找第一个大于等于 target 的位置
+二分查找：找最后一个小于 target 的位置
 ```
 
 关键一句话：
 
 ```text
-nums[mid] >= target 时往左收缩，nums[mid] < target 时往右查找，最后返回 left。
+nums[mid] < target 时 left = mid + 1，否则 right = mid - 1，最后返回 right + 1。
 ```
