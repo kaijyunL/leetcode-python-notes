@@ -1,29 +1,16 @@
 class Solution:
     def sortArray(self, nums: list[int]) -> list[int]:
-        """
-        归并排序：分治排序后合并两个有序区间
-        时间复杂度: O(n log n)
-        空间复杂度: O(n)
-        """
-        if len(nums) <= 1:
-            return nums
-
         temp = [0] * len(nums)
 
         def merge_sort(left: int, right: int) -> None:
             if left >= right:
                 return
 
-            mid = (left + right) // 2
+            mid = left + (right - left) // 2
             merge_sort(left, mid)
             merge_sort(mid + 1, right)
 
-            if nums[mid] <= nums[mid + 1]:
-                return
-
-            i = left
-            j = mid + 1
-            k = left
+            i, j, k = left, mid + 1, left
 
             while i <= mid and j <= right:
                 if nums[i] <= nums[j]:
@@ -44,8 +31,7 @@ class Solution:
                 j += 1
                 k += 1
 
-            for index in range(left, right + 1):
-                nums[index] = temp[index]
+            nums[left : right + 1] = temp[left : right + 1]
 
         merge_sort(0, len(nums) - 1)
         return nums
