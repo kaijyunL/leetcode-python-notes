@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeetCode 144 方法2：显式栈迭代可视化</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: #0f172a;
+      --panel-2: #111827;
+      --border: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --blue: #38bdf8;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --purple: #a78bfa;
+      --red: #ef4444;
+      --orange: #fb7185;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: rgba(2, 6, 23, 0.92);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--blue);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: #1e293b;
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    button:hover { border-color: var(--blue); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    input[type="range"] { accent-color: var(--blue); }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+      min-height: calc(100vh - 84px);
+    }
+
+    .left, .right {
+      padding: 18px;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .left { border-right: 1px solid var(--border); }
+
+    .card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card h2, .card h3 {
+      margin: 0 0 12px 0;
+      font-size: 15px;
+      color: var(--blue);
+    }
+
+    .status {
+      min-height: 88px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f8fafc;
+      word-break: break-word;
+    }
+
+    .visual-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 240px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .tree-box, .stack-box, .tips-box {
+      background: rgba(2, 6, 23, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .edge {
+      stroke: #475569;
+      stroke-width: 3;
+      opacity: 0.8;
+    }
+
+    .edge.active {
+      stroke: var(--yellow);
+      stroke-width: 4;
+      opacity: 1;
+    }
+
+    .node circle {
+      fill: #1e293b;
+      stroke: #64748b;
+      stroke-width: 3;
+      transition: 0.2s ease;
+    }
+
+    .node text {
+      fill: #e5e7eb;
+      font-size: 18px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .node.current circle {
+      fill: rgba(56, 189, 248, 0.18);
+      stroke: var(--blue);
+    }
+
+    .node.visited circle {
+      fill: rgba(34, 197, 94, 0.18);
+      stroke: var(--green);
+    }
+
+    .node.pushed circle {
+      fill: rgba(167, 139, 250, 0.16);
+      stroke: var(--purple);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+
+    .stack-title {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .stack-items {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+      min-height: 200px;
+    }
+
+    .stack-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #111827;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .stack-item.top {
+      border-color: var(--purple);
+      background: rgba(167, 139, 250, 0.16);
+    }
+
+    .tip {
+      padding: 10px 12px;
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      background: rgba(245, 158, 11, 0.12);
+      border-radius: 10px;
+      color: #fde68a;
+      line-height: 1.7;
+      font-size: 13px;
+    }
+
+    .code-block {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .code-header {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .code-line {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      padding: 7px 14px;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre;
+    }
+
+    .code-line.active {
+      background: rgba(56, 189, 248, 0.16);
+    }
+
+    .line-no {
+      color: #64748b;
+      text-align: right;
+      user-select: none;
+    }
+
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      .left { border-right: none; border-bottom: 1px solid var(--border); }
+      .visual-wrap { grid-template-columns: 1fr; }
+      .state-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>LeetCode 144 前序遍历 · 方法2 显式栈迭代</h1>
+      <div class="subtitle">这是最适合面试的方法：手动模拟递归，用栈控制访问顺序，关键点是“先压右，再压左”。</div>
+    </div>
+    <div class="controls">
+      <button id="prevBtn">上一步</button>
+      <button id="nextBtn">下一步</button>
+      <button id="playBtn">自动播放</button>
+      <button id="resetBtn">重置</button>
+      <div class="range-wrap">
+        <span>进度</span>
+        <input id="progress" type="range" min="0" max="0" value="0" />
+      </div>
+      <div class="range-wrap">
+        <span>速度</span>
+        <input id="speed" type="range" min="300" max="1500" step="100" value="850" />
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="left">
+      <div class="card">
+        <h2>当前步骤</h2>
+        <div class="status" id="status"></div>
+        <div class="meta">
+          <span id="stepInfo"></span>
+          <span>最终输出应为 [1, 2, 4, 5, 3, 6]</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>状态</h2>
+        <div class="state-grid">
+          <div class="stat">
+            <div class="stat-label">当前节点</div>
+            <div class="stat-value" id="currentNode">-</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">当前栈</div>
+            <div class="stat-value" id="stackView">[]</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">当前结果</div>
+            <div class="stat-value" id="resultView">[]</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card visual-wrap">
+        <div>
+          <div class="tree-box">
+            <h3>树的状态</h3>
+            <svg viewBox="0 0 520 260" aria-label="binary tree">
+              <line id="edge-1-2" class="edge" x1="260" y1="48" x2="160" y2="110"></line>
+              <line id="edge-1-3" class="edge" x1="260" y1="48" x2="360" y2="110"></line>
+              <line id="edge-2-4" class="edge" x1="160" y1="128" x2="95" y2="196"></line>
+              <line id="edge-2-5" class="edge" x1="160" y1="128" x2="225" y2="196"></line>
+              <line id="edge-3-6" class="edge" x1="360" y1="128" x2="425" y2="196"></line>
+
+              <g id="node-1" class="node"><circle cx="260" cy="36" r="28"></circle><text x="260" y="36">1</text></g>
+              <g id="node-2" class="node"><circle cx="160" cy="120" r="28"></circle><text x="160" y="120">2</text></g>
+              <g id="node-3" class="node"><circle cx="360" cy="120" r="28"></circle><text x="360" y="120">3</text></g>
+              <g id="node-4" class="node"><circle cx="95" cy="206" r="28"></circle><text x="95" y="206">4</text></g>
+              <g id="node-5" class="node"><circle cx="225" cy="206" r="28"></circle><text x="225" y="206">5</text></g>
+              <g id="node-6" class="node"><circle cx="425" cy="206" r="28"></circle><text x="425" y="206">6</text></g>
+            </svg>
+            <div class="legend">
+              <div class="legend-item"><span class="dot" style="background:#38bdf8"></span><span>当前弹出节点</span></div>
+              <div class="legend-item"><span class="dot" style="background:#22c55e"></span><span>已加入结果</span></div>
+              <div class="legend-item"><span class="dot" style="background:#a78bfa"></span><span>已压栈待处理</span></div>
+              <div class="legend-item"><span class="dot" style="background:#f59e0b"></span><span>当前关注边</span></div>
+            </div>
+          </div>
+
+          <div class="tips-box" style="margin-top:16px;">
+            <h3>面试关键点</h3>
+            <div class="tip">
+              栈是 <strong>后进先出</strong>。<br>
+              前序想要的是 <strong>根 → 左 → 右</strong>。<br>
+              所以处理一个节点后，必须<strong>先压右子节点，再压左子节点</strong>，这样左子节点才会先弹出。<br><br>
+              常见错误：先压左再压右，结果会变成 <strong>根 → 右 → 左</strong>。
+            </div>
+          </div>
+        </div>
+
+        <div class="stack-box">
+          <h3>显式栈</h3>
+          <div class="stack-title">栈顶显示在最上面</div>
+          <div id="stackItems" class="stack-items"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="right">
+      <div class="card">
+        <h2>核心代码</h2>
+        <div class="code-block">
+          <div class="code-header">solution_2_iterative_stack.py</div>
+          <div id="code"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const codeLines = [
+      'def preorderTraversal(self, root):',
+      '    if root is None:',
+      '        return []',
+      '',
+      '    ans = []',
+      '    stack = [root]',
+      '',
+      '    while stack:',
+      '        node = stack.pop()',
+      '        ans.append(node.val)',
+      '',
+      '        if node.right is not None:',
+      '            stack.append(node.right)',
+      '        if node.left is not None:',
+      '            stack.append(node.left)',
+      '',
+      '    return ans'
+    ];
+
+    const treeNodes = ['1', '2', '3', '4', '5', '6'];
+    const treeEdges = ['1-2', '1-3', '2-4', '2-5', '3-6'];
+    const tree = {
+      '1': { left: '2', right: '3' },
+      '2': { left: '4', right: '5' },
+      '3': { left: null, right: '6' },
+      '4': { left: null, right: null },
+      '5': { left: null, right: null },
+      '6': { left: null, right: null }
+    };
+
+    function makeStep({ title, desc, line, current = null, result = [], stack = [], visited = [], pushed = [], edge = null }) {
+      return { title, desc, line, current, result, stack, visited, pushed, edge };
+    }
+
+    function buildIterativeSteps() {
+      const steps = [];
+      const result = [];
+      const stack = [];
+      const visited = new Set();
+      const pushed = new Set();
+
+      function snapshot(payload) {
+        steps.push(makeStep({
+          ...payload,
+          result: [...result],
+          stack: [...stack],
+          visited: [...visited],
+          pushed: [...pushed]
+        }));
+      }
+
+      snapshot({
+        title: '开始遍历',
+        desc: 'root 不为空，所以先创建答案数组，并把 root 压入栈中。',
+        line: 5,
+        current: null
+      });
+
+      stack.push('1');
+      pushed.add('1');
+      snapshot({
+        title: '初始化栈',
+        desc: '执行 stack = [root]。此时栈里只有根节点 1。',
+        line: 6,
+        current: '1'
+      });
+
+      while (stack.length) {
+        snapshot({
+          title: '检查 while stack',
+          desc: `当前栈不为空，进入下一轮循环。此时栈顶是 ${stack[stack.length - 1]}。`,
+          line: 8,
+          current: stack[stack.length - 1]
+        });
+
+        const node = stack.pop();
+        snapshot({
+          title: `弹出节点 ${node}`,
+          desc: `执行 node = stack.pop()。当前真正要处理的节点是 ${node}。`,
+          line: 9,
+          current: node
+        });
+
+        result.push(Number(node));
+        visited.add(node);
+        pushed.delete(node);
+        snapshot({
+          title: `访问节点 ${node}`,
+          desc: `执行 ans.append(${node})。前序遍历的特点是：节点一弹出，就立刻加入结果。`,
+          line: 10,
+          current: node
+        });
+
+        if (tree[node].right) {
+          stack.push(tree[node].right);
+          pushed.add(tree[node].right);
+          snapshot({
+            title: `先压右子节点 ${tree[node].right}`,
+            desc: `先执行 stack.append(node.right)。注意这一步非常关键：右边必须先入栈。`,
+            line: 13,
+            current: node,
+            edge: `${node}-${tree[node].right}`
+          });
+        } else {
+          snapshot({
+            title: `节点 ${node} 没有右子节点`,
+            desc: 'if node.right is not None 条件不成立，这一步跳过。',
+            line: 12,
+            current: node
+          });
+        }
+
+        if (tree[node].left) {
+          stack.push(tree[node].left);
+          pushed.add(tree[node].left);
+          snapshot({
+            title: `再压左子节点 ${tree[node].left}`,
+            desc: `再执行 stack.append(node.left)。因为栈后进先出，所以左子节点会先于右子节点被处理。`,
+            line: 15,
+            current: node,
+            edge: `${node}-${tree[node].left}`
+          });
+        } else {
+          snapshot({
+            title: `节点 ${node} 没有左子节点`,
+            desc: 'if node.left is not None 条件不成立，这一步跳过。',
+            line: 14,
+            current: node
+          });
+        }
+      }
+
+      snapshot({
+        title: '返回结果',
+        desc: '栈已经为空，所有节点都按前序顺序访问完成，最后返回答案。',
+        line: 17,
+        current: null
+      });
+
+      return steps;
+    }
+
+    const steps = buildIterativeSteps();
+    const statusEl = document.getElementById('status');
+    const stepInfoEl = document.getElementById('stepInfo');
+    const currentNodeEl = document.getElementById('currentNode');
+    const stackViewEl = document.getElementById('stackView');
+    const resultViewEl = document.getElementById('resultView');
+    const stackItemsEl = document.getElementById('stackItems');
+    const codeEl = document.getElementById('code');
+    const progressEl = document.getElementById('progress');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const playBtn = document.getElementById('playBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const speedEl = document.getElementById('speed');
+
+    let currentStep = 0;
+    let timer = null;
+
+    function escapeHtml(str) {
+      return str
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+    }
+
+    function renderCode() {
+      codeEl.innerHTML = '';
+      codeLines.forEach((line, index) => {
+        const row = document.createElement('div');
+        row.className = 'code-line';
+        row.dataset.line = index + 1;
+        row.innerHTML = `<div class="line-no">${index + 1}</div><div>${escapeHtml(line)}</div>`;
+        codeEl.appendChild(row);
+      });
+    }
+
+    function clearHighlights() {
+      treeNodes.forEach(id => {
+        document.getElementById(`node-${id}`).className.baseVal = 'node';
+      });
+      treeEdges.forEach(id => {
+        document.getElementById(`edge-${id}`).className.baseVal = 'edge';
+      });
+      document.querySelectorAll('.code-line').forEach(line => line.classList.remove('active'));
+    }
+
+    function renderStack(stack) {
+      stackItemsEl.innerHTML = '';
+      stack.forEach((value, index) => {
+        const div = document.createElement('div');
+        div.className = 'stack-item' + (index === stack.length - 1 ? ' top' : '');
+        div.textContent = value;
+        stackItemsEl.appendChild(div);
+      });
+    }
+
+    function renderStep(index) {
+      const step = steps[index];
+      clearHighlights();
+
+      statusEl.innerHTML = `<strong>${step.title}</strong><br>${step.desc}`;
+      stepInfoEl.textContent = `步骤 ${index + 1} / ${steps.length}`;
+      currentNodeEl.textContent = step.current ?? '-';
+      stackViewEl.textContent = `[${step.stack.join(', ')}]`;
+      resultViewEl.textContent = `[${step.result.join(', ')}]`;
+      progressEl.value = index;
+
+      if (step.line) {
+        const lineEl = document.querySelector(`.code-line[data-line="${step.line}"]`);
+        if (lineEl) lineEl.classList.add('active');
+      }
+
+      step.visited.forEach(id => {
+        const node = document.getElementById(`node-${id}`);
+        if (node) node.classList.add('visited');
+      });
+      step.pushed.forEach(id => {
+        if (!step.visited.includes(id)) {
+          const node = document.getElementById(`node-${id}`);
+          if (node) node.classList.add('pushed');
+        }
+      });
+      if (step.current) {
+        const node = document.getElementById(`node-${step.current}`);
+        if (node) node.classList.add('current');
+      }
+      if (step.edge) {
+        const edge = document.getElementById(`edge-${step.edge}`);
+        if (edge) edge.classList.add('active');
+      }
+
+      renderStack(step.stack);
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === steps.length - 1;
+    }
+
+    function stopPlay() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      playBtn.textContent = '自动播放';
+    }
+
+    function nextStep() {
+      if (currentStep < steps.length - 1) {
+        currentStep += 1;
+        renderStep(currentStep);
+      } else {
+        stopPlay();
+      }
+    }
+
+    prevBtn.addEventListener('click', () => {
+      stopPlay();
+      if (currentStep > 0) {
+        currentStep -= 1;
+        renderStep(currentStep);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      stopPlay();
+      nextStep();
+    });
+
+    playBtn.addEventListener('click', () => {
+      if (timer) {
+        stopPlay();
+        return;
+      }
+      playBtn.textContent = '暂停';
+      timer = setInterval(nextStep, Number(speedEl.value));
+    });
+
+    resetBtn.addEventListener('click', () => {
+      stopPlay();
+      currentStep = 0;
+      renderStep(currentStep);
+    });
+
+    progressEl.addEventListener('input', (e) => {
+      stopPlay();
+      currentStep = Number(e.target.value);
+      renderStep(currentStep);
+    });
+
+    speedEl.addEventListener('input', () => {
+      if (timer) {
+        stopPlay();
+        playBtn.click();
+      }
+    });
+
+    progressEl.max = steps.length - 1;
+    renderCode();
+    renderStep(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LeetCode 94 方法一：递归中序遍历动态讲解</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #64748b;
+      --line: #d8dee9;
+      --code-bg: #101827;
+      --code-text: #dbe7ff;
+      --code-muted: #7f8da3;
+      --active: #2563eb;
+      --active-soft: #dbeafe;
+      --stack: #f59e0b;
+      --stack-soft: #fff3cf;
+      --done: #059669;
+      --done-soft: #d1fae5;
+      --danger: #dc2626;
+      --danger-soft: #fee2e2;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    header {
+      padding: 22px 28px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(420px, 1fr) minmax(430px, 0.95fr);
+      gap: 18px;
+      padding: 18px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 50px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .step-pill {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .visual-body {
+      padding: 14px 16px 16px;
+    }
+
+    .tree-wrap {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcff;
+      overflow: hidden;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .edge {
+      stroke: #a9b4c4;
+      stroke-width: 3;
+      stroke-linecap: round;
+      transition: stroke 180ms ease, stroke-width 180ms ease;
+    }
+
+    .edge.active {
+      stroke: var(--active);
+      stroke-width: 5;
+    }
+
+    .node circle {
+      fill: #ffffff;
+      stroke: #94a3b8;
+      stroke-width: 3;
+      transition: fill 180ms ease, stroke 180ms ease, stroke-width 180ms ease;
+    }
+
+    .node text {
+      font-size: 18px;
+      font-weight: 800;
+      fill: var(--text);
+      dominant-baseline: middle;
+      text-anchor: middle;
+      transition: fill 180ms ease;
+    }
+
+    .node.in-stack circle {
+      fill: var(--stack-soft);
+      stroke: var(--stack);
+    }
+
+    .node.visited circle {
+      fill: var(--done-soft);
+      stroke: var(--done);
+    }
+
+    .node.current circle {
+      fill: var(--active-soft);
+      stroke: var(--active);
+      stroke-width: 5;
+    }
+
+    .node.current text {
+      fill: #1d4ed8;
+    }
+
+    .null-marker rect {
+      fill: var(--danger-soft);
+      stroke: var(--danger);
+      stroke-width: 2;
+      stroke-dasharray: 5 4;
+      rx: 7;
+    }
+
+    .null-marker text {
+      fill: var(--danger);
+      font-size: 13px;
+      font-weight: 800;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .state-row {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #ffffff;
+    }
+
+    .state-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .state-text {
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 30px;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      min-height: 28px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #eef2f7;
+      border: 1px solid #d5dde8;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .chip.call {
+      background: var(--stack-soft);
+      border-color: #f7c768;
+      color: #92400e;
+    }
+
+    .chip.answer {
+      background: var(--done-soft);
+      border-color: #8de2bf;
+      color: #047857;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .code-panel {
+      background: var(--code-bg);
+      color: var(--code-text);
+    }
+
+    .code-panel .panel-title {
+      background: #0b1220;
+      border-bottom-color: #263449;
+      color: #eef5ff;
+    }
+
+    .code-wrap {
+      padding: 14px 0;
+      overflow: auto;
+      max-height: 650px;
+    }
+
+    .code-line {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 12px;
+      padding: 5px 18px 5px 0;
+      min-height: 28px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 14px;
+      line-height: 1.45;
+      white-space: pre;
+      border-left: 4px solid transparent;
+    }
+
+    .line-number {
+      color: var(--code-muted);
+      text-align: right;
+      user-select: none;
+    }
+
+    .code-line.active {
+      background: rgba(37, 99, 235, 0.18);
+      border-left-color: #60a5fa;
+    }
+
+    .code-line.active .line-number {
+      color: #bfdbfe;
+      font-weight: 800;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto auto auto auto 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 14px 18px 18px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    button {
+      min-height: 38px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font-weight: 800;
+      padding: 0 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--active);
+      color: var(--active);
+    }
+
+    button.primary {
+      background: var(--active);
+      border-color: var(--active);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--active);
+    }
+
+    @media (max-width: 980px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .controls input {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LeetCode 94 方法一：递归中序遍历</h1>
+    <div class="subtitle">左图展示递归调用、当前节点和答案变化；右侧代码高亮当前执行语句。</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-title">
+        <span>执行图解</span>
+        <span class="step-pill" id="stepText">Step 1 / 1</span>
+      </div>
+      <div class="visual-body">
+        <div class="tree-wrap">
+          <svg id="treeSvg" viewBox="0 0 640 360" role="img" aria-label="中序遍历递归过程树图"></svg>
+        </div>
+
+        <div class="status-grid">
+          <div class="state-row">
+            <div class="state-label">当前动作</div>
+            <div class="state-text" id="actionText"></div>
+          </div>
+          <div class="state-row">
+            <div class="state-label">递归调用栈</div>
+            <div class="chips" id="callStack"></div>
+          </div>
+          <div class="state-row">
+            <div class="state-label">ans</div>
+            <div class="chips" id="answer"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel code-panel">
+      <div class="panel-title">
+        <span>代码对应</span>
+        <span class="step-pill" id="lineText">Line 1</span>
+      </div>
+      <div class="code-wrap" id="codeWrap"></div>
+    </section>
+  </main>
+
+  <div class="controls">
+    <button id="prevBtn">上一步</button>
+    <button id="playBtn" class="primary">播放</button>
+    <button id="nextBtn">下一步</button>
+    <button id="resetBtn">重置</button>
+    <input id="stepRange" type="range" min="0" value="0" aria-label="步骤进度">
+  </div>
+
+  <script>
+    const codeLines = [
+      "def inorderTraversal(root):",
+      "    ans = []",
+      "    def dfs(node):",
+      "        if node is None:",
+      "            return",
+      "        dfs(node.left)",
+      "        ans.append(node.val)",
+      "        dfs(node.right)",
+      "    dfs(root)",
+      "    return ans",
+    ];
+
+    const nodes = {
+      "1": { x: 320, y: 66, label: "1" },
+      "2": { x: 205, y: 150, label: "2" },
+      "3": { x: 435, y: 150, label: "3" },
+      "4": { x: 130, y: 245, label: "4" },
+      "5": { x: 280, y: 245, label: "5" },
+      "6": { x: 510, y: 245, label: "6" },
+    };
+
+    const edges = [
+      ["1", "2"],
+      ["1", "3"],
+      ["2", "4"],
+      ["2", "5"],
+      ["3", "6"],
+    ];
+
+    const nullPoints = {
+      "4L": { x: 76, y: 310 },
+      "4R": { x: 178, y: 310 },
+      "5L": { x: 240, y: 310 },
+      "5R": { x: 324, y: 310 },
+      "3L": { x: 390, y: 238 },
+      "6L": { x: 468, y: 310 },
+      "6R": { x: 552, y: 310 },
+    };
+
+    const steps = [
+      {
+        line: 1,
+        title: "进入函数",
+        detail: "准备执行 inorderTraversal(root)，目标是得到左 -> 根 -> 右的访问顺序。",
+        current: null,
+        callStack: [],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 2,
+        title: "创建答案数组",
+        detail: "ans 用来按中序顺序保存已经访问过的节点。",
+        current: null,
+        callStack: [],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 9,
+        title: "从根节点开始递归",
+        detail: "调用 dfs(root)，第一个进入递归的节点是 1。",
+        current: "1",
+        callStack: [],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 3,
+        title: "进入 dfs(1)",
+        detail: "当前递归函数处理节点 1。中序遍历不能立刻访问 1，必须先处理左子树。",
+        current: "1",
+        callStack: ["1"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 4,
+        title: "判断节点 1",
+        detail: "node 不是 None，继续执行左子树递归。",
+        current: "1",
+        callStack: ["1"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 6,
+        title: "递归进入 1 的左子树",
+        detail: "执行 dfs(node.left)，也就是 dfs(2)。节点 1 暂时留在调用栈中等待回来访问。",
+        current: "1",
+        focusEdge: ["1", "2"],
+        callStack: ["1"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 3,
+        title: "进入 dfs(2)",
+        detail: "当前处理节点 2。它也要先处理自己的左子树。",
+        current: "2",
+        callStack: ["1", "2"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 6,
+        title: "递归进入 2 的左子树",
+        detail: "执行 dfs(4)。节点 2 暂时等待左子树处理完成。",
+        current: "2",
+        focusEdge: ["2", "4"],
+        callStack: ["1", "2"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 3,
+        title: "进入 dfs(4)",
+        detail: "当前处理节点 4。继续先看它的左子树。",
+        current: "4",
+        callStack: ["1", "2", "4"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 6,
+        title: "访问 4 的左子树",
+        detail: "执行 dfs(4.left)，但 4 没有左孩子，所以这次递归传入 None。",
+        current: "4",
+        nullKey: "4L",
+        callStack: ["1", "2", "4"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 4,
+        title: "遇到 None",
+        detail: "node is None 成立，说明这条路走到底了。",
+        current: null,
+        nullKey: "4L",
+        callStack: ["1", "2", "4", "None"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 5,
+        title: "空节点返回",
+        detail: "None 不产生答案，直接 return，回到 dfs(4)。",
+        current: null,
+        nullKey: "4L",
+        callStack: ["1", "2", "4"],
+        visited: [],
+        ans: [],
+      },
+      {
+        line: 7,
+        title: "访问节点 4",
+        detail: "4 的左子树处理完了，现在把 4 加入 ans。",
+        current: "4",
+        callStack: ["1", "2", "4"],
+        visited: ["4"],
+        ans: [4],
+      },
+      {
+        line: 8,
+        title: "访问 4 的右子树",
+        detail: "执行 dfs(4.right)，4 没有右孩子，传入 None。",
+        current: "4",
+        nullKey: "4R",
+        callStack: ["1", "2", "4"],
+        visited: ["4"],
+        ans: [4],
+      },
+      {
+        line: 5,
+        title: "4 的右子树返回",
+        detail: "空右子树返回，dfs(4) 完成，回到 dfs(2)。",
+        current: null,
+        nullKey: "4R",
+        callStack: ["1", "2"],
+        visited: ["4"],
+        ans: [4],
+      },
+      {
+        line: 7,
+        title: "访问节点 2",
+        detail: "2 的左子树已经处理完，现在访问 2。",
+        current: "2",
+        callStack: ["1", "2"],
+        visited: ["4", "2"],
+        ans: [4, 2],
+      },
+      {
+        line: 8,
+        title: "递归进入 2 的右子树",
+        detail: "执行 dfs(5)，开始处理中序里的 2 之后的部分。",
+        current: "2",
+        focusEdge: ["2", "5"],
+        callStack: ["1", "2"],
+        visited: ["4", "2"],
+        ans: [4, 2],
+      },
+      {
+        line: 3,
+        title: "进入 dfs(5)",
+        detail: "当前处理节点 5。先看左子树。",
+        current: "5",
+        callStack: ["1", "2", "5"],
+        visited: ["4", "2"],
+        ans: [4, 2],
+      },
+      {
+        line: 6,
+        title: "访问 5 的左子树",
+        detail: "5 没有左孩子，dfs(None) 直接返回。",
+        current: "5",
+        nullKey: "5L",
+        callStack: ["1", "2", "5"],
+        visited: ["4", "2"],
+        ans: [4, 2],
+      },
+      {
+        line: 5,
+        title: "5 的左子树返回",
+        detail: "空左子树返回，可以访问节点 5。",
+        current: null,
+        nullKey: "5L",
+        callStack: ["1", "2", "5"],
+        visited: ["4", "2"],
+        ans: [4, 2],
+      },
+      {
+        line: 7,
+        title: "访问节点 5",
+        detail: "把 5 加入 ans。",
+        current: "5",
+        callStack: ["1", "2", "5"],
+        visited: ["4", "2", "5"],
+        ans: [4, 2, 5],
+      },
+      {
+        line: 8,
+        title: "访问 5 的右子树",
+        detail: "5 没有右孩子，dfs(None) 直接返回。",
+        current: "5",
+        nullKey: "5R",
+        callStack: ["1", "2", "5"],
+        visited: ["4", "2", "5"],
+        ans: [4, 2, 5],
+      },
+      {
+        line: 7,
+        title: "访问节点 1",
+        detail: "整个左子树 2 已经处理完，现在回到根节点 1，并访问它。",
+        current: "1",
+        callStack: ["1"],
+        visited: ["4", "2", "5", "1"],
+        ans: [4, 2, 5, 1],
+      },
+      {
+        line: 8,
+        title: "递归进入 1 的右子树",
+        detail: "执行 dfs(3)，继续处理根节点右侧。",
+        current: "1",
+        focusEdge: ["1", "3"],
+        callStack: ["1"],
+        visited: ["4", "2", "5", "1"],
+        ans: [4, 2, 5, 1],
+      },
+      {
+        line: 3,
+        title: "进入 dfs(3)",
+        detail: "当前处理节点 3。中序仍然先看左子树。",
+        current: "3",
+        callStack: ["1", "3"],
+        visited: ["4", "2", "5", "1"],
+        ans: [4, 2, 5, 1],
+      },
+      {
+        line: 6,
+        title: "访问 3 的左子树",
+        detail: "3 没有左孩子，dfs(None) 返回。",
+        current: "3",
+        nullKey: "3L",
+        callStack: ["1", "3"],
+        visited: ["4", "2", "5", "1"],
+        ans: [4, 2, 5, 1],
+      },
+      {
+        line: 7,
+        title: "访问节点 3",
+        detail: "3 的左子树为空，所以现在访问 3。",
+        current: "3",
+        callStack: ["1", "3"],
+        visited: ["4", "2", "5", "1", "3"],
+        ans: [4, 2, 5, 1, 3],
+      },
+      {
+        line: 8,
+        title: "递归进入 3 的右子树",
+        detail: "执行 dfs(6)。",
+        current: "3",
+        focusEdge: ["3", "6"],
+        callStack: ["1", "3"],
+        visited: ["4", "2", "5", "1", "3"],
+        ans: [4, 2, 5, 1, 3],
+      },
+      {
+        line: 3,
+        title: "进入 dfs(6)",
+        detail: "当前处理节点 6。它没有左子树，接下来会访问自己。",
+        current: "6",
+        callStack: ["1", "3", "6"],
+        visited: ["4", "2", "5", "1", "3"],
+        ans: [4, 2, 5, 1, 3],
+      },
+      {
+        line: 6,
+        title: "访问 6 的左子树",
+        detail: "6 没有左孩子，dfs(None) 返回。",
+        current: "6",
+        nullKey: "6L",
+        callStack: ["1", "3", "6"],
+        visited: ["4", "2", "5", "1", "3"],
+        ans: [4, 2, 5, 1, 3],
+      },
+      {
+        line: 7,
+        title: "访问节点 6",
+        detail: "把 6 加入 ans。",
+        current: "6",
+        callStack: ["1", "3", "6"],
+        visited: ["4", "2", "5", "1", "3", "6"],
+        ans: [4, 2, 5, 1, 3, 6],
+      },
+      {
+        line: 8,
+        title: "访问 6 的右子树",
+        detail: "6 没有右孩子，dfs(None) 返回。递归随后一路返回到最外层。",
+        current: "6",
+        nullKey: "6R",
+        callStack: ["1", "3", "6"],
+        visited: ["4", "2", "5", "1", "3", "6"],
+        ans: [4, 2, 5, 1, 3, 6],
+      },
+      {
+        line: 10,
+        title: "返回答案",
+        detail: "递归全部结束，返回 ans = [4, 2, 5, 1, 3, 6]。",
+        current: null,
+        callStack: [],
+        visited: ["4", "2", "5", "1", "3", "6"],
+        ans: [4, 2, 5, 1, 3, 6],
+      },
+    ];
+
+    const state = {
+      index: 0,
+      timer: null,
+    };
+
+    const treeSvg = document.getElementById("treeSvg");
+    const codeWrap = document.getElementById("codeWrap");
+    const stepText = document.getElementById("stepText");
+    const lineText = document.getElementById("lineText");
+    const actionText = document.getElementById("actionText");
+    const callStack = document.getElementById("callStack");
+    const answer = document.getElementById("answer");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const playBtn = document.getElementById("playBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const stepRange = document.getElementById("stepRange");
+
+    function createSvgElement(name, attrs = {}) {
+      const element = document.createElementNS("http://www.w3.org/2000/svg", name);
+      for (const [key, value] of Object.entries(attrs)) {
+        element.setAttribute(key, value);
+      }
+      return element;
+    }
+
+    function sameEdge(a, b) {
+      return a && a[0] === b[0] && a[1] === b[1];
+    }
+
+    function renderTree(step) {
+      treeSvg.innerHTML = "";
+
+      for (const edge of edges) {
+        const from = nodes[edge[0]];
+        const to = nodes[edge[1]];
+        const line = createSvgElement("line", {
+          x1: from.x,
+          y1: from.y + 24,
+          x2: to.x,
+          y2: to.y - 24,
+          class: sameEdge(step.focusEdge, edge) ? "edge active" : "edge",
+        });
+        treeSvg.appendChild(line);
+      }
+
+      const stackSet = new Set(step.callStack || []);
+      const visitedSet = new Set(step.visited || []);
+
+      for (const [id, node] of Object.entries(nodes)) {
+        const group = createSvgElement("g", { class: "node" });
+        if (stackSet.has(id)) group.classList.add("in-stack");
+        if (visitedSet.has(id)) group.classList.add("visited");
+        if (step.current === id) group.classList.add("current");
+
+        group.appendChild(createSvgElement("circle", { cx: node.x, cy: node.y, r: 26 }));
+        const text = createSvgElement("text", { x: node.x, y: node.y + 1 });
+        text.textContent = node.label;
+        group.appendChild(text);
+        treeSvg.appendChild(group);
+      }
+
+      if (step.nullKey && nullPoints[step.nullKey]) {
+        const point = nullPoints[step.nullKey];
+        const group = createSvgElement("g", { class: "null-marker" });
+        group.appendChild(createSvgElement("rect", {
+          x: point.x - 31,
+          y: point.y - 16,
+          width: 62,
+          height: 32,
+        }));
+        const text = createSvgElement("text", { x: point.x, y: point.y + 1 });
+        text.textContent = "None";
+        group.appendChild(text);
+        treeSvg.appendChild(group);
+      }
+    }
+
+    function renderCode(step) {
+      codeWrap.innerHTML = "";
+      codeLines.forEach((line, index) => {
+        const row = document.createElement("div");
+        row.className = "code-line";
+        if (index + 1 === step.line) row.classList.add("active");
+
+        const number = document.createElement("span");
+        number.className = "line-number";
+        number.textContent = index + 1;
+
+        const content = document.createElement("span");
+        content.textContent = line;
+
+        row.appendChild(number);
+        row.appendChild(content);
+        codeWrap.appendChild(row);
+      });
+    }
+
+    function renderChips(container, values, className, formatter) {
+      container.innerHTML = "";
+      if (!values || values.length === 0) {
+        const empty = document.createElement("span");
+        empty.className = "empty";
+        empty.textContent = "空";
+        container.appendChild(empty);
+        return;
+      }
+
+      values.forEach((value) => {
+        const chip = document.createElement("span");
+        chip.className = `chip ${className}`;
+        chip.textContent = formatter(value);
+        container.appendChild(chip);
+      });
+    }
+
+    function stopPlaying() {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+      playBtn.textContent = "播放";
+    }
+
+    function render() {
+      const step = steps[state.index];
+      renderTree(step);
+      renderCode(step);
+      stepText.textContent = `Step ${state.index + 1} / ${steps.length}`;
+      lineText.textContent = `Line ${step.line}`;
+      actionText.textContent = `${step.title}：${step.detail}`;
+      renderChips(callStack, step.callStack, "call", (value) => `dfs(${value})`);
+      renderChips(answer, step.ans, "answer", (value) => value);
+
+      stepRange.value = state.index;
+      prevBtn.disabled = state.index === 0;
+      nextBtn.disabled = state.index === steps.length - 1;
+    }
+
+    function goTo(index) {
+      state.index = Math.max(0, Math.min(steps.length - 1, index));
+      render();
+    }
+
+    prevBtn.addEventListener("click", () => {
+      stopPlaying();
+      goTo(state.index - 1);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      stopPlaying();
+      goTo(state.index + 1);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      stopPlaying();
+      goTo(0);
+    });
+
+    playBtn.addEventListener("click", () => {
+      if (state.timer) {
+        stopPlaying();
+        return;
+      }
+
+      playBtn.textContent = "暂停";
+      state.timer = setInterval(() => {
+        if (state.index >= steps.length - 1) {
+          stopPlaying();
+          return;
+        }
+        goTo(state.index + 1);
+      }, 1100);
+    });
+
+    stepRange.max = steps.length - 1;
+    stepRange.addEventListener("input", (event) => {
+      stopPlaying();
+      goTo(Number(event.target.value));
+    });
+
+    render();
+  </script>
+</body>
+</html>
+
