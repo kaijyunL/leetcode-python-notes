@@ -8,18 +8,17 @@ class Solution:
         时间复杂度: O(n)
         空间复杂度: O(n)
         """
-        freq = Counter(nums)
+        count = Counter(nums)
         buckets = [[] for _ in range(len(nums) + 1)]
 
-        for num, count in freq.items():
-            buckets[count].append(num)
+        for num, freq in count.items():
+            buckets[freq].append(num)
 
         ans = []
-        for i in range(len(buckets) - 1, 0, -1):
-            for num in buckets[i]:
-                ans.append(num)
-                if len(ans) == k:
-                    return ans
+        for freq in range(len(nums), 0, -1):
+            ans.extend(buckets[freq])
+            if len(ans) >= k:
+                return ans[:k]
 
         return ans
 

@@ -26,12 +26,12 @@ class Solution:
                 else:
                     i += 1
 
-            if left <= target <= lt - 1:
+            if lt <= target <= gt:
                 return nums[target]
-            elif target > gt:
-                left = gt + 1
-            else:
+            elif target < lt:
                 right = lt - 1
+            else:
+                left = gt + 1
 
 
 if __name__ == "__main__":

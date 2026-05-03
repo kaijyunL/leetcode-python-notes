@@ -29,9 +29,9 @@ class Solution:
                 else:
                     i += 1
 
-            if k <= lt:
+            if k - 1 < lt:
                 right = lt - 1
-            elif k > gt:
+            elif k - 1 > gt:
                 left = gt + 1
             else:
                 return points[:k]
