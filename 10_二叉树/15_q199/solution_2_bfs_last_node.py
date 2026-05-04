@@ -15,30 +15,31 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def rightSideView(self, root: Optional[TreeNode]) -> list[int]:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
+        解法2：BFS 分层，只记录每层最后一个节点（面试推荐）
         时间复杂度：O(n)
-        空间复杂度：O(h)，不计返回结果
+        空间复杂度：O(w)
         """
         if root is None:
             return []
 
         ans = []
-        stack = [(root, False)]
+        queue = deque([root])
 
-        while stack:
-            node, visited = stack.pop()
+        while queue:
+            level_size = len(queue)
 
-            if visited:
-                ans.append(node.val)
-                continue
+            for i in range(level_size):
+                node = queue.popleft()
 
-            stack.append((node, True))
-            if node.right:
-                stack.append((node.right, False))
-            if node.left:
-                stack.append((node.left, False))
+                if i == level_size - 1:
+                    ans.append(node.val)
+
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
 
         return ans
 
@@ -76,16 +77,16 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
+        ([1, 2, 3, None, 5, None, 4], [1, 3, 4]),
+        ([1, None, 3], [1, 3]),
         ([], []),
+        ([1, 2, 3, 4], [1, 3, 4]),
+        ([1, 2], [1, 2]),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
+        output = solution.rightSideView(root)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
-

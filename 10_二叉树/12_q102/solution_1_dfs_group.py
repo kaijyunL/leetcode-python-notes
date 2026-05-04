@@ -15,31 +15,26 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def levelOrder(self, root: Optional[TreeNode]) -> list[list[int]]:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
+        解法1：DFS 按深度分组
         时间复杂度：O(n)
         空间复杂度：O(h)，不计返回结果
         """
-        if root is None:
-            return []
-
         ans = []
-        stack = [(root, False)]
 
-        while stack:
-            node, visited = stack.pop()
+        def dfs(node: Optional[TreeNode], depth: int) -> None:
+            if node is None:
+                return
 
-            if visited:
-                ans.append(node.val)
-                continue
+            if depth == len(ans):
+                ans.append([])
 
-            stack.append((node, True))
-            if node.right:
-                stack.append((node.right, False))
-            if node.left:
-                stack.append((node.left, False))
+            ans[depth].append(node.val)
+            dfs(node.left, depth + 1)
+            dfs(node.right, depth + 1)
 
+        dfs(root, 0)
         return ans
 
 
@@ -76,16 +71,15 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
+        ([3, 9, 20, None, None, 15, 7], [[3], [9, 20], [15, 7]]),
+        ([1], [[1]]),
         ([], []),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
+        output = solution.levelOrder(root)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
 

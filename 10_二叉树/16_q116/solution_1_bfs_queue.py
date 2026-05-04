@@ -2,45 +2,52 @@ from collections import deque
 from typing import Optional
 
 
-class TreeNode:
+class Node:
     def __init__(
         self,
         val: int = 0,
-        left: Optional["TreeNode"] = None,
-        right: Optional["TreeNode"] = None,
+        left: Optional["Node"] = None,
+        right: Optional["Node"] = None,
+        next: Optional["Node"] = None,
     ) -> None:
         self.val = val
         self.left = left
         self.right = right
+        self.next = next
 
 
 class Solution:
-    def maxDepth(self, root: Optional[TreeNode]) -> int:
+    def connect(self, root: Optional[Node]) -> Optional[Node]:
         """
-        解法2：BFS 层序遍历
+        解法1：BFS 队列
         时间复杂度：O(n)
         空间复杂度：O(w)
         """
         if root is None:
-            return 0
+            return None
 
-        depth = 0
         queue = deque([root])
 
         while queue:
-            depth += 1
+            prev = None
+            level_size = len(queue)
 
-            for _ in range(len(queue)):
+            for _ in range(level_size):
                 node = queue.popleft()
+
+                if prev:
+                    prev.next = node
+                prev = node
+
                 if node.left:
                     queue.append(node.left)
                 if node.right:
                     queue.append(node.right)
 
-        return depth
+        return root
 
 
-def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
+def build_tree(values: list[Optional[int]]) -> Optional[Node]:
     if not values:
         return None
 
@@ -49,7 +56,7 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
     if root_val is None:
         return None
 
-    root = TreeNode(root_val)
+    root = Node(root_val)
     queue = deque([root])
 
     while queue:
@@ -58,12 +65,12 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
         try:
             left_val = next(iter_values)
             if left_val is not None:
-                node.left = TreeNode(left_val)
+                node.left = Node(left_val)
                 queue.append(node.left)
 
             right_val = next(iter_values)
             if right_val is not None:
-                node.right = TreeNode(right_val)
+                node.right = Node(right_val)
                 queue.append(node.right)
         except StopIteration:
             break
@@ -71,18 +78,37 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
     return root
 
 
+def serialize_by_next(root: Optional[Node]) -> list[int | str]:
+    ans = []
+    leftmost = root
+
+    while leftmost:
+        node = leftmost
+        next_leftmost = None
+
+        while node:
+            ans.append(node.val)
+            if next_leftmost is None:
+                next_leftmost = node.left or node.right
+            node = node.next
+
+        ans.append("#")
+        leftmost = next_leftmost
+
+    return ans
+
+
 if __name__ == "__main__":
     test_cases = [
-        ([3, 9, 20, None, None, 15, 7], 3),
-        ([1, None, 2], 2),
-        ([1], 1),
-        ([], 0),
+        ([1, 2, 3, 4, 5, 6, 7], [1, "#", 2, 3, "#", 4, 5, 6, 7, "#"]),
+        ([1], [1, "#"]),
+        ([], []),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.maxDepth(root)
+        connected = solution.connect(root)
+        output = serialize_by_next(connected)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
-

@@ -15,30 +15,38 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def zigzagLevelOrder(self, root: Optional[TreeNode]) -> list[list[int]]:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
+        解法2：BFS + deque 按方向插入
         时间复杂度：O(n)
-        空间复杂度：O(h)，不计返回结果
+        空间复杂度：O(w)
         """
         if root is None:
             return []
 
         ans = []
-        stack = [(root, False)]
+        queue = deque([root])
+        left_to_right = True
 
-        while stack:
-            node, visited = stack.pop()
+        while queue:
+            level = deque()
+            level_size = len(queue)
 
-            if visited:
-                ans.append(node.val)
-                continue
+            for _ in range(level_size):
+                node = queue.popleft()
 
-            stack.append((node, True))
-            if node.right:
-                stack.append((node.right, False))
-            if node.left:
-                stack.append((node.left, False))
+                if left_to_right:
+                    level.append(node.val)
+                else:
+                    level.appendleft(node.val)
+
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+
+            ans.append(list(level))
+            left_to_right = not left_to_right
 
         return ans
 
@@ -76,16 +84,15 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
+        ([3, 9, 20, None, None, 15, 7], [[3], [20, 9], [15, 7]]),
+        ([1], [[1]]),
         ([], []),
+        ([1, 2, 3, 4, None, None, 5], [[1], [3, 2], [4, 5]]),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
+        output = solution.zigzagLevelOrder(root)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
-

@@ -24,14 +24,14 @@ class Solution:
         ans = []
         cur = root
 
-        while cur is not None:
+        while cur:
             if cur.left is None:
                 ans.append(cur.val)
                 cur = cur.right
                 continue
 
             pred = cur.left
-            while pred.right is not None and pred.right is not cur:
+            while pred.right and pred.right is not cur:
                 pred = pred.right
 
             if pred.right is None:

@@ -348,8 +348,8 @@ ans = [1, 3, 2]
 stack = []
 cur = root
 
-while cur is not None or stack:
-    while cur is not None:
+while cur or stack:
+    while cur:
         stack.append(cur)
         cur = cur.left
 
@@ -419,7 +419,7 @@ cur = cur.right
 必须写成：
 
 ```python
-while cur is not None or stack:
+while cur or stack:
 ```
 
 因为：

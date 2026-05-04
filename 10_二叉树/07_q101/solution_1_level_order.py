@@ -15,32 +15,42 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def isSymmetric(self, root: Optional[TreeNode]) -> bool:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
+        解法1：层序遍历，逐层判断是否回文
         时间复杂度：O(n)
-        空间复杂度：O(h)，不计返回结果
+        空间复杂度：O(w)
         """
         if root is None:
-            return []
+            return True
 
-        ans = []
-        stack = [(root, False)]
+        queue = deque([root])
 
-        while stack:
-            node, visited = stack.pop()
+        while queue:
+            level = []
+            has_next_level = False
 
-            if visited:
-                ans.append(node.val)
-                continue
+            for _ in range(len(queue)):
+                node = queue.popleft()
 
-            stack.append((node, True))
-            if node.right:
-                stack.append((node.right, False))
-            if node.left:
-                stack.append((node.left, False))
+                if node is None:
+                    level.append(None)
+                    continue
 
-        return ans
+                level.append(node.val)
+                queue.append(node.left)
+                queue.append(node.right)
+
+                if node.left or node.right:
+                    has_next_level = True
+
+            if level != level[::-1]:
+                return False
+
+            if not has_next_level:
+                break
+
+        return True
 
 
 def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
@@ -76,16 +86,17 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
-        ([], []),
+        ([1, 2, 2, 3, 4, 4, 3], True),
+        ([1, 2, 2, None, 3, None, 3], False),
+        ([1, 2, 2, 2, None, 2], False),
+        ([1], True),
+        ([], True),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
+        output = solution.isSymmetric(root)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
 

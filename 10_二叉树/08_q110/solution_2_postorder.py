@@ -15,32 +15,31 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def isBalanced(self, root: Optional[TreeNode]) -> bool:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
+        解法2：后序 DFS（面试推荐）
         时间复杂度：O(n)
-        空间复杂度：O(h)，不计返回结果
+        空间复杂度：O(h)
         """
-        if root is None:
-            return []
 
-        ans = []
-        stack = [(root, False)]
+        def height(node: Optional[TreeNode]) -> int:
+            if node is None:
+                return 0
 
-        while stack:
-            node, visited = stack.pop()
+            left_height = height(node.left)
+            if left_height == -1:
+                return -1
 
-            if visited:
-                ans.append(node.val)
-                continue
+            right_height = height(node.right)
+            if right_height == -1:
+                return -1
 
-            stack.append((node, True))
-            if node.right:
-                stack.append((node.right, False))
-            if node.left:
-                stack.append((node.left, False))
+            if abs(left_height - right_height) > 1:
+                return -1
 
-        return ans
+            return 1 + max(left_height, right_height)
+
+        return height(root) != -1
 
 
 def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
@@ -76,16 +75,17 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
-        ([], []),
+        ([3, 9, 20, None, None, 15, 7], True),
+        ([1, 2, 2, 3, 3, None, None, 4, 4], False),
+        ([1, 2, 2, 3, None, None, 3, 4, None, None, 4], False),
+        ([1], True),
+        ([], True),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
+        output = solution.isBalanced(root)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
 

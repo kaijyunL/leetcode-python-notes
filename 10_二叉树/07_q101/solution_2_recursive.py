@@ -15,32 +15,31 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def isSymmetric(self, root: Optional[TreeNode]) -> bool:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
+        解法2：递归 DFS（面试推荐）
         时间复杂度：O(n)
-        空间复杂度：O(h)，不计返回结果
+        空间复杂度：O(h)
         """
         if root is None:
-            return []
+            return True
 
-        ans = []
-        stack = [(root, False)]
+        def is_mirror(left: Optional[TreeNode], right: Optional[TreeNode]) -> bool:
+            if left is None and right is None:
+                return True
 
-        while stack:
-            node, visited = stack.pop()
+            if left is None or right is None:
+                return False
 
-            if visited:
-                ans.append(node.val)
-                continue
+            if left.val != right.val:
+                return False
 
-            stack.append((node, True))
-            if node.right:
-                stack.append((node.right, False))
-            if node.left:
-                stack.append((node.left, False))
+            return is_mirror(left.left, right.right) and is_mirror(
+                left.right,
+                right.left,
+            )
 
-        return ans
+        return is_mirror(root.left, root.right)
 
 
 def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
@@ -76,16 +75,17 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
-        ([], []),
+        ([1, 2, 2, 3, 4, 4, 3], True),
+        ([1, 2, 2, None, 3, None, 3], False),
+        ([1, 2, 2, 2, None, 2], False),
+        ([1], True),
+        ([], True),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
+        output = solution.isSymmetric(root)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
 

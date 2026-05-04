@@ -264,9 +264,9 @@ while stack:
         continue
 
     stack.append((node, True))
-    if node.right is not None:
+    if node.right:
         stack.append((node.right, False))
-    if node.left is not None:
+    if node.left:
         stack.append((node.left, False))
 ```
 

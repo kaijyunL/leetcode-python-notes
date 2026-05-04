@@ -15,30 +15,30 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def pathSum(self, root: Optional[TreeNode], targetSum: int) -> list[list[int]]:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
-        时间复杂度：O(n)
-        空间复杂度：O(h)，不计返回结果
+        解法3：迭代栈
+        时间复杂度：O(n * h)
+        空间复杂度：O(n * h)
         """
         if root is None:
             return []
 
         ans = []
-        stack = [(root, False)]
+        stack = [(root, targetSum, [root.val])]
 
         while stack:
-            node, visited = stack.pop()
+            node, remain, path = stack.pop()
 
-            if visited:
-                ans.append(node.val)
+            if node.left is None and node.right is None and node.val == remain:
+                ans.append(path)
                 continue
 
-            stack.append((node, True))
+            next_remain = remain - node.val
             if node.right:
-                stack.append((node.right, False))
+                stack.append((node.right, next_remain, path + [node.right.val]))
             if node.left:
-                stack.append((node.left, False))
+                stack.append((node.left, next_remain, path + [node.left.val]))
 
         return ans
 
@@ -76,16 +76,23 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
-        ([], []),
+        (
+            [5, 4, 8, 11, None, 13, 4, 7, 2, None, None, 5, 1],
+            22,
+            [[5, 4, 11, 2], [5, 8, 4, 5]],
+        ),
+        ([1, 2, 3], 5, []),
+        ([1, 2], 3, [[1, 2]]),
+        ([], 0, []),
     ]
 
     solution = Solution()
-    for values, expected in test_cases:
+    for values, target_sum, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
-        print(f"输入: {values}, 输出: {output}, 期望: {expected}")
+        output = solution.pathSum(root, target_sum)
+        print(
+            f"输入: root={values}, targetSum={target_sum}, "
+            f"输出: {output}, 期望: {expected}"
+        )
         assert output == expected
 

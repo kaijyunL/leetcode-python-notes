@@ -15,32 +15,28 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def pathSum(self, root: Optional[TreeNode], targetSum: int) -> list[list[int]]:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
-        时间复杂度：O(n)
-        空间复杂度：O(h)，不计返回结果
+        解法1：朴素暴力，先枚举所有根到叶路径再过滤
+        时间复杂度：O(n * h)
+        空间复杂度：O(n * h)
         """
-        if root is None:
-            return []
+        all_paths = []
 
-        ans = []
-        stack = [(root, False)]
+        def dfs(node: Optional[TreeNode], path: list[int]) -> None:
+            if node is None:
+                return
 
-        while stack:
-            node, visited = stack.pop()
+            new_path = path + [node.val]
+            if node.left is None and node.right is None:
+                all_paths.append(new_path)
+                return
 
-            if visited:
-                ans.append(node.val)
-                continue
+            dfs(node.left, new_path)
+            dfs(node.right, new_path)
 
-            stack.append((node, True))
-            if node.right:
-                stack.append((node.right, False))
-            if node.left:
-                stack.append((node.left, False))
-
-        return ans
+        dfs(root, [])
+        return [path for path in all_paths if sum(path) == targetSum]
 
 
 def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
@@ -76,16 +72,23 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
-        ([], []),
+        (
+            [5, 4, 8, 11, None, 13, 4, 7, 2, None, None, 5, 1],
+            22,
+            [[5, 4, 11, 2], [5, 8, 4, 5]],
+        ),
+        ([1, 2, 3], 5, []),
+        ([1, 2], 3, [[1, 2]]),
+        ([], 0, []),
     ]
 
     solution = Solution()
-    for values, expected in test_cases:
+    for values, target_sum, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
-        print(f"输入: {values}, 输出: {output}, 期望: {expected}")
+        output = solution.pathSum(root, target_sum)
+        print(
+            f"输入: root={values}, targetSum={target_sum}, "
+            f"输出: {output}, 期望: {expected}"
+        )
         assert output == expected
 

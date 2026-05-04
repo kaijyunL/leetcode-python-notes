@@ -15,32 +15,25 @@ class TreeNode:
 
 
 class Solution:
-    def postorderTraversal(self, root: Optional[TreeNode]) -> list[int]:
+    def minDepth(self, root: Optional[TreeNode]) -> int:
         """
-        解法2：显式栈 + 访问标记（面试推荐）
+        解法1：递归 DFS
         时间复杂度：O(n)
-        空间复杂度：O(h)，不计返回结果
+        空间复杂度：O(h)
         """
         if root is None:
-            return []
+            return 0
 
-        ans = []
-        stack = [(root, False)]
+        if root.left is None and root.right is None:
+            return 1
 
-        while stack:
-            node, visited = stack.pop()
+        if root.left is None:
+            return 1 + self.minDepth(root.right)
 
-            if visited:
-                ans.append(node.val)
-                continue
+        if root.right is None:
+            return 1 + self.minDepth(root.left)
 
-            stack.append((node, True))
-            if node.right:
-                stack.append((node.right, False))
-            if node.left:
-                stack.append((node.left, False))
-
-        return ans
+        return 1 + min(self.minDepth(root.left), self.minDepth(root.right))
 
 
 def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
@@ -76,16 +69,17 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([1, None, 2, 3], [3, 2, 1]),
-        ([1, 2, 3, 4, 5, None, 6], [4, 5, 2, 6, 3, 1]),
-        ([1], [1]),
-        ([], []),
+        ([3, 9, 20, None, None, 15, 7], 2),
+        ([2, None, 3, None, 4, None, 5, None, 6], 5),
+        ([1, 2, 3, 4, 5], 2),
+        ([1], 1),
+        ([], 0),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.postorderTraversal(root)
+        output = solution.minDepth(root)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
 

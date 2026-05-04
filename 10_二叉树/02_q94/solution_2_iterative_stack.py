@@ -25,8 +25,8 @@ class Solution:
         stack = []
         cur = root
 
-        while cur is not None or stack:
-            while cur is not None:
+        while cur or stack:
+            while cur:
                 stack.append(cur)
                 cur = cur.left
 
