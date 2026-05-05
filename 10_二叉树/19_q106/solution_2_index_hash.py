@@ -17,8 +17,8 @@ class TreeNode:
 class Solution:
     def buildTree(
         self,
-        preorder: list[int],
         inorder: list[int],
+        postorder: list[int],
     ) -> Optional[TreeNode]:
         """
         解法2：递归 + 哈希表 + 下标边界（面试推荐）
@@ -27,31 +27,31 @@ class Solution:
         """
         inorder_map = {value: index for index, value in enumerate(inorder)}
 
-        def build(pre_left, pre_right, in_left, in_right):
-            if pre_left > pre_right:
+        def build(in_left, in_right, post_left, post_right):
+            if post_left > post_right:
                 return None
 
-            root_val = preorder[pre_left]
+            root_val = postorder[post_right]
             root = TreeNode(root_val)
             root_inorder_index = inorder_map[root_val]
             left_size = root_inorder_index - in_left
 
             root.left = build(
-                pre_left + 1,
-                pre_left + left_size,
                 in_left,
                 root_inorder_index - 1,
+                post_left,
+                post_left + left_size - 1,
             )
             root.right = build(
-                pre_left + left_size + 1,
-                pre_right,
                 root_inorder_index + 1,
                 in_right,
+                post_left + left_size,
+                post_right - 1,
             )
 
             return root
 
-        return build(0, len(preorder) - 1, 0, len(inorder) - 1)
+        return build(0, len(inorder) - 1, 0, len(postorder) - 1)
 
 
 def serialize_level_order(root: Optional[TreeNode]) -> list[Optional[int]]:
@@ -79,18 +79,19 @@ def serialize_level_order(root: Optional[TreeNode]) -> list[Optional[int]]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([3, 9, 20, 15, 7], [9, 3, 15, 20, 7], [3, 9, 20, None, None, 15, 7]),
+        ([9, 3, 15, 20, 7], [9, 15, 7, 20, 3], [3, 9, 20, None, None, 15, 7]),
         ([-1], [-1], [-1]),
-        ([1, 2], [2, 1], [1, 2]),
-        ([1, 2, 3], [2, 3, 1], [1, 2, None, None, 3]),
+        ([2, 1], [2, 1], [1, 2]),
+        ([1, 2], [2, 1], [1, None, 2]),
+        ([2, 3, 1], [3, 2, 1], [1, 2, None, None, 3]),
     ]
 
     solution = Solution()
-    for preorder, inorder, expected in test_cases:
-        root = solution.buildTree(preorder, inorder)
+    for inorder, postorder, expected in test_cases:
+        root = solution.buildTree(inorder, postorder)
         output = serialize_level_order(root)
         print(
-            f"输入: preorder={preorder}, inorder={inorder}, "
+            f"输入: inorder={inorder}, postorder={postorder}, "
             f"输出: {output}, 期望: {expected}"
         )
         assert output == expected

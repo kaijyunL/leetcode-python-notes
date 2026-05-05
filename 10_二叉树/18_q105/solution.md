@@ -105,7 +105,7 @@ root_val = preorder[0]
 这个长度来自中序：
 
 ```python
-left_size = root_index - inorder_left
+left_size = root_inorder_index - inorder_left
 ```
 
 `left_size` 是这题最关键的变量。
@@ -166,19 +166,19 @@ root_val = preorder[0]
 在中序里找到根的位置：
 
 ```python
-root_index = inorder.index(root_val)
+root_inorder_index = inorder.index(root_val)
 ```
 
 中序左边就是左子树：
 
 ```python
-left_inorder = inorder[:root_index]
+left_inorder = inorder[:root_inorder_index]
 ```
 
 中序右边就是右子树：
 
 ```python
-right_inorder = inorder[root_index + 1:]
+right_inorder = inorder[root_inorder_index + 1:]
 ```
 
 左子树节点个数是：
@@ -261,140 +261,425 @@ O(n^2)
 
 ---
 
-### 从第一性原理推导
+### 先把四个下标翻译成人话
 
-我们定义递归函数：
+解法一是直接切数组：
+
+```text
+当前子树的 preorder
+当前子树的 inorder
+```
+
+解法二不切数组，只用下标表示这两段范围。
 
 ```python
 def build(pre_left, pre_right, in_left, in_right):
 ```
 
-含义是：
+这四个参数的意思是：
 
 ```text
-用 preorder[pre_left:pre_right] 和 inorder[in_left:in_right] 这一段构造当前子树
+preorder[pre_left ... pre_right] 表示当前子树的前序遍历
+inorder[in_left ... in_right] 表示当前子树的中序遍历
 ```
 
-这里实际使用左闭右闭区间：
+注意这里不是 Python 切片语法，而是左闭右闭区间。
+
+如果非要换成 Python 真切片，它应该是：
 
 ```text
-preorder[pre_left ... pre_right]
-inorder[in_left ... in_right]
+preorder[pre_left : pre_right + 1]
+inorder[in_left : in_right + 1]
 ```
 
-如果前序区间为空：
+比如：
+
+```text
+preorder[0 ... 4] 等价于 Python 的 preorder[0:5]
+preorder[2 ... 4] 等价于 Python 的 preorder[2:5]
+inorder[2 ... 4]  等价于 Python 的 inorder[2:5]
+```
+
+也就是说，方法二其实还是在做解法一那件事：
+
+```text
+根据当前子树的前序片段和中序片段，构造当前子树
+```
+
+只是它没有真的创建新数组。
+
+---
+
+### 用例子走一遍
+
+还是看这个例子：
+
+```text
+preorder = [3, 9, 20, 15, 7]
+inorder  = [9, 3, 15, 20, 7]
+```
+
+第一次调用是：
+
+```python
+build(0, 4, 0, 4)
+```
+
+意思是：
+
+```text
+preorder[0 ... 4] 和 inorder[0 ... 4] 构造整棵树
+```
+
+把它真的展开就是：
+
+```text
+preorder[0 ... 4] = [3, 9, 20, 15, 7]
+inorder[0 ... 4]  = [9, 3, 15, 20, 7]
+```
+
+也就是：
+
+```text
+当前这次递归，要用完整的 preorder 和完整的 inorder 构造整棵树。
+```
+
+当前前序区间的第一个数就是根：
+
+```python
+root_val = preorder[0]  # 3
+```
+
+然后去中序里找 `3` 的位置：
+
+```text
+inorder = [9, 3, 15, 20, 7]
+              ^
+          root_inorder_index = 1
+```
+
+中序的特点是：
+
+```text
+左子树 -> 根 -> 右子树
+```
+
+所以 `3` 左边的 `[9]` 是左子树，右边的 `[15, 20, 7]` 是右子树。
+
+左子树有几个节点？
+
+```python
+left_size = root_inorder_index - in_left
+          = 1 - 0
+          = 1
+```
+
+这就是 `left_size` 的含义：
+
+```text
+左子树节点个数
+```
+
+---
+
+### 为什么前序区间可以这样切
+
+前序顺序是：
+
+```text
+根 -> 左子树 -> 右子树
+```
+
+现在根已经占了 `pre_left` 这个位置。
+
+如果左子树有 `left_size` 个节点，那么前序里根后面的 `left_size` 个位置，一定都属于左子树。
+
+所以左子树的前序区间是：
+
+```text
+pre_left + 1 到 pre_left + left_size
+```
+
+右子树就从左子树后面开始：
+
+```text
+pre_left + left_size + 1 到 pre_right
+```
+
+套到例子里：
+
+```text
+preorder = [3, 9, 20, 15, 7]
+            ^  ^  ^       ^
+            根 左  右子树范围
+
+根节点：preorder[0] = 3
+左子树前序：preorder[1 ... 1] = [9]
+右子树前序：preorder[2 ... 4] = [20, 15, 7]
+```
+
+中序区间更直接：
+
+```text
+左子树中序：in_left 到 root_inorder_index - 1
+右子树中序：root_inorder_index + 1 到 in_right
+```
+
+套到例子里：
+
+```text
+inorder = [9, 3, 15, 20, 7]
+           ^  ^  ^       ^
+           左 根  右子树范围
+
+左子树中序：inorder[0 ... 0] = [9]
+右子树中序：inorder[2 ... 4] = [15, 20, 7]
+```
+
+所以两次递归就是：
+
+```python
+root.left = build(1, 1, 0, 0)
+root.right = build(2, 4, 2, 4)
+```
+
+翻译成人话：
+
+```text
+用 preorder[1 ... 1] 和 inorder[0 ... 0] 构造左子树
+用 preorder[2 ... 4] 和 inorder[2 ... 4] 构造右子树
+```
+
+把它真的展开：
+
+```text
+左子树：
+preorder[1 ... 1] = [9]
+inorder[0 ... 0]  = [9]
+
+右子树：
+preorder[2 ... 4] = [20, 15, 7]
+inorder[2 ... 4]  = [15, 20, 7]
+```
+
+也就是说，第一层递归把完整数组拆成了：
+
+```text
+整棵树：
+preorder[0 ... 4] = [3, 9, 20, 15, 7]
+inorder[0 ... 4]  = [9, 3, 15, 20, 7]
+
+左子树：
+preorder[1 ... 1] = [9]
+inorder[0 ... 0]  = [9]
+
+右子树：
+preorder[2 ... 4] = [20, 15, 7]
+inorder[2 ... 4]  = [15, 20, 7]
+```
+
+右子树还会继续递归：
+
+```python
+build(2, 4, 2, 4)
+```
+
+这次的当前子树片段是：
+
+```text
+preorder[2 ... 4] = [20, 15, 7]
+inorder[2 ... 4]  = [15, 20, 7]
+```
+
+这段的根是：
+
+```python
+root_val = preorder[2]  # 20
+```
+
+`20` 在当前中序片段里的位置是：
+
+```text
+inorder = [9, 3, 15, 20, 7]
+                  ^   ^
+              in_left root_inorder_index
+                 2       3
+```
+
+所以：
+
+```python
+left_size = root_inorder_index - in_left
+          = 3 - 2
+          = 1
+```
+
+右子树里的左子树和右子树继续拆成：
+
+```text
+20 的左子树：
+preorder[3 ... 3] = [15]
+inorder[2 ... 2]  = [15]
+
+20 的右子树：
+preorder[4 ... 4] = [7]
+inorder[4 ... 4]  = [7]
+```
+
+把这几次递归汇总成表格，就是：
+
+| 调用 | 当前 preorder 范围 | 实际拿到的 preorder | 当前 inorder 范围 | 实际拿到的 inorder | 根节点 |
+| --- | --- | --- | --- | --- | --- |
+| `build(0, 4, 0, 4)` | `preorder[0 ... 4]` | `[3, 9, 20, 15, 7]` | `inorder[0 ... 4]` | `[9, 3, 15, 20, 7]` | `3` |
+| `build(1, 1, 0, 0)` | `preorder[1 ... 1]` | `[9]` | `inorder[0 ... 0]` | `[9]` | `9` |
+| `build(2, 4, 2, 4)` | `preorder[2 ... 4]` | `[20, 15, 7]` | `inorder[2 ... 4]` | `[15, 20, 7]` | `20` |
+| `build(3, 3, 2, 2)` | `preorder[3 ... 3]` | `[15]` | `inorder[2 ... 2]` | `[15]` | `15` |
+| `build(4, 4, 4, 4)` | `preorder[4 ... 4]` | `[7]` | `inorder[4 ... 4]` | `[7]` | `7` |
+
+所以不要把 `pre_left`、`pre_right` 想成抽象变量。
+
+它们就是在说：
+
+```text
+这次递归，只看 preorder 的哪一段。
+```
+
+`in_left`、`in_right` 也是同理：
+
+```text
+这次递归，只看 inorder 的哪一段。
+```
+
+这就是方法二的全部逻辑。
+
+---
+
+### 对应到代码
+
+递归停止条件：
 
 ```python
 if pre_left > pre_right:
     return None
 ```
 
-当前子树根节点一定是：
+意思是当前前序区间里已经没有节点了。
+
+这个情况通常出现在“某个节点没有左子树或右子树”的时候。
+
+比如上面的例子里，`9` 是一个叶子节点。
+
+构造 `9` 的调用是：
 
 ```python
-root_val = preorder[pre_left]
+build(1, 1, 0, 0)
 ```
 
-创建根节点：
+这次只包含一个节点：
+
+```text
+preorder[1 ... 1] = [9]
+inorder[0 ... 0]  = [9]
+```
+
+所以：
 
 ```python
-root = TreeNode(root_val)
+root_val = preorder[1]  # 9
+root_inorder_index = 0
+left_size = root_inorder_index - in_left
+          = 0 - 0
+          = 0
 ```
 
-找到根在中序里的位置：
-
-```python
-root_index = inorder_map[root_val]
-```
-
-左子树节点个数：
-
-```python
-left_size = root_index - in_left
-```
-
-于是左子树对应的前序区间是：
-
-```text
-pre_left + 1 到 pre_left + left_size
-```
-
-左子树对应的中序区间是：
-
-```text
-in_left 到 root_index - 1
-```
-
-右子树对应的前序区间是：
-
-```text
-pre_left + left_size + 1 到 pre_right
-```
-
-右子树对应的中序区间是：
-
-```text
-root_index + 1 到 in_right
-```
-
-所以代码是：
+接下来代码还是会尝试构造 `9` 的左子树：
 
 ```python
 root.left = build(
     pre_left + 1,
     pre_left + left_size,
     in_left,
-    root_index - 1,
+    root_inorder_index - 1,
+)
+```
+
+把数字代进去：
+
+```python
+root.left = build(2, 1, 0, -1)
+```
+
+这里 `pre_left = 2`，`pre_right = 1`。
+
+也就是：
+
+```text
+preorder[2 ... 1]
+```
+
+这个范围左边界已经超过右边界，说明里面没有任何节点。
+
+所以：
+
+```python
+if pre_left > pre_right:
+    return None
+```
+
+就会返回 `None`，表示 `9` 没有左子树。
+
+`9` 的右子树也是一样：
+
+```python
+root.right = build(2, 1, 1, 0)
+```
+
+这里同样是 `pre_left = 2`，`pre_right = 1`，所以也返回 `None`。
+
+这就是叶子节点的左右子树怎么变成空的。
+
+当前根节点：
+
+```python
+root_val = preorder[pre_left]
+root = TreeNode(root_val)
+```
+
+根在中序里的位置：
+
+```python
+root_inorder_index = inorder_map[root_val]
+```
+
+左子树节点个数：
+
+```python
+left_size = root_inorder_index - in_left
+```
+
+递归构造左右子树：
+
+```python
+root.left = build(
+    pre_left + 1,
+    pre_left + left_size,
+    in_left,
+    root_inorder_index - 1,
 )
 root.right = build(
     pre_left + left_size + 1,
     pre_right,
-    root_index + 1,
+    root_inorder_index + 1,
     in_right,
 )
 ```
 
----
-
-### 为什么 left_size 是关键
-
-前序遍历是：
+如果只记一句话，就记这个：
 
 ```text
-根 -> 左子树 -> 右子树
+中序负责告诉我们左子树有多大；
+前序根据这个大小切出左子树和右子树。
 ```
-
-当前根占了一个位置：
-
-```text
-pre_left
-```
-
-所以左子树从：
-
-```text
-pre_left + 1
-```
-
-开始。
-
-但左子树到哪里结束？
-
-这就要靠中序里左子树的节点个数。
-
-如果：
-
-```python
-left_size = root_index - in_left
-```
-
-那么左子树在前序里的最后一个位置就是：
-
-```text
-pre_left + left_size
-```
-
-这就是 105 题下标写法的核心。
 
 ---
 
@@ -485,7 +770,7 @@ root_val = preorder[pre_left]
 3. 最后记住左右子树长度：
 
 ```python
-left_size = root_index - in_left
+left_size = root_inorder_index - in_left
 ```
 
 ---
