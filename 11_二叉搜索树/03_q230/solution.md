@@ -54,12 +54,12 @@
 1. 暴力法：遍历整棵树，收集所有值后排序
 2. 中序遍历 + 存数组：直接利用 BST 的有序性质
 3. 递归中序 + 计数提前返回：边遍历边计数，不存整条数组
-4. 迭代中序 + 计数提前返回：把递归过程改写成显式栈
+4. 迭代中序 + 消耗 k 提前返回：把递归过程改写成显式栈
 
 其中最适合面试的是：
 
 ```text
-解法四：迭代中序 + 计数提前返回
+解法四：迭代中序 + 消耗 k 提前返回
 ```
 
 因为它：
@@ -361,7 +361,7 @@ class Solution:
 
 ---
 
-## 解法四：迭代中序 + 计数提前返回
+## 解法四：迭代中序 + 消耗 k 提前返回
 
 对应文件：
 
@@ -376,7 +376,7 @@ class Solution:
 ```text
 既然中序遍历本身就是升序，
 那我没必要把所有值都存下来，
-只要在遍历过程中数到第 k 个，立刻返回即可。
+只要在遍历过程中把 `k` 一步步减到 `0`，立刻返回即可。
 ```
 
 ---
@@ -388,7 +388,7 @@ class Solution:
 面试里用迭代写法有两个优点：
 
 1. 逻辑很清楚，能直接展示你对中序遍历过程的理解
-2. 不需要依赖 `nonlocal` 或全局变量去记录第几个节点
+2. 不需要依赖 `nonlocal` 或额外的 `count` 变量去记录第几个节点
 
 当然递归也能做，这里主推迭代版本，是因为它更像“过程可视化”。
 
@@ -421,7 +421,7 @@ class Solution:
 
 1. 一个栈 `stack`
 2. 一个指针 `cur`
-3. 一个计数器 `count`
+3. 每访问一个节点，就把 `k` 减 1
 
 ### 第一步：一直往左压栈
 
@@ -441,11 +441,11 @@ cur = stack.pop()
 
 此时这个节点就是“当前还没访问过的最小值”。
 
-### 第三步：计数
+### 第三步：消耗一个名额
 
 ```python
-count += 1
-if count == k:
+k -= 1
+if k == 0:
     return cur.val
 ```
 
@@ -478,22 +478,18 @@ class Solution:
     def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
         stack = []
         cur = root
-        count = 0
-
-        while stack or cur:
+        while cur or stack:
             while cur:
                 stack.append(cur)
                 cur = cur.left
 
             cur = stack.pop()
-            count += 1
+            k -= 1
 
-            if count == k:
+            if k == 0:
                 return cur.val
 
             cur = cur.right
-
-        raise ValueError("k 超出节点数量")
 ```
 
 ---
@@ -543,7 +539,7 @@ cur = None
 此时：
 
 ```python
-count == k
+k == 0
 ```
 
 直接返回 `3`。

@@ -15,39 +15,35 @@ class TreeNode:
 
 
 class Solution:
-    def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
+    def recoverTree(self, root: Optional[TreeNode]) -> None:
         """
-        解法3：递归中序 + 计数提前返回
-        时间复杂度：最坏 O(n)
+        解法2：中序遍历找出两个错位节点
+        时间复杂度：O(n)
         空间复杂度：O(h)
         """
-        count = 0
-        answer = None
+        first = None
+        second = None
+        prev = None
 
-        def inorder(node: Optional[TreeNode]) -> None:
-            nonlocal count, answer
-
-            if not node or answer is not None:
+        def inorder(node):
+            nonlocal first, second, prev
+            if not node:
                 return
 
             inorder(node.left)
 
-            if answer is not None:
-                return
+            if prev and prev.val > node.val:
+                if first is None:
+                    first = prev
+                second = node
 
-            count += 1
-            if count == k:
-                answer = node.val
-                return
-
+            prev = node
             inorder(node.right)
 
         inorder(root)
 
-        if answer is None:
-            raise ValueError("k 超出节点数量")
-
-        return answer
+        if first and second:
+            first.val, second.val = second.val, first.val
 
 
 def build_tree(level_order: list[Optional[int]]) -> Optional[TreeNode]:
@@ -86,17 +82,30 @@ def build_tree(level_order: list[Optional[int]]) -> Optional[TreeNode]:
     return root
 
 
+def inorder_values(root: Optional[TreeNode]) -> list[int]:
+    values: list[int] = []
+
+    def dfs(node: Optional[TreeNode]) -> None:
+        if not node:
+            return
+        dfs(node.left)
+        values.append(node.val)
+        dfs(node.right)
+
+    dfs(root)
+    return values
+
+
 if __name__ == "__main__":
     test_cases = [
-        ([3, 1, 4, None, 2], 1, 1),
-        ([5, 3, 6, 2, 4, None, None, 1], 3, 3),
-        ([2, 1, 3], 2, 2),
-        ([6, 3, 8, 2, 4, 7, 9, 1], 5, 6),
+        ([1, 3, None, None, 2], [1, 2, 3]),
+        ([3, 1, 4, None, None, 2], [1, 2, 3, 4]),
     ]
 
     solution = Solution()
-    for values, k, expected in test_cases:
+    for values, expected_inorder in test_cases:
         root = build_tree(values)
-        actual = solution.kthSmallest(root, k)
-        print(f"输入: values={values}, k={k}, 输出: {actual}, 期望: {expected}")
-        assert actual == expected
+        solution.recoverTree(root)
+        actual = inorder_values(root)
+        print(f"输入: {values}, 输出: {actual}, 期望: {expected_inorder}")
+        assert actual == expected_inorder

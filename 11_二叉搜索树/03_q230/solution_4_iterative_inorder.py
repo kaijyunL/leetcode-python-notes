@@ -17,28 +17,25 @@ class TreeNode:
 class Solution:
     def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
         """
-        解法3：迭代中序 + 计数提前返回
+        解法4：迭代中序 + 消耗 k 提前返回
         时间复杂度：最坏 O(n)
         空间复杂度：O(h)
         """
-        stack: list[TreeNode] = []
+        stack = []
         cur = root
-        count = 0
 
-        while stack or cur:
+        while cur or stack:
             while cur:
                 stack.append(cur)
                 cur = cur.left
 
             cur = stack.pop()
-            count += 1
+            k -= 1
 
-            if count == k:
+            if k == 0:
                 return cur.val
 
             cur = cur.right
-
-        raise ValueError("k 超出节点数量")
 
 
 def build_tree(level_order: list[Optional[int]]) -> Optional[TreeNode]:
