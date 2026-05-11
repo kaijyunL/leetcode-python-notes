@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LeetCode 109 方法三：中序模拟动态讲解</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --panel: #ffffff;
+      --line: #d8e0eb;
+      --text: #172033;
+      --muted: #63748a;
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --green: #059669;
+      --green-soft: #d1fae5;
+      --orange: #d97706;
+      --orange-soft: #ffedd5;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --code-bg: #0f172a;
+      --code-text: #dbeafe;
+      --code-muted: #7c8aa5;
+      --shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    header {
+      padding: 24px 28px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(6px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 980px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(520px, 1.08fr) minmax(420px, 0.92fr);
+      gap: 18px;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .pill.blue {
+      background: #e0ebff;
+      color: #1d4ed8;
+    }
+
+    .pill.orange {
+      background: #fff1db;
+      color: #b45309;
+    }
+
+    .visual-body {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hint-box {
+      border: 1px solid #bfd4ff;
+      background: linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%);
+      color: #1e3a8a;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .hint-box strong {
+      color: #1d4ed8;
+    }
+
+    .list-card,
+    .tree-card,
+    .state-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fbfcff;
+      padding: 14px;
+    }
+
+    .card-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .linked-list {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 12px;
+      align-items: center;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .list-node {
+      position: relative;
+      min-width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      transition: 160ms ease;
+      flex: 0 0 auto;
+    }
+
+    .list-node.current {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.16);
+    }
+
+    .list-node.used {
+      border-color: #99d9bd;
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .list-node.future {
+      opacity: 0.92;
+    }
+
+    .list-arrow {
+      color: #94a3b8;
+      font-size: 24px;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .null-pill {
+      min-width: 72px;
+      height: 44px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 2px dashed #f0b2b2;
+      color: var(--red);
+      background: var(--red-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .tree-wrap {
+      border-radius: 12px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top center, rgba(37, 99, 235, 0.06), transparent 48%),
+        #f9fbff;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .edge {
+      stroke: #bfcbda;
+      stroke-width: 4;
+      stroke-linecap: round;
+      transition: 150ms ease;
+    }
+
+    .edge.active {
+      stroke: var(--blue);
+      stroke-width: 6;
+    }
+
+    .slot circle {
+      fill: #f5f7fb;
+      stroke: #c3cedd;
+      stroke-width: 3;
+      stroke-dasharray: 7 7;
+      transition: 150ms ease;
+    }
+
+    .slot.active circle {
+      fill: #eef5ff;
+      stroke: var(--blue);
+      stroke-width: 5;
+      stroke-dasharray: none;
+    }
+
+    .slot.created circle {
+      fill: #ffffff;
+      stroke: var(--green);
+      stroke-width: 4;
+      stroke-dasharray: none;
+    }
+
+    .slot.created.active circle {
+      fill: #eef5ff;
+      stroke: var(--blue);
+      stroke-width: 5;
+    }
+
+    .slot text.value {
+      fill: var(--text);
+      font-size: 20px;
+      font-weight: 900;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .slot text.range {
+      fill: #73839a;
+      font-size: 12px;
+      font-weight: 800;
+      text-anchor: middle;
+    }
+
+    .slot.created text.value {
+      fill: var(--green);
+    }
+
+    .slot.created.active text.value {
+      fill: #1d4ed8;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+    }
+
+    .legend-dot.pending {
+      background: #f1f5f9;
+      border: 2px solid #cbd5e1;
+    }
+
+    .legend-dot.active {
+      background: #dbeafe;
+      border: 2px solid var(--blue);
+    }
+
+    .legend-dot.done {
+      background: #d1fae5;
+      border: 2px solid var(--green);
+    }
+
+    .state-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .state-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff;
+      padding: 12px 14px;
+    }
+
+    .state-title {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .state-text {
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 30px;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      border: 1px solid #d8e0eb;
+      background: #f8fafc;
+      color: var(--text);
+    }
+
+    .chip.stack {
+      background: var(--orange-soft);
+      border-color: #f6c77d;
+      color: #9a4d00;
+    }
+
+    .chip.note {
+      background: var(--blue-soft);
+      border-color: #9fc3ff;
+      color: #1d4ed8;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .code-panel {
+      background: var(--code-bg);
+      color: var(--code-text);
+    }
+
+    .code-panel .panel-title {
+      background: #0b1220;
+      border-bottom-color: #23314c;
+      color: #eff6ff;
+    }
+
+    .code-wrap {
+      padding: 12px 0;
+      max-height: 760px;
+      overflow: auto;
+    }
+
+    .code-line {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 12px;
+      padding: 5px 18px 5px 0;
+      min-height: 28px;
+      border-left: 4px solid transparent;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 14px;
+      line-height: 1.45;
+      white-space: pre;
+    }
+
+    .code-line.active {
+      background: rgba(37, 99, 235, 0.20);
+      border-left-color: #60a5fa;
+    }
+
+    .line-number {
+      color: var(--code-muted);
+      text-align: right;
+      user-select: none;
+    }
+
+    .code-line.active .line-number {
+      color: #bfdbfe;
+      font-weight: 800;
+    }
+
+    .right-body {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .focus-note {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.18), rgba(15, 23, 42, 0.12));
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: #dce8ff;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .focus-note strong {
+      color: #ffffff;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto auto auto auto 180px 1fr;
+      gap: 10px;
+      align-items: center;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 18px 22px;
+    }
+
+    button {
+      min-height: 40px;
+      border-radius: 12px;
+      border: 1px solid #c7d2e0;
+      background: #ffffff;
+      color: var(--text);
+      font-weight: 800;
+      padding: 0 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    button.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.42;
+    }
+
+    .speed-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    @media (max-width: 1080px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .speed-wrap,
+      .controls input[type="range"] {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LeetCode 109 方法三：为什么外层那次 `root = TreeNode(self.current.val)` 正好是整棵树根</h1>
+    <div class="subtitle">
+      固定用链表 <code>[-10, -3, 0, 5, 9]</code> 演示。左边看链表游标、递归栈和树槽位是怎么变化的，右边看代码逐行高亮。
+      关键不是“最后创建的节点才是根”，而是“外层 <code>build(0, 4)</code> 在左子树建完后，<code>self.current</code> 恰好走到 0，所以它成为当前这一层的根”。
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-title">
+        <span>执行图解</span>
+        <span class="pill blue" id="stepText">步骤 1 / 1</span>
+      </div>
+      <div class="visual-body">
+        <div class="hint-box" id="headline">
+          <strong>先定结构，再按中序填值：</strong> <span id="headlineText"></span>
+        </div>
+
+        <div class="list-card">
+          <div class="card-label">链表与 self.current</div>
+          <div class="linked-list" id="listView"></div>
+        </div>
+
+        <div class="tree-card">
+          <div class="card-label">按区间预留的树槽位</div>
+          <div class="tree-wrap">
+            <svg id="treeSvg" viewBox="0 0 760 420" role="img" aria-label="有序链表转平衡 BST 的中序模拟过程"></svg>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-dot pending"></span>还没填值的槽位</div>
+            <div class="legend-item"><span class="legend-dot active"></span>当前正在处理的槽位</div>
+            <div class="legend-item"><span class="legend-dot done"></span>已经填值完成</div>
+          </div>
+        </div>
+
+        <div class="state-grid">
+          <div class="state-box">
+            <div class="state-title">当前动作</div>
+            <div class="state-text" id="actionText"></div>
+          </div>
+          <div class="state-box">
+            <div class="state-title">当前递归栈</div>
+            <div class="chips" id="stackView"></div>
+          </div>
+          <div class="state-box">
+            <div class="state-title">此刻你该盯住的事实</div>
+            <div class="chips" id="noteView"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel code-panel">
+      <div class="panel-title">
+        <span>代码对应</span>
+        <span class="pill orange" id="lineText">Line 1</span>
+      </div>
+      <div class="right-body">
+        <div class="focus-note" id="focusNote"></div>
+        <div class="code-wrap" id="codeWrap"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="controls">
+    <button id="prevBtn">上一步</button>
+    <button id="playBtn" class="primary">播放</button>
+    <button id="nextBtn">下一步</button>
+    <button id="resetBtn">重置</button>
+    <div class="speed-wrap">
+      <span>速度</span>
+      <input id="speedRange" type="range" min="500" max="1800" step="100" value="1100" aria-label="自动播放速度">
+    </div>
+    <input id="stepRange" type="range" min="0" value="0" aria-label="步骤进度">
+  </div>
+
+  <script>
+    const codeLines = [
+      "class Solution:",
+      "    def sortedListToBST(self, head):",
+      "        self.current = head",
+      "        n = self.get_length(head)",
+      "        def build(left, right):",
+      "            if left > right:",
+      "                return None",
+      "            mid = (left + right) // 2",
+      "            left_subtree = build(left, mid - 1)",
+      "            root = TreeNode(self.current.val)",
+      "            self.current = self.current.next",
+      "            root.left = left_subtree",
+      "            root.right = build(mid + 1, right)",
+      "            return root",
+      "        return build(0, n - 1)",
+    ];
+
+    const linkedValues = [-10, -3, 0, 5, 9];
+
+    const slots = {
+      A: { x: 380, y: 76, range: "[0,4]" },
+      B: { x: 210, y: 170, range: "[0,1]" },
+      C: { x: 550, y: 170, range: "[3,4]" },
+      D: { x: 290, y: 282, range: "[1,1]" },
+      E: { x: 630, y: 282, range: "[4,4]" },
+    };
+
+    const edges = [
+      ["A", "B"],
+      ["A", "C"],
+      ["B", "D"],
+      ["C", "E"],
+    ];
+
+    const steps = [
+      {
+        line: 3,
+        title: "初始化游标",
+        detail: "先把 self.current 指到链表头。现在它指向 -10，后面建树时会按中序顺序一个个消费节点。",
+        headline: "计数还没开始，但建树游标已经记住了链表头。",
+        focus: "此时没有任何树节点被创建。self.current 只是一个“下一个待使用值”的游标。",
+        currentIndex: 0,
+        created: {},
+        activeSlot: null,
+        activeEdge: null,
+        stack: [],
+        notes: ["self.current -> -10", "还没开始 build"],
+      },
+      {
+        line: 4,
+        title: "统计长度",
+        detail: "get_length(head) 只是在数节点个数，得到 n = 5。这里移动的是局部变量 head，不会消耗 self.current。",
+        headline: "长度统计和建树消费是两趟流程，不是同一个游标。",
+        focus: "这一遍只是数出总共有 5 个节点，真正创建树节点时 self.current 仍然从 -10 开始。",
+        currentIndex: 0,
+        created: {},
+        activeSlot: null,
+        activeEdge: null,
+        stack: [],
+        notes: ["n = 5", "self.current 还在 -10"],
+      },
+      {
+        line: 15,
+        title: "进入最外层 build(0, 4)",
+        detail: "现在开始构造整棵树。区间 [0,4] 代表这 5 个节点最终会形成一棵平衡 BST。",
+        headline: "最外层 build(0,4) 负责整棵树，因此它返回的 root 才是整棵树根。",
+        focus: "注意：此刻外层还没有创建 root，它只是接手了“整棵树”这份任务。",
+        currentIndex: 0,
+        created: {},
+        activeSlot: "A",
+        activeEdge: null,
+        stack: ["build(0,4)"],
+        notes: ["A 槽位负责整棵树", "root 还没创建"],
+      },
+      {
+        line: 8,
+        title: "计算最外层中点",
+        detail: "在 build(0,4) 里算出 mid = 2。结构上，A 这个槽位就是整棵树的根槽位。",
+        headline: "先通过节点个数决定结构，再按中序顺序把值填进去。",
+        focus: "mid = 2 只是在确定结构，并没有去链表里找第 2 个节点。self.current 仍然停在 -10。",
+        currentIndex: 0,
+        created: {},
+        activeSlot: "A",
+        activeEdge: null,
+        stack: ["build(0,4)"],
+        notes: ["mid = 2", "还没读链表值"],
+      },
+      {
+        line: 9,
+        title: "先递归建左子树",
+        detail: "代码先执行 left_subtree = build(left, mid - 1)，也就是 build(0,1)。根不能先建，因为中序顺序必须是 左 -> 根 -> 右。",
+        headline: "外层想创建自己的根，必须先把左子树这两个位置处理完。",
+        focus: "这一步是整题的核心：外层 build(0,4) 主动暂停，先去处理左边。",
+        currentIndex: 0,
+        created: {},
+        activeSlot: "B",
+        activeEdge: ["A", "B"],
+        stack: ["build(0,4)", "build(0,1)"],
+        notes: ["外层暂停", "先去左边 build(0,1)"],
+      },
+      {
+        line: 8,
+        title: "进入 build(0,1)",
+        detail: "左子树这一层负责槽位 B。这里算出 mid = 0，它也会先尝试建自己的左子树。",
+        headline: "每一层都遵守同样规则：先左，再根，再右。",
+        focus: "B 这一层负责的是区间 [0,1] 这棵子树，不是整棵树。",
+        currentIndex: 0,
+        created: {},
+        activeSlot: "B",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(0,1)"],
+        notes: ["B 负责 [0,1]", "mid = 0"],
+      },
+      {
+        line: 9,
+        title: "B 的左子树为空",
+        detail: "build(0,1) 再去建左边，相当于 build(0,-1)。这会命中 left > right，直接返回 None。",
+        headline: "空子树返回后，B 这一层终于可以用当前链表节点创建自己的根了。",
+        focus: "因为 B 左边没有节点要处理，所以现在轮到 B 这层的根位置。",
+        currentIndex: 0,
+        created: {},
+        activeSlot: "B",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(0,1)"],
+        notes: ["B.left = None", "轮到 B 自己"],
+      },
+      {
+        line: 10,
+        title: "第一次创建节点：B = -10",
+        detail: "现在执行 root = TreeNode(self.current.val)。由于 self.current 还指向 -10，所以 B 这个槽位填入 -10。",
+        headline: "B 这一层的 root 是 -10，因为它的左边已经没有待处理节点了。",
+        focus: "这不是整棵树的根，只是 build(0,1) 这一层返回的子树根。",
+        currentIndex: 0,
+        created: { B: -10 },
+        activeSlot: "B",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(0,1)"],
+        notes: ["B.root = -10", "外层 root 还没创建"],
+      },
+      {
+        line: 11,
+        title: "游标后移到 -3",
+        detail: "B 这一层已经用掉了 -10，所以 self.current 往后走一步，指向 -3。",
+        headline: "每创建一个节点，游标就只前进一步，严格按中序消费链表。",
+        focus: "链表没有被删节点，只是游标移动到了下一个待使用值。",
+        currentIndex: 1,
+        created: { B: -10 },
+        activeSlot: "B",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(0,1)"],
+        notes: ["self.current -> -3", "-10 已经用过"],
+      },
+      {
+        line: 13,
+        title: "递归建 B 的右子树",
+        detail: "接着执行 root.right = build(mid + 1, right)，也就是 build(1,1)。这个槽位就是 D。",
+        headline: "左边处理完，B 用了自己的值，接下来才轮到 B 的右边。",
+        focus: "现在要把区间 [1,1] 这个单节点子树填出来。",
+        currentIndex: 1,
+        created: { B: -10 },
+        activeSlot: "D",
+        activeEdge: ["B", "D"],
+        stack: ["build(0,4)", "build(0,1)", "build(1,1)"],
+        notes: ["进入 build(1,1)", "D 负责 [1,1]"],
+      },
+      {
+        line: 10,
+        title: "创建 D = -3",
+        detail: "D 的左边也是空，所以它直接拿到当前值 -3，成为区间 [1,1] 这棵子树的根。",
+        headline: "到这里，外层左子树 [0,1] 的两个值都已经消费完了。",
+        focus: "D 填完以后，左子树整体会变成 -10 -> 右孩子 -3。",
+        currentIndex: 1,
+        created: { B: -10, D: -3 },
+        activeSlot: "D",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(0,1)", "build(1,1)"],
+        notes: ["D.root = -3", "左子树快完成了"],
+      },
+      {
+        line: 11,
+        title: "游标后移到 0",
+        detail: "D 用掉了 -3，所以 self.current 再向后移动，指向 0。",
+        headline: "注意这个时刻：左子树 [0,1] 刚好用掉了两个值，游标正好来到 0。",
+        focus: "这就是后面 0 会成为整棵树根的前提条件。",
+        currentIndex: 2,
+        created: { B: -10, D: -3 },
+        activeSlot: "D",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(0,1)", "build(1,1)"],
+        notes: ["self.current -> 0", "左子树值已全部消费"],
+      },
+      {
+        line: 14,
+        title: "左子树 build(0,1) 返回",
+        detail: "现在 B 这棵子树完整了，返回给最外层的 left_subtree。最外层 build(0,4) 重新获得控制权。",
+        headline: "外层等到左子树整个返回后，才有资格创建自己的根。",
+        focus: "请盯住两件事：left_subtree 已经准备好，self.current 正指向 0。",
+        currentIndex: 2,
+        created: { B: -10, D: -3 },
+        activeSlot: "A",
+        activeEdge: null,
+        stack: ["build(0,4)"],
+        notes: ["left_subtree 已完成", "self.current = 0"],
+      },
+      {
+        line: 10,
+        title: "关键一刻：A = 0",
+        detail: "现在回到最外层 build(0,4)，终于执行 root = TreeNode(self.current.val)。因为左子树已经消费掉 -10 和 -3，此刻 self.current 正好是 0，所以 A 填入 0。",
+        headline: "这就是为什么外层那次 root 赋值正好是整棵树根：因为轮到它时，游标已经被左子树推进到了 0。",
+        focus: "不是“最后创建的节点才是根”，而是“build(0,4) 这一层在左子树之后创建 root，而那时 self.current 恰好指向 0”。",
+        currentIndex: 2,
+        created: { A: 0, B: -10, D: -3 },
+        activeSlot: "A",
+        activeEdge: null,
+        stack: ["build(0,4)"],
+        notes: ["A.root = 0", "整棵树根已经确定"],
+      },
+      {
+        line: 11,
+        title: "游标继续后移到 5",
+        detail: "0 已经被用作整棵树的根，所以 self.current 向后移动，准备给右子树使用。",
+        headline: "根用掉之后，右半边自然接着消费 5 和 9。",
+        focus: "如果这时不后移，右子树就会重复使用 0，那就错了。",
+        currentIndex: 3,
+        created: { A: 0, B: -10, D: -3 },
+        activeSlot: "A",
+        activeEdge: null,
+        stack: ["build(0,4)"],
+        notes: ["self.current -> 5", "右子树准备开始"],
+      },
+      {
+        line: 12,
+        title: "把左子树挂到 0 左边",
+        detail: "执行 root.left = left_subtree。现在你可以直接看到：0 左边挂着完整的 [-10, -3] 子树。",
+        headline: "创建 root 和挂左子树是两步事，但它们共同说明 0 已经是外层这棵树的根。",
+        focus: "这里的 root 是最外层 build(0,4) 的局部变量，所以它代表整棵树的入口。",
+        currentIndex: 3,
+        created: { A: 0, B: -10, D: -3 },
+        activeSlot: "A",
+        activeEdge: ["A", "B"],
+        stack: ["build(0,4)"],
+        notes: ["0.left = left_subtree", "外层 root 已成形"],
+      },
+      {
+        line: 13,
+        title: "开始建右子树",
+        detail: "接着执行 root.right = build(3,4)。右边会继续按同样规则，先左再根再右。",
+        headline: "外层根已经确定为 0，剩下只是把右子树补完整。",
+        focus: "后面的 5、9 只可能出现在 0 的右边，不会再改变整棵树根是谁。",
+        currentIndex: 3,
+        created: { A: 0, B: -10, D: -3 },
+        activeSlot: "C",
+        activeEdge: ["A", "C"],
+        stack: ["build(0,4)", "build(3,4)"],
+        notes: ["进入 build(3,4)", "根仍然是 0"],
+      },
+      {
+        line: 10,
+        title: "创建 C = 5",
+        detail: "右子树左边为空，所以 build(3,4) 这一层会先拿到 5，填入 C。",
+        headline: "5 是右子树这一层的 root，不是整棵树根。",
+        focus: "每一层的 root 都只对自己的子树负责。整棵树根早在 A = 0 那一步就定了。",
+        currentIndex: 3,
+        created: { A: 0, B: -10, C: 5, D: -3 },
+        activeSlot: "C",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(3,4)"],
+        notes: ["C.root = 5", "A.root 仍然是 0"],
+      },
+      {
+        line: 11,
+        title: "游标后移到 9",
+        detail: "5 被消费后，self.current 指向 9。接下来它会被更右边的槽位使用。",
+        headline: "游标只会一路向右走，不会回头。",
+        focus: "这保证了树的中序遍历顺序和原链表顺序完全一致。",
+        currentIndex: 4,
+        created: { A: 0, B: -10, C: 5, D: -3 },
+        activeSlot: "C",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(3,4)"],
+        notes: ["self.current -> 9", "继续填右边"],
+      },
+      {
+        line: 10,
+        title: "创建 E = 9",
+        detail: "最右侧单节点区间 [4,4] 现在拿到 9，于是 E 被填成 9。",
+        headline: "整棵树的右侧完成，但根依然没有变化。",
+        focus: "到这一步你可以对比：最后创建的节点是 9，不是根；整棵树根早就已经是 0。",
+        currentIndex: 4,
+        created: { A: 0, B: -10, C: 5, D: -3, E: 9 },
+        activeSlot: "E",
+        activeEdge: null,
+        stack: ["build(0,4)", "build(3,4)", "build(4,4)"],
+        notes: ["E.root = 9", "最后创建的不是整树根"],
+      },
+      {
+        line: 14,
+        title: "返回整棵树根 0",
+        detail: "所有子树都建完后，最外层 build(0,4) 执行 return root，返回的就是 A，也就是值为 0 的节点。",
+        headline: "最终答案返回的是最外层那一帧持有的 root，而不是“最后创建的节点”。",
+        focus: "所以真正要记住的是：build(0,4) 负责整棵树，它在左子树完成后创建的那个 root，才是整棵树根。",
+        currentIndex: null,
+        created: { A: 0, B: -10, C: 5, D: -3, E: 9 },
+        activeSlot: "A",
+        activeEdge: null,
+        stack: ["build(0,4) -> return A"],
+        notes: ["return root = 0", "最外层返回整棵树入口"],
+      },
+    ];
+
+    const state = {
+      index: 0,
+      timer: null,
+      playing: false,
+    };
+
+    const treeSvg = document.getElementById("treeSvg");
+    const listView = document.getElementById("listView");
+    const codeWrap = document.getElementById("codeWrap");
+    const stepText = document.getElementById("stepText");
+    const lineText = document.getElementById("lineText");
+    const actionText = document.getElementById("actionText");
+    const stackView = document.getElementById("stackView");
+    const noteView = document.getElementById("noteView");
+    const headlineText = document.getElementById("headlineText");
+    const focusNote = document.getElementById("focusNote");
+    const stepRange = document.getElementById("stepRange");
+    const playBtn = document.getElementById("playBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const speedRange = document.getElementById("speedRange");
+
+    function renderCode(activeLine) {
+      codeWrap.innerHTML = "";
+      codeLines.forEach((line, index) => {
+        const row = document.createElement("div");
+        row.className = "code-line";
+        if (index + 1 === activeLine) row.classList.add("active");
+
+        const num = document.createElement("div");
+        num.className = "line-number";
+        num.textContent = String(index + 1).padStart(2, " ");
+
+        const content = document.createElement("div");
+        content.textContent = line;
+
+        row.append(num, content);
+        codeWrap.appendChild(row);
+      });
+    }
+
+    function renderList(step) {
+      listView.innerHTML = "";
+
+      linkedValues.forEach((value, index) => {
+        const node = document.createElement("div");
+        node.className = "list-node";
+
+        if (step.currentIndex !== null && index < step.currentIndex) {
+          node.classList.add("used");
+        } else if (step.currentIndex === index) {
+          node.classList.add("current");
+        } else {
+          node.classList.add("future");
+        }
+
+        node.textContent = value;
+        listView.appendChild(node);
+
+        if (index !== linkedValues.length - 1) {
+          const arrow = document.createElement("div");
+          arrow.className = "list-arrow";
+          arrow.textContent = "→";
+          listView.appendChild(arrow);
+        }
+      });
+
+      const tail = document.createElement("div");
+      tail.className = "null-pill";
+      tail.textContent = "None";
+      if (step.currentIndex === null) {
+        tail.style.borderColor = "#2563eb";
+        tail.style.background = "#dbeafe";
+        tail.style.color = "#1d4ed8";
+      }
+      listView.appendChild(tail);
+    }
+
+    function renderTree(step) {
+      const ns = "http://www.w3.org/2000/svg";
+      treeSvg.innerHTML = "";
+
+      edges.forEach(([from, to]) => {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", slots[from].x);
+        line.setAttribute("y1", slots[from].y + 30);
+        line.setAttribute("x2", slots[to].x);
+        line.setAttribute("y2", slots[to].y - 30);
+        line.setAttribute("class", "edge");
+        if (
+          step.activeEdge &&
+          step.activeEdge[0] === from &&
+          step.activeEdge[1] === to
+        ) {
+          line.classList.add("active");
+        }
+        treeSvg.appendChild(line);
+      });
+
+      Object.entries(slots).forEach(([id, info]) => {
+        const group = document.createElementNS(ns, "g");
+        group.setAttribute("class", "slot");
+
+        const isCreated = Object.prototype.hasOwnProperty.call(step.created, id);
+        if (isCreated) group.classList.add("created");
+        if (step.activeSlot === id) group.classList.add("active");
+
+        const circle = document.createElementNS(ns, "circle");
+        circle.setAttribute("cx", info.x);
+        circle.setAttribute("cy", info.y);
+        circle.setAttribute("r", 34);
+
+        const value = document.createElementNS(ns, "text");
+        value.setAttribute("x", info.x);
+        value.setAttribute("y", info.y + 1);
+        value.setAttribute("class", "value");
+        value.textContent = isCreated ? step.created[id] : "?";
+
+        const range = document.createElementNS(ns, "text");
+        range.setAttribute("x", info.x);
+        range.setAttribute("y", info.y + 60);
+        range.setAttribute("class", "range");
+        range.textContent = info.range;
+
+        group.append(circle, value, range);
+        treeSvg.appendChild(group);
+      });
+    }
+
+    function renderChips(container, items, type, formatter) {
+      container.innerHTML = "";
+      if (!items || items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "空";
+        container.appendChild(empty);
+        return;
+      }
+
+      items.forEach((item) => {
+        const chip = document.createElement("div");
+        chip.className = `chip ${type}`;
+        chip.textContent = formatter(item);
+        container.appendChild(chip);
+      });
+    }
+
+    function stopPlay() {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+      state.playing = false;
+      playBtn.textContent = "播放";
+    }
+
+    function render() {
+      const step = steps[state.index];
+
+      renderCode(step.line);
+      renderList(step);
+      renderTree(step);
+      renderChips(stackView, step.stack, "stack", (item) => item);
+      renderChips(noteView, step.notes, "note", (item) => item);
+
+      stepText.textContent = `步骤 ${state.index + 1} / ${steps.length}`;
+      lineText.textContent = `Line ${step.line}`;
+      actionText.innerHTML = `<strong>${step.title}</strong><br>${step.detail}`;
+      headlineText.textContent = step.headline;
+      focusNote.innerHTML = `<strong>这一步最关键：</strong> ${step.focus}`;
+      stepRange.value = state.index;
+
+      prevBtn.disabled = state.index === 0;
+      nextBtn.disabled = state.index === steps.length - 1;
+    }
+
+    function goTo(index) {
+      state.index = Math.max(0, Math.min(steps.length - 1, index));
+      render();
+    }
+
+    function startPlay() {
+      if (state.playing) {
+        stopPlay();
+        return;
+      }
+
+      state.playing = true;
+      playBtn.textContent = "暂停";
+
+      state.timer = setInterval(() => {
+        if (state.index >= steps.length - 1) {
+          stopPlay();
+          return;
+        }
+        goTo(state.index + 1);
+      }, Number(speedRange.value));
+    }
+
+    prevBtn.addEventListener("click", () => {
+      stopPlay();
+      goTo(state.index - 1);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      stopPlay();
+      goTo(state.index + 1);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      stopPlay();
+      goTo(0);
+    });
+
+    playBtn.addEventListener("click", startPlay);
+
+    stepRange.max = steps.length - 1;
+    stepRange.addEventListener("input", (event) => {
+      stopPlay();
+      goTo(Number(event.target.value));
+    });
+
+    speedRange.addEventListener("input", () => {
+      if (state.playing) {
+        stopPlay();
+        startPlay();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
