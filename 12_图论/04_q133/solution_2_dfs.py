@@ -1,3 +1,4 @@
+# 方法二：DFS + 哈希表（最适合面试）
 from typing import Optional, List
 
 
@@ -14,7 +15,7 @@ class Solution:
 
         visited = {}
 
-        def dfs(old: Node) -> Node:
+        def dfs(old):
             if old in visited:
                 return visited[old]
 

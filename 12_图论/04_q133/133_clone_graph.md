@@ -67,7 +67,7 @@ adjList = [[2,4],[1,3],[2,4],[1,3]]
 - 空间复杂度：`O(V)`（哈希表 + 队列/递归栈）
 
 #### 代码文件
-- `solution_two_pass.py`
+- `solution_1_two_pass.py`
 
 ---
 
@@ -181,7 +181,7 @@ DFS 从 1 出发：
   哈希表存所有节点；递归栈最坏也是 `O(V)`。
 
 #### 代码文件
-- `solution_dfs.py`
+- `solution_2_dfs.py`
 
 ---
 
@@ -208,7 +208,7 @@ DFS 从 1 出发：
 - 空间复杂度：`O(V)`
 
 #### 代码文件
-- `solution_bfs.py`
+- `solution_3_bfs.py`
 
 ---
 

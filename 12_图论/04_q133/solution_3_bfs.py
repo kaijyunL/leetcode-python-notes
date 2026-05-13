@@ -1,3 +1,4 @@
+# 方法三：BFS + 哈希表（迭代写法）
 from collections import deque
 from typing import Optional, List
 

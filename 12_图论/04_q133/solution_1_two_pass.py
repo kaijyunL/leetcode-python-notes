@@ -1,3 +1,4 @@
+# 方法一：两次遍历（先建点，再连边）
 from typing import Optional, List
 
 
