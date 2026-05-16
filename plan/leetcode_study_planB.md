@@ -567,7 +567,7 @@
 
 ## 📅 第四阶段：动态规划（第 10-13 周）
 
-### 4.1 一维 DP（11 + 2模板 = 13 题）
+### 4.1 一维 DP（9 + 1模板 = 10 题）
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
@@ -580,10 +580,7 @@
 | 152 | Maximum Product Subarray | 🟡 | 同时维护最大最小 | ⬜ |
 | 198 | House Robber | 🟡 | 选/不选 | ⬜ |
 | 213 | House Robber II | 🟡 | 环形打家劫舍 | ⬜ |
-| 279 | Perfect Squares | 🟡 | DP / BFS 最短步数 | ⬜ |
 | **300** | **LIS** 🏷️模板 | 🟡 | DP+二分 O(nlogn) | ⬜ |
-| **322** | **Coin Change** 🏷️模板 | 🟡 | 完全背包 | ⬜ |
-| 377 | Combination Sum IV | 🟡 | 排列型完全背包 | ⬜ |
 
 **📋 推荐刷题顺序：**
 
@@ -598,12 +595,9 @@
 | 5 | 198 | House Robber | 🟡 选/不选，经典线性 DP |
 | 6 | 213 | House Robber II | 🟡 环形约束，#198 直接进阶 |
 | 7 | 91 | Decode Ways | 🟡 分段选择 DP，#70 的字符串版 |
-| 8 | 279 | Perfect Squares | 🟡 DP/BFS 最短步数模型 |
-| 9 | **322** | **Coin Change** 🏷️ | 🟡 **完全背包模板**，必须掌握 |
-| 10 | 377 | Combination Sum IV | 🟡 排列型完全背包，与 #322/#518 对比 |
-| 11 | **300** | **LIS** 🏷️ | 🟡 DP + 二分 O(nlogn)，面试高频 |
-| 12 | 139 | Word Break | 🟡 字符串切分 DP，综合应用 |
-| 13 | 140 | Word Break II（选做） | 🔴 DP + 回溯输出，#139 的进阶 |
+| 8 | **300** | **LIS** 🏷️ | 🟡 DP + 二分 O(nlogn)，面试高频 |
+| 9 | 139 | Word Break | 🟡 字符串切分 DP，综合应用 |
+| 10 | 140 | Word Break II（选做） | 🔴 DP + 回溯输出，#139 的进阶 |
 
 ### 4.2 二维 DP（17 题）
 
@@ -651,7 +645,7 @@
 | 16 | 85 | Maximal Rectangle | 🔴 基于 #84(单调栈) 扩展 |
 | 17 | 87 | Scramble String（选做） | 🔴 区间 DP/记忆化 |
 
-### 4.3 股票系列 & 背包（6 + 3模板 = 9 题）
+### 4.3 股票系列 & 背包（4 + 6模板 = 10 题）
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
@@ -659,27 +653,29 @@
 | 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 | 状态机+冷冻期 | ⬜ |
 | 123 | Best Time to Buy and Sell Stock III | 🔴 | 至多两次交易 | ⬜ |
 | 188 | Best Time to Buy and Sell Stock IV（选做） | 🔴 | 至多k次交易 | ⬜ |
-| 146 | LRU Cache | 🟡 | 哈希+双向链表 | ⬜ |
 | **416** | **Partition Equal Subset Sum** 🏷️模板 | 🟡 | 0-1 背包 | ⬜ |
 | **494** | **Target Sum** 🏷️模板 | 🟡 | 0-1 背包变体 | ⬜ |
+| **279** | **Perfect Squares** 🏷️模板 | 🟡 | 完全背包最值 / BFS | ⬜ |
+| **322** | **Coin Change** 🏷️模板 | 🟡 | 完全背包最值 | ⬜ |
 | **518** | **Coin Change II** 🏷️模板 | 🟡 | 完全背包计数 | ⬜ |
 | 377 | Combination Sum IV | 🟡 | 排列型完全背包 | ⬜ |
 
 **📋 推荐刷题顺序：**
 
-> 背包模板 → 股票状态机 → 设计题
+> 背包模板 → 股票状态机
 
 | 顺序 | # | 题目 | 理由 |
 |:----:|---|------|------|
 | 1 | **416** | **Partition Equal Subset Sum** 🏷️ | 🟡 **0-1 背包模板**，先掌握 |
 | 2 | **494** | **Target Sum** 🏷️ | 🟡 0-1 背包变体，#416 直接进阶 |
-| 3 | **518** | **Coin Change II** 🏷️ | 🟡 **完全背包模板**，与 4.1 的 #322 对比 |
-| 4 | 377 | Combination Sum IV | 🟡 排列型完全背包，补齐计数方向 |
-| 5 | 122 | Best Time to Buy and Sell Stock II | 🟡 贪心/状态机，股票系列入门 |
-| 6 | 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 状态机 + 冷冻期，股票 DP 变体 |
-| 7 | 123 | Best Time to Buy and Sell Stock III | 🔴 至多两次交易，#122 进阶 |
-| 8 | 188 | Best Time to Buy and Sell Stock IV（选做） | 🔴 至多k次交易，#123 泛化版 |
-| 9 | 146 | LRU Cache | 🟡 哈希 + 双向链表，数据结构设计 |
+| 3 | **279** | **Perfect Squares** 🏷️ | 🟡 完全背包最值入门，也可对照 BFS 最短步数 |
+| 4 | **322** | **Coin Change** 🏷️ | 🟡 **完全背包最值模板**，先掌握最少硬币数 |
+| 5 | **518** | **Coin Change II** 🏷️ | 🟡 完全背包计数，和 #279/#322 对比最值 vs 计数 |
+| 6 | 377 | Combination Sum IV | 🟡 排列型完全背包，补齐计数方向 |
+| 7 | 122 | Best Time to Buy and Sell Stock II | 🟡 贪心/状态机，股票系列入门 |
+| 8 | 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 状态机 + 冷冻期，股票 DP 变体 |
+| 9 | 123 | Best Time to Buy and Sell Stock III | 🔴 至多两次交易，#122 进阶 |
+| 10 | 188 | Best Time to Buy and Sell Stock IV（选做） | 🔴 至多k次交易，#123 泛化版 |
 
 ---
 
@@ -795,7 +791,7 @@
 | 3 | **211** | **Add and Search Words** 🏷️ | 🟡 Trie + DFS 通配，#208 进阶 |
 | 4 | **212** | **Word Search II** 🏷️ | 🔴 Trie + 回溯，#208 + #79 综合 |
 
-### 5.5 Intervals 专题（5 题）
+### 5.5 区间专题（5 题）
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
@@ -817,7 +813,7 @@
 | 4 | 452 | Minimum Number of Arrows | 🟡 #435 的自然变体，面试高频 |
 | 5 | 986 | Interval List Intersections | 🟡 双指针处理两个有序区间列表 |
 
-### 5.6 Design / Data Structure 专题（8 题）
+### 5.6 设计题 / 数据结构设计专题（8 题）
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
@@ -862,20 +858,20 @@
 | 回溯 | 15 | 15 | 100% |
 | 二叉树 | 27 | 21 | 78% |
 | BST | 9 | 9 | 100% |
-| 图论 | 14 | 8 | 57% |
-| 并查集 | 5 | 5 | 100% |
-| 一维 DP | 13 | 13 | 100% |
+| 图论 | 14 | 6 | 43% |
+| 并查集 | 5 | 1 | 20% |
+| 一维 DP | 10 | 8 | 80% |
 | 二维 DP | 17 | 0 | 0% |
-| 股票 & 背包 | 9 | 0 | 0% |
+| 股票 & 背包 | 10 | 2 | 20% |
 | 贪心 | 8 | 0 | 0% |
 | 位运算 | 9 | 0 | 0% |
 | 数学 | 12 | 0 | 0% |
 | 堆进阶 & 字典树 | 4 | 0 | 0% |
-| Intervals 专题 | 5 | 2 | 40% |
-| Design / Data Structure 专题 | 8 | 1 | 13% |
-| **总计（唯一题号）** | **246** | **159** | **65%** |
+| 区间专题 | 5 | 2 | 40% |
+| 设计题 / 数据结构设计专题 | 8 | 1 | 12% |
+| **总计（唯一题号）** | **246** | **150** | **61%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**，本地已建题解/代码覆盖 **159 题**；本次补入了 `Contains Duplicate`、`Valid Anagram`、`Find the Duplicate Number`、`Minimum Size Subarray Sum`、`Permutation in String`、`Longest Repeating Character Replacement`、`Decode String`、`Valid Parenthesis String`、树前缀和、子树匹配、图染色/带权建模/反向可达性、区间专题、Design / Data Structure 专题等高频缺口；并将 `Count and Say`、`Valid Number`、`Text Justification`、`Maximum Gap`、`Sudoku Solver`、`N-Queens II`、`Unique BST II`、`Recover BST`、`Word Ladder II`、`Scramble String`、`Best Time to Buy and Sell Stock IV`、`Gray Code`、`Repeated DNA Sequences`、`Permutation Sequence`、`Max Points on a Line`、`Substring with Concatenation of All Words` 标记为**选做**；Premium/SQL/Shell 已排除。
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**，本地已建题解/代码覆盖 **150 题**。
 
 ---
 
