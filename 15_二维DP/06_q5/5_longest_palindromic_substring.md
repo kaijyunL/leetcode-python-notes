@@ -230,18 +230,16 @@ class Solution:
     def longestPalindrome(self, s: str) -> str:
         n = len(s)
         dp = [[False] * n for _ in range(n)]
-        best_left = 0
-        best_len = 1
+        start, end = 0, 0
 
         for right in range(n):
             for left in range(right + 1):
                 if s[left] == s[right] and (right - left <= 2 or dp[left + 1][right - 1]):
                     dp[left][right] = True
-                    if right - left + 1 > best_len:
-                        best_left = left
-                        best_len = right - left + 1
+                    if right - left > end - start:
+                        start, end = left, right
 
-        return s[best_left:best_left + best_len]
+        return s[start:end + 1]
 ```
 
 ### 复杂度

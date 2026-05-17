@@ -126,7 +126,7 @@
 | 151 | Reverse Words in a String | 🟡 | 分割+反转 | ✅ |
 | 165 | Compare Version Numbers | 🟡 | 分割逐段比较 | ✅ |
 | 394 | Decode String | 🟡 | 栈解析嵌套结构 | ⬜ |
-| 647 | Palindromic Substrings | 🟡 | 中心扩展 / DP | ⬜ |
+| 647 | Palindromic Substrings | 🟡 | 中心扩展 / DP | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -142,7 +142,7 @@
 | 6 | 28 | Find the Index of First Occurrence | 🟢 串匹配入门，可延伸学 KMP | ✅ |
 | 7 | 165 | Compare Version Numbers | 🟡 分割逐段比较，边界处理练习 | ✅ |
 | 8 | 151 | Reverse Words in a String | 🟡 分割 + 反转，字符串综合操作 | ✅ |
-| 9 | 647 | Palindromic Substrings | 🟡 中心扩展高频题，和 #5 互相补强 | ⬜ |
+| 9 | 647 | Palindromic Substrings | 🟡 中心扩展高频题，和 #5 互相补强 | ✅ |
 | 10 | 394 | Decode String | 🟡 栈 + 递归结构解析，面试高频 | ⬜ |
 | 11 | 38 | Count and Say（选做） | 🟡 递推模拟，迁移价值较低 | ✅ |
 | 12 | 6 | Zigzag Conversion | 🟡 按行分组/周期规律 | ✅ |
@@ -609,17 +609,17 @@
 | 62 | Unique Paths | 🟡 | 网格 DP | ✅ |
 | 63 | Unique Paths II | 🟡 | 含障碍物 | ✅ |
 | 64 | Minimum Path Sum | 🟡 | 网格最优路径 | ✅ |
-| 647 | Palindromic Substrings | 🟡 | 中心扩展 / DP | ⬜ |
-| 72 | Edit Distance | 🟡 | 经典字符串 DP | ⬜ |
+| 647 | Palindromic Substrings | 🟡 | 中心扩展 / DP | ✅ |
+| 72 | Edit Distance | 🟡 | 经典字符串 DP | ✅ |
 | 85 | Maximal Rectangle | 🔴 | 基于84题扩展 | ⬜ |
 | 87 | Scramble String（选做） | 🔴 | 区间 DP/记忆化 | ⬜ |
-| 97 | Interleaving String | 🟡 | 交错匹配 DP | ⬜ |
-| 115 | Distinct Subsequences | 🔴 | 子序列计数 DP | ⬜ |
+| 97 | Interleaving String | 🟡 | 交错匹配 DP | ✅ |
+| 115 | Distinct Subsequences | 🔴 | 子序列计数 DP | ✅ |
 | 120 | Triangle | 🟡 | 自底向上 DP | ✅ |
 | 132 | Palindrome Partitioning II | 🔴 | 最小分割 DP | ⬜ |
 | 174 | Dungeon Game（选做） | 🔴 | 逆向网格 DP | ⬜ |
 | 221 | Maximal Square | 🟡 | 网格 DP 经典转移 | ✅ |
-| 1143 | Longest Common Subsequence | 🟡 | 双序列 DP | ⬜ |
+| 1143 | Longest Common Subsequence | 🟡 | 双序列 DP | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -633,11 +633,11 @@
 | 4 | 120 | Triangle | 🟡 自底向上 DP，变形网格 | ✅ |
 | 5 | 221 | Maximal Square | 🟡 网格 DP 高频门面题 | ✅ |
 | 6 | 5 | Longest Palindromic Substring | 🟡 中心扩展/区间 DP，字符串 DP 入门 | ✅ |
-| 7 | 647 | Palindromic Substrings | 🟡 中心扩展高频题，和 #5 配套 | ⬜ |
-| 8 | 72 | Edit Distance | 🟡 经典字符串 DP，面试高频 | ⬜ |
-| 9 | 1143 | Longest Common Subsequence | 🟡 双序列 DP 门面题，必会 | ⬜ |
-| 10 | 97 | Interleaving String | 🟡 交错匹配 DP | ⬜ |
-| 11 | 115 | Distinct Subsequences | 🔴 子序列计数 DP | ⬜ |
+| 7 | 647 | Palindromic Substrings | 🟡 中心扩展高频题，和 #5 配套 | ✅ |
+| 8 | 72 | Edit Distance | 🟡 经典字符串 DP，面试高频 | ✅ |
+| 9 | 1143 | Longest Common Subsequence | 🟡 双序列 DP 门面题，必会 | ✅ |
+| 10 | 97 | Interleaving String | 🟡 交错匹配 DP | ✅ |
+| 11 | 115 | Distinct Subsequences | 🔴 子序列计数 DP | ✅ |
 | 12 | 132 | Palindrome Partitioning II | 🔴 最小分割 DP，#5 + DP | ⬜ |
 | 13 | 174 | Dungeon Game（选做） | 🔴 逆向网格 DP，#64 的逆向思维 | ⬜ |
 | 14 | 10 | Regular Expression Matching | 🔴 复杂字符串 DP | ⬜ |
@@ -848,7 +848,7 @@
 | 专题 | 题数 | 已覆盖 | 覆盖率 |
 |------|------|--------|--------|
 | 数组 & 哈希表 | 21 | 16 | 76% |
-| 字符串 | 16 | 13 | 81% |
+| 字符串 | 16 | 14 | 88% |
 | 链表 | 20 | 19 | 95% |
 | 栈 & 队列 | 10 | 8 | 80% |
 | 双指针 & 滑窗 | 15 | 11 | 73% |
@@ -861,7 +861,7 @@
 | 图论 | 14 | 6 | 43% |
 | 并查集 | 5 | 1 | 20% |
 | 一维 DP | 10 | 9 | 90% |
-| 二维 DP | 17 | 6 | 35% |
+| 二维 DP | 17 | 11 | 65% |
 | 股票 & 背包 | 10 | 2 | 20% |
 | 贪心 | 8 | 0 | 0% |
 | 位运算 | 9 | 0 | 0% |
@@ -869,10 +869,9 @@
 | 堆进阶 & 字典树 | 4 | 0 | 0% |
 | 区间专题 | 5 | 2 | 40% |
 | 设计题 / 数据结构设计专题 | 8 | 1 | 12% |
-| **总计（唯一题号）** | **246** | **156** | **63%** |
+| **总计（唯一题号）** | **246** | **161** | **65%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **156 题**。
-
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **161 题**。
 ---
 
 ## 🔑 代码模板区（完成专题后总结）
