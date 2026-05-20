@@ -1,6 +1,6 @@
 # 🚀 LeetCode 高效刷题计划（高频题 + 模板题）
 
-> **制定日期**: 2026-03-07 | **仓库覆盖**: 165 / 246 | **总题数**: 246（唯一题号；含新增高频缺口、Intervals、Design / Data Structure）
+> **制定日期**: 2026-03-07 | **仓库覆盖**: 169 / 246 | **总题数**: 246（唯一题号；含新增高频缺口、Intervals、Design / Data Structure）
 > **策略**: 专题突破，由易到难，间隔复习
 
 ---
@@ -567,14 +567,13 @@
 
 ## 📅 第四阶段：动态规划（第 10-13 周）
 
-### 4.1 一维 DP（9 + 1模板 = 10 题）
+### 4.1 一维 DP（8 + 1模板 = 9 题）
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
 | 53 | Maximum Subarray | 🟡 | Kadane 算法 | ✅ |
 | 70 | Climbing Stairs | 🟢 | 斐波那契 DP | ✅ |
 | 91 | Decode Ways | 🟡 | 分段选择 DP | ✅ |
-| 121 | Best Time to Buy and Sell Stock | 🟢 | 维护历史最低 | ✅ |
 | 139 | Word Break | 🟡 | 字符串切分 DP | ✅ |
 | 140 | Word Break II（选做） | 🔴 | DP+回溯输出 | ⬜ |
 | 152 | Maximum Product Subarray | 🟡 | 同时维护最大最小 | ✅ |
@@ -589,15 +588,14 @@
 | 顺序 | # | 题目 | 理由 | 状态 |
 |:----:|---|------|------|------|
 | 1 | 70 | Climbing Stairs | 🟢 斐波那契，最简单的 DP | ✅ |
-| 2 | 121 | Best Time to Buy and Sell Stock | 🟢 维护历史最低，一次遍历 | ✅ |
-| 3 | 53 | Maximum Subarray | 🟡 Kadane 算法，子数组 DP 入门 | ✅ |
-| 4 | 152 | Maximum Product Subarray | 🟡 同时维护最大最小，#53 变体 | ✅ |
-| 5 | 198 | House Robber | 🟡 选/不选，经典线性 DP | ✅ |
-| 6 | 213 | House Robber II | 🟡 环形约束，#198 直接进阶 | ✅ |
-| 7 | 91 | Decode Ways | 🟡 分段选择 DP，#70 的字符串版 | ✅ |
-| 8 | **300** | **LIS** 🏷️ | 🟡 DP + 二分 O(nlogn)，面试高频 | ✅ |
-| 9 | 139 | Word Break | 🟡 字符串切分 DP，综合应用 | ✅ |
-| 10 | 140 | Word Break II（选做） | 🔴 DP + 回溯输出，#139 的进阶 | ⬜ |
+| 2 | 53 | Maximum Subarray | 🟡 Kadane 算法，子数组 DP 入门 | ✅ |
+| 3 | 152 | Maximum Product Subarray | 🟡 同时维护最大最小，#53 变体 | ✅ |
+| 4 | 198 | House Robber | 🟡 选/不选，经典线性 DP | ✅ |
+| 5 | 213 | House Robber II | 🟡 环形约束，#198 直接进阶 | ✅ |
+| 6 | 91 | Decode Ways | 🟡 分段选择 DP，#70 的字符串版 | ✅ |
+| 7 | **300** | **LIS** 🏷️ | 🟡 DP + 二分 O(nlogn)，面试高频 | ✅ |
+| 8 | 139 | Word Break | 🟡 字符串切分 DP，综合应用 | ✅ |
+| 9 | 140 | Word Break II（选做） | 🔴 DP + 回溯输出，#139 的进阶 | ⬜ |
 
 ### 4.2 二维 DP（17 题）
 
@@ -645,20 +643,21 @@
 | 16 | 85 | Maximal Rectangle | 🔴 基于 #84(单调栈) 扩展 | ⬜ |
 | 17 | 87 | Scramble String（选做） | 🔴 区间 DP/记忆化 | ⬜ |
 
-### 4.3 股票系列 & 背包（4 + 6模板 = 10 题）
+### 4.3 股票系列 & 背包（5 + 6模板 = 11 题）
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
-| 122 | Best Time to Buy and Sell Stock II | 🟡 | 贪心/状态机 | ⬜ |
-| 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 | 状态机+冷冻期 | ⬜ |
-| 123 | Best Time to Buy and Sell Stock III | 🔴 | 至多两次交易 | ⬜ |
+| 121 | Best Time to Buy and Sell Stock | 🟢 | 维护历史最低 | ✅ |
+| 122 | Best Time to Buy and Sell Stock II | 🟡 | 贪心/状态机 | ✅ |
+| 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 | 状态机+冷冻期 | ✅ |
+| 123 | Best Time to Buy and Sell Stock III | 🔴 | 至多两次交易 | ✅ |
 | 188 | Best Time to Buy and Sell Stock IV（选做） | 🔴 | 至多k次交易 | ⬜ |
 | **416** | **Partition Equal Subset Sum** 🏷️模板 | 🟡 | 0-1 背包 | ✅ |
 | **494** | **Target Sum** 🏷️模板 | 🟡 | 0-1 背包变体 | ✅ |
 | **279** | **Perfect Squares** 🏷️模板 | 🟡 | 完全背包最值 / BFS | ✅ |
 | **322** | **Coin Change** 🏷️模板 | 🟡 | 完全背包最值 | ✅ |
 | **518** | **Coin Change II** 🏷️模板 | 🟡 | 完全背包计数 | ✅ |
-| 377 | Combination Sum IV | 🟡 | 排列型完全背包 | ⬜ |
+| 377 | Combination Sum IV | 🟡 | 排列型完全背包 | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -671,11 +670,12 @@
 | 3 | **279** | **Perfect Squares** 🏷️ | 🟡 完全背包最值入门，也可对照 BFS 最短步数 | ✅ |
 | 4 | **322** | **Coin Change** 🏷️ | 🟡 **完全背包最值模板**，先掌握最少硬币数 | ✅ |
 | 5 | **518** | **Coin Change II** 🏷️ | 🟡 完全背包计数，和 #279/#322 对比最值 vs 计数 | ✅ |
-| 6 | 377 | Combination Sum IV | 🟡 排列型完全背包，补齐计数方向 | ⬜ |
-| 7 | 122 | Best Time to Buy and Sell Stock II | 🟡 贪心/状态机，股票系列入门 | ⬜ |
-| 8 | 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 状态机 + 冷冻期，股票 DP 变体 | ⬜ |
-| 9 | 123 | Best Time to Buy and Sell Stock III | 🔴 至多两次交易，#122 进阶 | ⬜ |
-| 10 | 188 | Best Time to Buy and Sell Stock IV（选做） | 🔴 至多k次交易，#123 泛化版 | ⬜ |
+| 6 | 377 | Combination Sum IV | 🟡 排列型完全背包，补齐计数方向 | ✅ |
+| 7 | 121 | Best Time to Buy and Sell Stock | 🟢 维护历史最低，股票系列真正起点 | ✅ |
+| 8 | 122 | Best Time to Buy and Sell Stock II | 🟡 贪心/状态机，股票系列入门 | ✅ |
+| 9 | 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 状态机 + 冷冻期，股票 DP 变体 | ✅ |
+| 10 | 123 | Best Time to Buy and Sell Stock III | 🔴 至多两次交易，#122 进阶 | ✅ |
+| 11 | 188 | Best Time to Buy and Sell Stock IV（选做） | 🔴 至多k次交易，#123 泛化版 | ⬜ |
 
 ---
 
@@ -860,18 +860,18 @@
 | BST | 9 | 9 | 100% |
 | 图论 | 14 | 6 | 43% |
 | 并查集 | 5 | 1 | 20% |
-| 一维 DP | 10 | 9 | 90% |
+| 一维 DP | 9 | 8 | 89% |
 | 二维 DP | 17 | 12 | 71% |
-| 股票 & 背包 | 10 | 5 | 50% |
+| 股票 & 背包 | 11 | 10 | 91% |
 | 贪心 | 8 | 0 | 0% |
 | 位运算 | 9 | 0 | 0% |
 | 数学 | 12 | 0 | 0% |
 | 堆进阶 & 字典树 | 4 | 0 | 0% |
 | 区间专题 | 5 | 2 | 40% |
-| 设计题 / 数据结构设计专题 | 8 | 1 | 12% |
-| **总计（唯一题号）** | **246** | **165** | **67%** |
+| 设计题 / 数据结构设计专题 | 8 | 1 | 13% |
+| **总计（唯一题号）** | **246** | **169** | **69%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **165 题**。
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **169 题**。
 ---
 
 ## 🔑 代码模板区（完成专题后总结）
