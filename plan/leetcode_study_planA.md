@@ -210,7 +210,7 @@
 |---|------|------|--------|------|
 | 416 | [Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/) | 🟡 | 0-1 背包 | ⬜ |
 | 494 | [Target Sum](https://leetcode.com/problems/target-sum/) | 🟡 | 0-1 背包变体 | ⬜ |
-| 518 | [Coin Change II](https://leetcode.com/problems/coin-change-ii/) | 🟡 | 完全背包计数 | ⬜ |
+| 518 | [Coin Change II](https://leetcode.com/problems/coin-change-ii/) | 🟡 | 完全背包计数 | ✅ |
 | 474 | [Ones and Zeroes](https://leetcode.com/problems/ones-and-zeroes/) | 🟡 | 二维背包 | ⬜ |
 
 ---

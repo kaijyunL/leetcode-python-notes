@@ -1,6 +1,6 @@
 # 🚀 LeetCode 高效刷题计划（高频题 + 模板题）
 
-> **制定日期**: 2026-03-07 | **仓库覆盖**: 156 / 246 | **总题数**: 246（唯一题号；含新增高频缺口、Intervals、Design / Data Structure）
+> **制定日期**: 2026-03-07 | **仓库覆盖**: 165 / 246 | **总题数**: 246（唯一题号；含新增高频缺口、Intervals、Design / Data Structure）
 > **策略**: 专题突破，由易到难，间隔复习
 
 ---
@@ -616,7 +616,7 @@
 | 97 | Interleaving String | 🟡 | 交错匹配 DP | ✅ |
 | 115 | Distinct Subsequences | 🔴 | 子序列计数 DP | ✅ |
 | 120 | Triangle | 🟡 | 自底向上 DP | ✅ |
-| 132 | Palindrome Partitioning II | 🔴 | 最小分割 DP | ⬜ |
+| 132 | Palindrome Partitioning II | 🔴 | 最小分割 DP | ✅ |
 | 174 | Dungeon Game（选做） | 🔴 | 逆向网格 DP | ⬜ |
 | 221 | Maximal Square | 🟡 | 网格 DP 经典转移 | ✅ |
 | 1143 | Longest Common Subsequence | 🟡 | 双序列 DP | ✅ |
@@ -638,7 +638,7 @@
 | 9 | 1143 | Longest Common Subsequence | 🟡 双序列 DP 门面题，必会 | ✅ |
 | 10 | 97 | Interleaving String | 🟡 交错匹配 DP | ✅ |
 | 11 | 115 | Distinct Subsequences | 🔴 子序列计数 DP | ✅ |
-| 12 | 132 | Palindrome Partitioning II | 🔴 最小分割 DP，#5 + DP | ⬜ |
+| 12 | 132 | Palindrome Partitioning II | 🔴 最小分割 DP，#5 + DP | ✅ |
 | 13 | 174 | Dungeon Game（选做） | 🔴 逆向网格 DP，#64 的逆向思维 | ⬜ |
 | 14 | 10 | Regular Expression Matching | 🔴 复杂字符串 DP | ⬜ |
 | 15 | 44 | Wildcard Matching | 🔴 通配符 DP，与 #10 对比 | ⬜ |
@@ -653,11 +653,11 @@
 | 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 | 状态机+冷冻期 | ⬜ |
 | 123 | Best Time to Buy and Sell Stock III | 🔴 | 至多两次交易 | ⬜ |
 | 188 | Best Time to Buy and Sell Stock IV（选做） | 🔴 | 至多k次交易 | ⬜ |
-| **416** | **Partition Equal Subset Sum** 🏷️模板 | 🟡 | 0-1 背包 | ⬜ |
-| **494** | **Target Sum** 🏷️模板 | 🟡 | 0-1 背包变体 | ⬜ |
+| **416** | **Partition Equal Subset Sum** 🏷️模板 | 🟡 | 0-1 背包 | ✅ |
+| **494** | **Target Sum** 🏷️模板 | 🟡 | 0-1 背包变体 | ✅ |
 | **279** | **Perfect Squares** 🏷️模板 | 🟡 | 完全背包最值 / BFS | ✅ |
 | **322** | **Coin Change** 🏷️模板 | 🟡 | 完全背包最值 | ✅ |
-| **518** | **Coin Change II** 🏷️模板 | 🟡 | 完全背包计数 | ⬜ |
+| **518** | **Coin Change II** 🏷️模板 | 🟡 | 完全背包计数 | ✅ |
 | 377 | Combination Sum IV | 🟡 | 排列型完全背包 | ⬜ |
 
 **📋 推荐刷题顺序：**
@@ -666,11 +666,11 @@
 
 | 顺序 | # | 题目 | 理由 | 状态 |
 |:----:|---|------|------|------|
-| 1 | **416** | **Partition Equal Subset Sum** 🏷️ | 🟡 **0-1 背包模板**，先掌握 | ⬜ |
-| 2 | **494** | **Target Sum** 🏷️ | 🟡 0-1 背包变体，#416 直接进阶 | ⬜ |
+| 1 | **416** | **Partition Equal Subset Sum** 🏷️ | 🟡 **0-1 背包模板**，先掌握 | ✅ |
+| 2 | **494** | **Target Sum** 🏷️ | 🟡 0-1 背包变体，#416 直接进阶 | ✅ |
 | 3 | **279** | **Perfect Squares** 🏷️ | 🟡 完全背包最值入门，也可对照 BFS 最短步数 | ✅ |
 | 4 | **322** | **Coin Change** 🏷️ | 🟡 **完全背包最值模板**，先掌握最少硬币数 | ✅ |
-| 5 | **518** | **Coin Change II** 🏷️ | 🟡 完全背包计数，和 #279/#322 对比最值 vs 计数 | ⬜ |
+| 5 | **518** | **Coin Change II** 🏷️ | 🟡 完全背包计数，和 #279/#322 对比最值 vs 计数 | ✅ |
 | 6 | 377 | Combination Sum IV | 🟡 排列型完全背包，补齐计数方向 | ⬜ |
 | 7 | 122 | Best Time to Buy and Sell Stock II | 🟡 贪心/状态机，股票系列入门 | ⬜ |
 | 8 | 309 | Best Time to Buy and Sell Stock with Cooldown | 🟡 状态机 + 冷冻期，股票 DP 变体 | ⬜ |
@@ -861,17 +861,17 @@
 | 图论 | 14 | 6 | 43% |
 | 并查集 | 5 | 1 | 20% |
 | 一维 DP | 10 | 9 | 90% |
-| 二维 DP | 17 | 11 | 65% |
-| 股票 & 背包 | 10 | 2 | 20% |
+| 二维 DP | 17 | 12 | 71% |
+| 股票 & 背包 | 10 | 5 | 50% |
 | 贪心 | 8 | 0 | 0% |
 | 位运算 | 9 | 0 | 0% |
 | 数学 | 12 | 0 | 0% |
 | 堆进阶 & 字典树 | 4 | 0 | 0% |
 | 区间专题 | 5 | 2 | 40% |
 | 设计题 / 数据结构设计专题 | 8 | 1 | 12% |
-| **总计（唯一题号）** | **246** | **161** | **65%** |
+| **总计（唯一题号）** | **246** | **165** | **67%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **161 题**。
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **165 题**。
 ---
 
 ## 🔑 代码模板区（完成专题后总结）
