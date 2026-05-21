@@ -242,8 +242,8 @@
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
-| 55 | [Jump Game](https://leetcode.com/problems/jump-game/) | 🟡 | 最远可达 | ⬜ |
-| 45 | [Jump Game II](https://leetcode.com/problems/jump-game-ii/) | 🟡 | BFS 层思维 | ⬜ |
+| 55 | [Jump Game](https://leetcode.com/problems/jump-game/) | 🟡 | 最远可达 | ✅ |
+| 45 | [Jump Game II](https://leetcode.com/problems/jump-game-ii/) | 🟡 | BFS 层思维 | ✅ |
 | 134 | [Gas Station](https://leetcode.com/problems/gas-station/) | 🟡 | 净油量分析 | ⬜ |
 | 763 | [Partition Labels](https://leetcode.com/problems/partition-labels/) | 🟡 | 最远出现位置 | ⬜ |
 | 135 | [Candy](https://leetcode.com/problems/candy/) | 🔴 | 两次遍历 | ⬜ |
