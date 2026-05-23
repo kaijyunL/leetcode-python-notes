@@ -225,7 +225,7 @@
 |---|------|------|--------|------|
 | 295 | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/) | 🔴 | 对顶堆 | ⬜ |
 | 373 | [Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/) | 🟡 | 多路归并堆 | ⬜ |
-| 621 | [Task Scheduler](https://leetcode.com/problems/task-scheduler/) | 🟡 | 贪心+堆 | ⬜ |
+| 621 | [Task Scheduler](https://leetcode.com/problems/task-scheduler/) | 🟡 | 贪心+堆 | ✅ |
 | 767 | [Reorganize String](https://leetcode.com/problems/reorganize-string/) | 🟡 | 贪心+堆 | ⬜ |
 
 ### 5.2 字典树 (Trie) ⭐
@@ -245,7 +245,7 @@
 | 55 | [Jump Game](https://leetcode.com/problems/jump-game/) | 🟡 | 最远可达 | ✅ |
 | 45 | [Jump Game II](https://leetcode.com/problems/jump-game-ii/) | 🟡 | BFS 层思维 | ✅ |
 | 134 | [Gas Station](https://leetcode.com/problems/gas-station/) | 🟡 | 净油量分析 | ⬜ |
-| 763 | [Partition Labels](https://leetcode.com/problems/partition-labels/) | 🟡 | 最远出现位置 | ⬜ |
+| 763 | [Partition Labels](https://leetcode.com/problems/partition-labels/) | 🟡 | 最远出现位置 | ✅ |
 | 135 | [Candy](https://leetcode.com/problems/candy/) | 🔴 | 两次遍历 | ⬜ |
 
 ### 5.4 位运算 ⭐

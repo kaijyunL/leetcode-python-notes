@@ -1,6 +1,6 @@
 # 🚀 LeetCode 高效刷题计划（高频题 + 模板题）
 
-> **制定日期**: 2026-03-07 | **仓库覆盖**: 173 / 246 | **总题数**: 246（唯一题号；含新增高频缺口、Intervals、Design / Data Structure）
+> **制定日期**: 2026-03-07 | **仓库覆盖**: 185 / 246 | **总题数**: 246（唯一题号；含新增高频缺口、Intervals、Design / Data Structure）
 > **策略**: 专题突破，由易到难，间隔复习
 
 ---
@@ -690,9 +690,9 @@
 | 134 | Gas Station | 🟡 | 净油量分析 | ✅ |
 | 135 | Candy | 🔴 | 两次遍历 | ⬜ |
 | 435 | Non-overlapping Intervals | 🟡 | 按右端点排序做区间贪心 | ✅ |
-| 452 | Minimum Number of Arrows to Burst Balloons | 🟡 | 按右端点排序合并区间 | ⬜ |
-| 621 | Task Scheduler | 🟡 | 计数 + 贪心/堆 | ⬜ |
-| 763 | Partition Labels | 🟡 | 最远出现位置划分区间 | ⬜ |
+| 452 | Minimum Number of Arrows to Burst Balloons | 🟡 | 按右端点排序合并区间 | ✅ |
+| 621 | Task Scheduler | 🟡 | 计数 + 贪心/堆 | ✅ |
+| 763 | Partition Labels | 🟡 | 最远出现位置划分区间 | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -702,9 +702,9 @@
 | 2 | 45 | Jump Game II | 🟡 BFS 层思维，#55 的进阶 | ✅ |
 | 3 | 134 | Gas Station | 🟡 净油量分析，全局贪心 | ✅ |
 | 4 | 435 | Non-overlapping Intervals | 🟡 区间贪心门面题，面试高频 | ✅ |
-| 5 | 452 | Minimum Number of Arrows | 🟡 区间贪心，#435 的高频变体 | ⬜ |
-| 6 | 763 | Partition Labels | 🟡 字符串里的区间边界贪心 | ⬜ |
-| 7 | 621 | Task Scheduler | 🟡 计数 + 贪心/堆，调度高频题 | ⬜ |
+| 5 | 452 | Minimum Number of Arrows | 🟡 区间贪心，#435 的高频变体 | ✅ |
+| 6 | 763 | Partition Labels | 🟡 字符串里的区间边界贪心 | ✅ |
+| 7 | 621 | Task Scheduler | 🟡 计数 + 贪心/堆，调度高频题 | ✅ |
 | 8 | 135 | Candy | 🔴 两次遍历，贪心综合 | ⬜ |
 
 ### 5.2 位运算（9 题）
@@ -712,24 +712,24 @@
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
 | 89 | Gray Code（选做） | 🟡 | 格雷码 i^(i>>1) | ⬜ |
-| 136 | Single Number | 🟢 | 异或消除 | ⬜ |
+| 136 | Single Number | 🟢 | 异或消除 | ✅ |
 | 137 | Single Number II | 🟡 | 逐位统计 mod 3 | ⬜ |
 | 187 | Repeated DNA Sequences（选做） | 🟡 | 哈希/位压缩 | ⬜ |
-| 190 | Reverse Bits | 🟢 | 逐位翻转 | ⬜ |
-| 191 | Number of 1 Bits | 🟢 | n & (n-1) | ⬜ |
-| 268 | Missing Number | 🟢 | 异或 / 求和 / 哈希 | ⬜ |
-| 338 | Counting Bits | 🟢 | DP + 位运算 | ⬜ |
+| 190 | Reverse Bits | 🟢 | 逐位翻转 | ✅ |
+| 191 | Number of 1 Bits | 🟢 | n & (n-1) | ✅ |
+| 268 | Missing Number | 🟢 | 异或 / 求和 / 哈希 | ✅ |
+| 338 | Counting Bits | 🟢 | DP + 位运算 | ✅ |
 | 371 | Sum of Two Integers | 🟡 | 位运算加法 | ⬜ |
 
 **📋 推荐刷题顺序：**
 
 | 顺序 | # | 题目 | 理由 | 状态 |
 |:----:|---|------|------|------|
-| 1 | 136 | Single Number | 🟢 异或消除，位运算最经典入门 | ⬜ |
-| 2 | 268 | Missing Number | 🟢 异或/求和基础题，高频 warm-up | ⬜ |
-| 3 | 191 | Number of 1 Bits | 🟢 n & (n-1) 技巧 | ⬜ |
-| 4 | 190 | Reverse Bits | 🟢 逐位翻转，#191 同类 | ⬜ |
-| 5 | 338 | Counting Bits | 🟢 DP + 位运算，高频基础 | ⬜ |
+| 1 | 136 | Single Number | 🟢 异或消除，位运算最经典入门 | ✅ |
+| 2 | 268 | Missing Number | 🟢 异或/求和基础题，高频 warm-up | ✅ |
+| 3 | 191 | Number of 1 Bits | 🟢 n & (n-1) 技巧 | ✅ |
+| 4 | 190 | Reverse Bits | 🟢 逐位翻转，#191 同类 | ✅ |
+| 5 | 338 | Counting Bits | 🟢 DP + 位运算，高频基础 | ✅ |
 | 6 | 371 | Sum of Two Integers | 🟡 位运算模拟加法 | ⬜ |
 | 7 | 137 | Single Number II | 🟡 逐位统计 mod 3，#136 进阶 | ⬜ |
 | 8 | 89 | Gray Code（选做） | 🟡 格雷码 i^(i>>1)，数学 + 位运算 | ⬜ |
@@ -739,10 +739,10 @@
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
-| 7 | Reverse Integer | 🟡 | 溢出判断 | ⬜ |
-| 9 | Palindrome Number | 🟢 | 翻转一半比较 | ⬜ |
-| 12 | Integer to Roman | 🟡 | 贪心映射表 | ⬜ |
-| 13 | Roman to Integer | 🟢 | 减法规则 | ⬜ |
+| 7 | Reverse Integer | 🟡 | 溢出判断 | ✅ |
+| 9 | Palindrome Number | 🟢 | 翻转一半比较 | ✅ |
+| 12 | Integer to Roman | 🟡 | 贪心映射表 | ✅ |
+| 13 | Roman to Integer | 🟢 | 减法规则 | ✅ |
 | 29 | Divide Two Integers | 🟡 | 倍增/位移 | ⬜ |
 | 50 | Pow(x, n) | 🟡 | 快速幂 | ⬜ |
 | 60 | Permutation Sequence（选做） | 🔴 | 阶乘+逐位确定 | ⬜ |
@@ -758,10 +758,10 @@
 
 | 顺序 | # | 题目 | 理由 | 状态 |
 |:----:|---|------|------|------|
-| 1 | 9 | Palindrome Number | 🟢 翻转一半比较 | ⬜ |
-| 2 | 7 | Reverse Integer | 🟡 溢出判断，#9 同类 | ⬜ |
-| 3 | 13 | Roman to Integer | 🟢 减法规则 | ⬜ |
-| 4 | 12 | Integer to Roman | 🟡 贪心映射表，#13 的反向 | ⬜ |
+| 1 | 9 | Palindrome Number | 🟢 翻转一半比较 | ✅ |
+| 2 | 7 | Reverse Integer | 🟡 溢出判断，#9 同类 | ✅ |
+| 3 | 13 | Roman to Integer | 🟢 减法规则 | ✅ |
+| 4 | 12 | Integer to Roman | 🟡 贪心映射表，#13 的反向 | ✅ |
 | 5 | 171 | Excel Sheet Column Number | 🟢 26进制转十进制 | ⬜ |
 | 6 | 168 | Excel Sheet Column Title | 🟢 26进制(从1开始)，#171 反向 | ⬜ |
 | 7 | 172 | Factorial Trailing Zeroes | 🟡 统计因子5 | ⬜ |
@@ -798,7 +798,7 @@
 | 56 | Merge Intervals | 🟡 | 排序后合并重叠区间 | ✅ |
 | 57 | Insert Interval | 🟡 | 插入新区间并合并 | ✅ |
 | 435 | Non-overlapping Intervals | 🟡 | 按右端点排序做区间贪心 | ✅ |
-| 452 | Minimum Number of Arrows to Burst Balloons | 🟡 | 区间交集 / 最少箭数 | ⬜ |
+| 452 | Minimum Number of Arrows to Burst Balloons | 🟡 | 区间交集 / 最少箭数 | ✅ |
 | 986 | Interval List Intersections | 🟡 | 双指针求区间交集 | ⬜ |
 
 **📋 推荐刷题顺序：**
@@ -810,7 +810,7 @@
 | 1 | 56 | Merge Intervals | 🟡 区间问题最基础入口 | ✅ |
 | 2 | 57 | Insert Interval | 🟡 在 #56 基础上处理新区间插入 | ✅ |
 | 3 | 435 | Non-overlapping Intervals | 🟡 按右端点排序，区间贪心门面题 | ✅ |
-| 4 | 452 | Minimum Number of Arrows | 🟡 #435 的自然变体，面试高频 | ⬜ |
+| 4 | 452 | Minimum Number of Arrows | 🟡 #435 的自然变体，面试高频 | ✅ |
 | 5 | 986 | Interval List Intersections | 🟡 双指针处理两个有序区间列表 | ⬜ |
 
 ### 5.6 设计题 / 数据结构设计专题（8 题）
@@ -863,15 +863,15 @@
 | 一维 DP | 9 | 8 | 89% |
 | 二维 DP | 17 | 12 | 71% |
 | 股票 & 背包 | 11 | 10 | 91% |
-| 贪心 | 8 | 4 | 50% |
-| 位运算 | 9 | 0 | 0% |
-| 数学 | 12 | 0 | 0% |
+| 贪心 | 8 | 7 | 88% |
+| 位运算 | 9 | 5 | 56% |
+| 数学 | 12 | 4 | 33% |
 | 堆进阶 & 字典树 | 4 | 0 | 0% |
-| 区间专题 | 5 | 3 | 60% |
+| 区间专题 | 5 | 4 | 80% |
 | 设计题 / 数据结构设计专题 | 8 | 1 | 13% |
-| **总计（唯一题号）** | **246** | **173** | **70%** |
+| **总计（唯一题号）** | **246** | **185** | **75%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **173 题**。
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **185 题**。
 ---
 
 ## 🔑 代码模板区（完成专题后总结）
