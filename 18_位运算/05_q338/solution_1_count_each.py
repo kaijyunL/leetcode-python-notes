@@ -3,12 +3,12 @@
 
 class Solution:
     def countBits(self, n: int) -> list[int]:
-        def count_ones(num):
-            ans = 0
+        def count_ones(num: int) -> int:
+            count = 0
             while num:
                 num &= num - 1
-                ans += 1
-            return ans
+                count += 1
+            return count
 
         ans = []
         for num in range(n + 1):
@@ -18,7 +18,14 @@ class Solution:
 
 if __name__ == "__main__":
     solver = Solution()
-    test_cases = [2, 5, 0, 8]
+    test_cases = {
+        0: [0],
+        2: [0, 1, 1],
+        5: [0, 1, 1, 2, 1, 2],
+        8: [0, 1, 1, 2, 1, 2, 2, 3, 1],
+    }
 
-    for n in test_cases:
-        print(f"n={n}, answer={solver.countBits(n)}")
+    for n, expected in test_cases.items():
+        assert solver.countBits(n) == expected
+
+    print("all tests passed")
