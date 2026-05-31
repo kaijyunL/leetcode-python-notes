@@ -1,6 +1,6 @@
 # 🚀 LeetCode 高效刷题计划（高频题 + 模板题）
 
-> **制定日期**: 2026-03-07 | **仓库覆盖**: 189 / 246 | **总题数**: 246（唯一题号；含新增高频缺口、Intervals、Design / Data Structure）
+> **制定日期**: 2026-03-07 | **仓库覆盖**: 196 / 246 | **总题数**: 246（唯一题号；含新增高频缺口、Intervals、Design / Data Structure）
 > **策略**: 专题突破，由易到难，间隔复习
 
 ---
@@ -743,14 +743,14 @@
 | 9 | Palindrome Number | 🟢 | 翻转一半比较 | ✅ |
 | 12 | Integer to Roman | 🟡 | 贪心映射表 | ✅ |
 | 13 | Roman to Integer | 🟢 | 减法规则 | ✅ |
-| 29 | Divide Two Integers | 🟡 | 倍增/位移 | ⬜ |
-| 50 | Pow(x, n) | 🟡 | 快速幂 | ⬜ |
+| 29 | Divide Two Integers | 🟡 | 倍增/位移 | ✅ |
+| 50 | Pow(x, n) | 🟡 | 快速幂 | ✅ |
 | 60 | Permutation Sequence（选做） | 🔴 | 阶乘+逐位确定 | ⬜ |
 | 149 | Max Points on a Line（选做） | 🔴 | 斜率哈希计数 | ⬜ |
-| 166 | Fraction to Recurring Decimal | 🟡 | 长除法+哈希找循环 | ⬜ |
-| 168 | Excel Sheet Column Title | 🟢 | 26进制(注意从1开始) | ⬜ |
-| 171 | Excel Sheet Column Number | 🟢 | 26进制转十进制 | ⬜ |
-| 172 | Factorial Trailing Zeroes | 🟡 | 统计因子5 | ⬜ |
+| 166 | Fraction to Recurring Decimal | 🟡 | 长除法+哈希找循环 | ✅ |
+| 168 | Excel Sheet Column Title | 🟢 | 26进制(注意从1开始) | ✅ |
+| 171 | Excel Sheet Column Number | 🟢 | 26进制转十进制 | ✅ |
+| 172 | Factorial Trailing Zeroes | 🟡 | 统计因子5 | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -762,12 +762,12 @@
 | 2 | 7 | Reverse Integer | 🟡 溢出判断，#9 同类 | ✅ |
 | 3 | 13 | Roman to Integer | 🟢 减法规则 | ✅ |
 | 4 | 12 | Integer to Roman | 🟡 贪心映射表，#13 的反向 | ✅ |
-| 5 | 171 | Excel Sheet Column Number | 🟢 26进制转十进制 | ⬜ |
-| 6 | 168 | Excel Sheet Column Title | 🟢 26进制(从1开始)，#171 反向 | ⬜ |
-| 7 | 172 | Factorial Trailing Zeroes | 🟡 统计因子5 | ⬜ |
-| 8 | 50 | Pow(x, n) | 🟡 快速幂 | ⬜ |
-| 9 | 29 | Divide Two Integers | 🟡 倍增/位移 | ⬜ |
-| 10 | 166 | Fraction to Recurring Decimal | 🟡 长除法 + 哈希找循环 | ⬜ |
+| 5 | 171 | Excel Sheet Column Number | 🟢 26进制转十进制 | ✅ |
+| 6 | 168 | Excel Sheet Column Title | 🟢 26进制(从1开始)，#171 反向 | ✅ |
+| 7 | 172 | Factorial Trailing Zeroes | 🟡 统计因子5 | ✅ |
+| 8 | 50 | Pow(x, n) | 🟡 快速幂 | ✅ |
+| 9 | 29 | Divide Two Integers | 🟡 倍增/位移 | ✅ |
+| 10 | 166 | Fraction to Recurring Decimal | 🟡 长除法 + 哈希找循环 | ✅ |
 | 11 | 60 | Permutation Sequence（选做） | 🔴 阶乘 + 逐位确定 | ⬜ |
 | 12 | 149 | Max Points on a Line（选做） | 🔴 斜率哈希计数 | ⬜ |
 
@@ -778,7 +778,7 @@
 | **208** | **Implement Trie** 🏷️模板 | 🟡 | Trie 基础实现 | ⬜ |
 | **211** | **Design Add and Search Words** 🏷️模板 | 🟡 | Trie+DFS通配 | ⬜ |
 | **212** | **Word Search II** 🏷️模板 | 🔴 | Trie+回溯 | ⬜ |
-| **295** | **Find Median from Data Stream** 🏷️模板 | 🔴 | 对顶堆 | ⬜ |
+| **295** | **Find Median from Data Stream** 🏷️模板 | 🔴 | 对顶堆 | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -786,7 +786,7 @@
 
 | 顺序 | # | 题目 | 理由 | 状态 |
 |:----:|---|------|------|------|
-| 1 | **295** | **Find Median from Data Stream** 🏷️ | 🔴 对顶堆，堆的进阶应用 | ⬜ |
+| 1 | **295** | **Find Median from Data Stream** 🏷️ | 🔴 对顶堆，堆的进阶应用 | ✅ |
 | 2 | **208** | **Implement Trie** 🏷️ | 🟡 Trie 基础实现，字典树第一步 | ⬜ |
 | 3 | **211** | **Add and Search Words** 🏷️ | 🟡 Trie + DFS 通配，#208 进阶 | ⬜ |
 | 4 | **212** | **Word Search II** 🏷️ | 🔴 Trie + 回溯，#208 + #79 综合 | ⬜ |
@@ -821,7 +821,7 @@
 | 155 | Min Stack | 🟡 | 辅助栈 / 单栈存差值 | ✅ |
 | 208 | Implement Trie | 🟡 | Trie 基础设计 | ⬜ |
 | 211 | Design Add and Search Words | 🟡 | Trie + DFS 通配符 | ⬜ |
-| 295 | Find Median from Data Stream | 🔴 | 双堆维护中位数 | ⬜ |
+| 295 | Find Median from Data Stream | 🔴 | 双堆维护中位数 | ✅ |
 | 380 | Insert Delete GetRandom O(1) | 🟡 | 哈希表 + 动态数组 | ⬜ |
 | 703 | Kth Largest Element in a Stream | 🟢 | 小顶堆维护第 k 大 | ⬜ |
 | 981 | Time Based Key-Value Store | 🟡 | 哈希表 + 每 key 二分 | ⬜ |
@@ -834,7 +834,7 @@
 |:----:|---|------|------|------|
 | 1 | 155 | Min Stack | 🟡 最基础的数据结构设计题 | ✅ |
 | 2 | 703 | Kth Largest Element in a Stream | 🟢 流式数据 + 堆，进入堆设计 | ⬜ |
-| 3 | 295 | Find Median from Data Stream | 🔴 双堆经典设计题 | ⬜ |
+| 3 | 295 | Find Median from Data Stream | 🔴 双堆经典设计题 | ✅ |
 | 4 | 208 | Implement Trie | 🟡 Trie 基础实现 | ⬜ |
 | 5 | 211 | Design Add and Search Words | 🟡 Trie + DFS 通配，#208 进阶 | ⬜ |
 | 6 | 380 | Insert Delete GetRandom O(1) | 🟡 哈希表 + 数组，设计题高频 | ⬜ |
@@ -865,13 +865,13 @@
 | 股票 & 背包 | 11 | 10 | 91% |
 | 贪心 | 8 | 7 | 88% |
 | 位运算 | 9 | 9 | 100% |
-| 数学 | 12 | 4 | 33% |
-| 堆进阶 & 字典树 | 4 | 0 | 0% |
+| 数学 | 12 | 10 | 83% |
+| 堆进阶 & 字典树 | 4 | 1 | 25% |
 | 区间专题 | 5 | 4 | 80% |
-| 设计题 / 数据结构设计专题 | 8 | 1 | 13% |
-| **总计（唯一题号）** | **246** | **189** | **77%** |
+| 设计题 / 数据结构设计专题 | 8 | 2 | 25% |
+| **总计（唯一题号）** | **246** | **196** | **80%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **189 题**。
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；“已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **196 题**。
 ---
 
 ## 🔑 代码模板区（完成专题后总结）
