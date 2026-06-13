@@ -1,6 +1,6 @@
 # 🚀 LeetCode 高效刷题计划（高频题 + 模板题）
 
-> **制定日期**: 2026-03-07 | **仓库覆盖**: 198 / 246 | **总题数**: 246（唯一题号）
+> **制定日期**: 2026-03-07 | **仓库覆盖**: 208 / 246 | **总题数**: 246（唯一题号）
 > **策略**: 专题突破，由易到难，间隔复习
 
 ---
@@ -64,7 +64,7 @@
 | 31 | Next Permutation | 🟡 | 找规律：降序→交换→翻转 | ✅ |
 | 36 | Valid Sudoku | 🟡 | 行/列/宫哈希集合 | ✅ |
 | 41 | First Missing Positive | 🔴 | 原地哈希(索引映射) | ✅ |
-| 287 | Find the Duplicate Number | 🟡 | 数组环 / Floyd 快慢指针 | ⬜ |
+| 287 | Find the Duplicate Number | 🟡 | 数组环 / Floyd 快慢指针 | ✅ |
 | 48 | Rotate Image | 🟡 | 转置+水平翻转 | ✅ |
 | 49 | Group Anagrams | 🟡 | 排序/计数作 key | ✅ |
 | 54 | Spiral Matrix | 🟡 | 四边界收缩 | ✅ |
@@ -77,7 +77,7 @@
 | 169 | Majority Element | 🟢 | Boyer-Moore 投票 | ✅ |
 | 189 | Rotate Array | 🟡 | 三次翻转法 | ✅ |
 | 238 | Product of Array Except Self | 🟡 | 前后缀乘积/空间优化 | ✅ |
-| 560 | Subarray Sum Equals K | 🟡 | 前缀和+哈希计数 | ⬜ |
+| 560 | Subarray Sum Equals K | 🟡 | 前缀和+哈希计数 | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -97,8 +97,8 @@
 | 10 | 238 | Product of Array Except Self | 🟡 前后缀积，空间优化经典题 | ✅ |
 | 11 | 49 | Group Anagrams | 🟡 哈希表进阶，排序/计数做 key | ✅ |
 | 12 | 128 | Longest Consecutive Sequence | 🟡 哈希集合 O(n)，经典面试题 | ✅ |
-| 13 | 560 | Subarray Sum Equals K | 🟡 前缀和 + 哈希，子数组计数高频 | ⬜ |
-| 14 | 287 | Find the Duplicate Number | 🟡 Floyd 思想从链表环迁移到数组 | ⬜ |
+| 13 | 560 | Subarray Sum Equals K | 🟡 前缀和 + 哈希，子数组计数高频 | ✅ |
+| 14 | 287 | Find the Duplicate Number | 🟡 Floyd 思想从链表环迁移到数组 | ✅ |
 | 15 | 48 | Rotate Image | 🟡 矩阵操作入门：转置 + 翻转 | ✅ |
 | 16 | 54 | Spiral Matrix | 🟡 四边界收缩法 | ✅ |
 | 17 | 59 | Spiral Matrix II | 🟡 #54 的填充版，紧跟加深理解 | ✅ |
@@ -503,7 +503,7 @@
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
-| 126 | Word Ladder II（选做） | 🔴 | BFS建图+DFS回溯 | ⬜ |
+| 126 | Word Ladder II（选做） | 🔴 | BFS建图+DFS回溯 | ✅ |
 | 127 | Word Ladder | 🔴 | 双向 BFS | ⬜ |
 | 130 | Surrounded Regions | 🟡 | 边界 DFS 标记 | ✅ |
 | 133 | Clone Graph | 🟡 | BFS/DFS+哈希 | ✅ |
@@ -537,7 +537,7 @@
 | 11 | 743 | Network Delay Time | 🟡 带权最短路代表题，补齐 Dijkstra | ⬜ |
 | 12 | 329 | Longest Increasing Path in a Matrix | 🔴 DFS + memo，图和 DP 的结合 | ⬜ |
 | 13 | 127 | Word Ladder | 🔴 双向 BFS，字符串 + 图 | ⬜ |
-| 14 | 126 | Word Ladder II（选做） | 🔴 BFS建图 + DFS回溯，#127 终极版 | ⬜ |
+| 14 | 126 | Word Ladder II（选做） | 🔴 BFS建图 + DFS回溯，#127 终极版 | ✅ |
 
 ### 3.4 并查集（5 题）
 
@@ -793,10 +793,10 @@
 
 | # | 题目 | 难度 | 关键点 | 状态 |
 |---|------|------|--------|------|
-| 146 | LRU Cache | 🟡 | 哈希表 + 双向链表 | ⬜ |
-| 380 | Insert Delete GetRandom O(1) | 🟡 | 哈希表 + 动态数组 | ⬜ |
+| 146 | LRU Cache | 🟡 | 哈希表 + 双向链表 | ✅ |
+| 380 | Insert Delete GetRandom O(1) | 🟡 | 哈希表 + 动态数组 | ✅ |
 | 703 | Kth Largest Element in a Stream | 🟢 | 小顶堆维护第 k 大 | ✅ |
-| 981 | Time Based Key-Value Store | 🟡 | 哈希表 + 每 key 二分 | ⬜ |
+| 981 | Time Based Key-Value Store | 🟡 | 哈希表 + 每 key 二分 | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -805,9 +805,9 @@
 | 顺序 | # | 题目 | 理由 | 状态 |
 |:----:|---|------|------|------|
 | 1 | 703 | Kth Largest Element in a Stream | 🟢 流式数据 + 堆，设计题入门 | ✅ |
-| 2 | 380 | Insert Delete GetRandom O(1) | 🟡 哈希表 + 数组，设计题高频 | ⬜ |
-| 3 | 981 | Time Based Key-Value Store | 🟡 哈希表 + 二分，设计和算法结合 | ⬜ |
-| 4 | 146 | LRU Cache | 🟡 哈希表 + 双向链表，设计题核心 | ⬜ |
+| 2 | 380 | Insert Delete GetRandom O(1) | 🟡 哈希表 + 数组，设计题高频 | ✅ |
+| 3 | 981 | Time Based Key-Value Store | 🟡 哈希表 + 二分，设计和算法结合 | ✅ |
+| 4 | 146 | LRU Cache | 🟡 哈希表 + 双向链表，设计题核心 | ✅ |
 
 ---
 
@@ -815,7 +815,7 @@
 
 | 专题 | 题数 | 已覆盖 | 覆盖率 |
 |------|------|--------|--------|
-| 数组 & 哈希表 | 21 | 19 | 90% |
+| 数组 & 哈希表 | 21 | 21 | 100% |
 | 字符串 | 14 | 13 | 93% |
 | 链表 | 20 | 19 | 95% |
 | 栈 & 队列 | 10 | 8 | 80% |
@@ -826,7 +826,7 @@
 | 回溯 | 15 | 15 | 100% |
 | 二叉树 | 27 | 21 | 78% |
 | BST | 9 | 9 | 100% |
-| 图论 | 14 | 6 | 43% |
+| 图论 | 14 | 7 | 50% |
 | 并查集 | 5 | 1 | 20% |
 | 一维 DP | 9 | 8 | 89% |
 | 二维 DP | 17 | 12 | 71% |
@@ -835,10 +835,10 @@
 | 位运算 | 9 | 9 | 100% |
 | 数学 | 12 | 10 | 83% |
 | 堆进阶 & 字典树 | 4 | 3 | 75% |
-| 设计题 / 数据结构设计专题 | 4 | 1 | 25% |
-| **总计（唯一题号）** | **246** | **201** | **82%** |
+| 设计题 / 数据结构设计专题 | 4 | 4 | 100% |
+| **总计（唯一题号）** | **246** | **208** | **85%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；”已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **201 题**。
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；”已覆盖”按仓库内该题已存在本地题解/代码目录统计，去重后共 **208 题**。
 ---
 
 ## 🔑 代码模板区（完成专题后总结）

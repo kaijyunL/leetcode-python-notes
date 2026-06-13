@@ -8,10 +8,10 @@ class Solution:
         triangle = []
 
         for row in range(numRows):
-            current_row = [1] * (row + 1)
+            cur_row = [1] * (row + 1)
             for col in range(1, row):
-                current_row[col] = triangle[row - 1][col - 1] + triangle[row - 1][col]
-            triangle.append(current_row)
+                cur_row[col] = triangle[row - 1][col - 1] + triangle[row - 1][col]
+            triangle.append(cur_row)
 
         return triangle
 
