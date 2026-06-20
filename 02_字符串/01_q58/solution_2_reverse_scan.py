@@ -1,10 +1,17 @@
-# 方法1：split 后取最后一个单词
+# 方法2：从后往前扫描（面试主推）
 class Solution:
     def lengthOfLastWord(self, s: str) -> int:
-        words = s.split()
-        if not words:
-            return 0
-        return len(words[-1])
+        i = len(s) - 1
+
+        while i >= 0 and s[i] == " ":
+            i -= 1
+
+        length = 0
+        while i >= 0 and s[i] != " ":
+            length += 1
+            i -= 1
+
+        return length
 
 
 def run_case(s: str, expected: int) -> None:
