@@ -1,5 +1,4 @@
-# 方法2：双端队列扫描（面试主推）
-from collections import deque
+# 方法2：手动扫描 + 列表反转（面试主推）
 
 
 class Solution:
@@ -13,13 +12,13 @@ class Solution:
         while left <= right and s[right] == " ":
             right -= 1
 
-        dq = deque()
         word = []
+        ans = []
 
         while left <= right:
             if s[left] == " ":
                 if word:
-                    dq.appendleft("".join(word))
+                    ans.append("".join(word))
                     word = []
             else:
                 word.append(s[left])
@@ -27,9 +26,9 @@ class Solution:
             left += 1
 
         if word:
-            dq.appendleft("".join(word))
+            ans.append("".join(word))
 
-        return " ".join(dq)
+        return " ".join(reversed(ans))
 
 
 def run_case(s: str, expected: str) -> None:
