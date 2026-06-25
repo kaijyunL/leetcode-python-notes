@@ -7,18 +7,18 @@ class Solution:
             return s
 
         rows = [""] * numRows
-        row = 0
+        i = 0
         direction = 1
 
         for ch in s:
-            rows[row] += ch
+            rows[i] += ch
 
-            if row == 0:
+            if i == 0:
                 direction = 1
-            elif row == numRows - 1:
+            elif i == numRows - 1:
                 direction = -1
 
-            row += direction
+            i += direction
 
         return "".join(rows)
 

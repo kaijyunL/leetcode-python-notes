@@ -4,7 +4,7 @@ class Solution:
         s = "1"
 
         for _ in range(2, n + 1):
-            parts = []
+            ans = []
             i = 0
 
             while i < len(s):
@@ -13,11 +13,11 @@ class Solution:
                     count += 1
                     i += 1
 
-                parts.append(str(count))
-                parts.append(s[i])
+                ans.append(str(count))
+                ans.append(s[i])
                 i += 1
 
-            s = "".join(parts)
+            s = "".join(ans)
 
         return s
 
