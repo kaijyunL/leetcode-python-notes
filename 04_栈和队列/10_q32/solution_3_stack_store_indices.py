@@ -8,7 +8,7 @@ class Solution:
         时间复杂度: O(n)
         空间复杂度: O(n)
         """
-        max_ans = 0
+        ans = 0
         stack = [-1]
 
         for i, ch in enumerate(s):
@@ -19,9 +19,9 @@ class Solution:
                 if not stack:
                     stack.append(i)
                 else:
-                    max_ans = max(max_ans, i - stack[-1])
+                    ans = max(ans, i - stack[-1])
 
-        return max_ans
+        return ans
 
 
 def run_test() -> None:
