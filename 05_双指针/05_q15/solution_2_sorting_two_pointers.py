@@ -30,7 +30,6 @@ class Solution:
                     left += 1
                     right -= 1
 
-                    # 找到答案后继续跳过重复值，避免重复三元组。
                     while left < right and nums[left] == nums[left - 1]:
                         left += 1
 
