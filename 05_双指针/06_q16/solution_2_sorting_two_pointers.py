@@ -7,7 +7,7 @@ class Solution:
     def threeSumClosest(self, nums: List[int], target: int) -> int:
         nums.sort()
         n = len(nums)
-        best_sum = nums[0] + nums[1] + nums[2]
+        ans = nums[0] + nums[1] + nums[2]
 
         for i in range(n - 2):
             left = i + 1
@@ -16,8 +16,8 @@ class Solution:
             while left < right:
                 total = nums[i] + nums[left] + nums[right]
 
-                if abs(total - target) < abs(best_sum - target):
-                    best_sum = total
+                if abs(total - target) < abs(ans - target):
+                    ans = total
 
                 if total == target:
                     return total
@@ -26,7 +26,8 @@ class Solution:
                 else:
                     right -= 1
 
-        return best_sum
+        return ans
+
 
 
 if __name__ == "__main__":

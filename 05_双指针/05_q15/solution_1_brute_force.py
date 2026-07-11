@@ -21,8 +21,8 @@ class Solution:
         return [list(triplet) for triplet in sorted(seen)]
 
 
-def normalize(result: List[List[int]]) -> List[List[int]]:
-    return sorted(result)
+def normalize(ans: List[List[int]]) -> List[List[int]]:
+    return sorted(ans)
 
 
 if __name__ == "__main__":

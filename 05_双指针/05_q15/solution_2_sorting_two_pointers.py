@@ -9,7 +9,7 @@ class Solution:
             return []
 
         nums.sort()
-        result = []
+        ans = []
         n = len(nums)
 
         for i in range(n - 2):
@@ -26,7 +26,7 @@ class Solution:
                 total = nums[i] + nums[left] + nums[right]
 
                 if total == 0:
-                    result.append([nums[i], nums[left], nums[right]])
+                    ans.append([nums[i], nums[left], nums[right]])
                     left += 1
                     right -= 1
 
@@ -40,11 +40,11 @@ class Solution:
                 else:
                     right -= 1
 
-        return result
+        return ans
 
 
-def normalize(result: List[List[int]]) -> List[List[int]]:
-    return sorted(result)
+def normalize(ans: List[List[int]]) -> List[List[int]]:
+    return sorted(ans)
 
 
 if __name__ == "__main__":
