@@ -1,11 +1,8 @@
+# 方法2：二分查找（面试主推）
+
+
 class Solution:
     def search(self, nums: list[int], target: int) -> bool:
-        """
-        最优解法：在第 33 题基础上处理重复元素
-        平均时间复杂度: O(log n)
-        最坏时间复杂度: O(n)
-        空间复杂度: O(1)
-        """
         left = 0
         right = len(nums) - 1
 
@@ -35,14 +32,12 @@ class Solution:
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        ([2, 5, 6, 0, 0, 1, 2], 0),
-        ([2, 5, 6, 0, 0, 1, 2], 3),
-        ([1, 0, 1, 1, 1], 0),
-        ([1, 1, 1, 1, 1], 2),
-        ([1], 1),
-        ([1, 3, 1, 1, 1], 3),
-    ]
+    assert solution.search([2, 5, 6, 0, 0, 1, 2], 0) is True
+    assert solution.search([2, 5, 6, 0, 0, 1, 2], 3) is False
+    assert solution.search([1, 0, 1, 1, 1], 0) is True
+    assert solution.search([1, 1, 1, 1, 1], 2) is False
+    assert solution.search([1], 1) is True
+    assert solution.search([1, 3, 1, 1, 1], 3) is True
+    assert solution.search([1, 1, 3, 1], 3) is True
 
-    for nums, target in test_cases:
-        print(f"nums = {nums}, target = {target}, result = {solution.search(nums, target)}")
+    print("all tests passed")
