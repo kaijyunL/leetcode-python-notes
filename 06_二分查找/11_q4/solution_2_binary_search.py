@@ -1,10 +1,8 @@
+# 方法2：二分查找分割点（面试主推）
+
+
 class Solution:
     def findMedianSortedArrays(self, nums1: list[int], nums2: list[int]) -> float:
-        """
-        最优解法：在较短数组上二分查找分割点
-        时间复杂度: O(log(min(m, n)))
-        空间复杂度: O(1)
-        """
         if len(nums1) > len(nums2):
             nums1, nums2 = nums2, nums1
 
@@ -37,21 +35,20 @@ class Solution:
             else:
                 left = i + 1
 
-        return 0.0
+        raise ValueError("input arrays are invalid")
 
 
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        ([1, 3], [2]),
-        ([1, 2], [3, 4]),
-        ([], [1]),
-        ([2], []),
-        ([0, 0], [0, 0]),
-        ([1, 3, 8], [7, 9, 10, 11]),
-    ]
+    assert solution.findMedianSortedArrays([1, 3], [2]) == 2.0
+    assert solution.findMedianSortedArrays([1, 2], [3, 4]) == 2.5
+    assert solution.findMedianSortedArrays([], [1]) == 1.0
+    assert solution.findMedianSortedArrays([2], []) == 2.0
+    assert solution.findMedianSortedArrays([0, 0], [0, 0]) == 0.0
+    assert solution.findMedianSortedArrays([1, 3, 8], [7, 9, 10, 11]) == 8.0
+    assert solution.findMedianSortedArrays([-5, -3, -1], [-2]) == -2.5
+    assert solution.findMedianSortedArrays([1, 1], [1, 2]) == 1.0
+    assert solution.findMedianSortedArrays([100000], [100001]) == 100000.5
 
-    for nums1, nums2 in test_cases:
-        result = solution.findMedianSortedArrays(nums1, nums2)
-        print(f"nums1 = {nums1}, nums2 = {nums2}, result = {result}")
+    print("all tests passed")
