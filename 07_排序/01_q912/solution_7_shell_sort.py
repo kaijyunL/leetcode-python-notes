@@ -1,23 +1,21 @@
+# 方法7：希尔排序
+
+
 class Solution:
     def sortArray(self, nums: list[int]) -> list[int]:
-        """
-        希尔排序：按 gap 分组做插入排序
-        平均时间复杂度: 取决于 gap 序列
-        空间复杂度: O(1)
-        """
         n = len(nums)
         gap = n // 2
 
         while gap > 0:
             for i in range(gap, n):
-                current = nums[i]
+                value = nums[i]
                 j = i
 
-                while j >= gap and nums[j - gap] > current:
+                while j >= gap and nums[j - gap] > value:
                     nums[j] = nums[j - gap]
                     j -= gap
 
-                nums[j] = current
+                nums[j] = value
 
             gap //= 2
 
@@ -27,14 +25,10 @@ class Solution:
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        [5, 2, 3, 1],
-        [5, 1, 1, 2, 0, 0],
-        [],
-        [1],
-        [-1, 5, 3, 4, 0],
-        [2, 2, 2],
-    ]
+    assert solution.sortArray([5, 2, 3, 1]) == [1, 2, 3, 5]
+    assert solution.sortArray([5, 1, 1, 2, 0, 0]) == [0, 0, 1, 1, 2, 5]
+    assert solution.sortArray([]) == []
+    assert solution.sortArray([-1, 5, 3, 4, 0]) == [-1, 0, 3, 4, 5]
+    assert solution.sortArray([2, 2, 2]) == [2, 2, 2]
 
-    for nums in test_cases:
-        print(f"nums = {nums}, result = {solution.sortArray(nums[:])}")
+    print("all tests passed")

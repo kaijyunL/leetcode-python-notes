@@ -1,8 +1,11 @@
+# 方法4：归并排序（面试主推）
+
+
 class Solution:
     def sortArray(self, nums: list[int]) -> list[int]:
         temp = [0] * len(nums)
 
-        def merge_sort(left: int, right: int) -> None:
+        def merge_sort(left, right):
             if left >= right:
                 return
 
@@ -10,8 +13,11 @@ class Solution:
             merge_sort(left, mid)
             merge_sort(mid + 1, right)
 
-            i, j, k = left, mid + 1, left
+            i = left
+            j = mid + 1
+            k = left
 
+            # 两个子区间已经有序，用双指针把它们合并到 temp。
             while i <= mid and j <= right:
                 if nums[i] <= nums[j]:
                     temp[k] = nums[i]
@@ -40,14 +46,10 @@ class Solution:
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        [5, 2, 3, 1],
-        [5, 1, 1, 2, 0, 0],
-        [],
-        [1],
-        [-1, 5, 3, 4, 0],
-        [2, 2, 2],
-    ]
+    assert solution.sortArray([5, 2, 3, 1]) == [1, 2, 3, 5]
+    assert solution.sortArray([5, 1, 1, 2, 0, 0]) == [0, 0, 1, 1, 2, 5]
+    assert solution.sortArray([]) == []
+    assert solution.sortArray([-1, 5, 3, 4, 0]) == [-1, 0, 3, 4, 5]
+    assert solution.sortArray([2, 2, 2]) == [2, 2, 2]
 
-    for nums in test_cases:
-        print(f"nums = {nums}, result = {solution.sortArray(nums[:])}")
+    print("all tests passed")

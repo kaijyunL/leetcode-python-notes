@@ -1,10 +1,11 @@
+# 方法9：基数排序
+
+
 class Solution:
     def sortArray(self, nums: list[int]) -> list[int]:
-        """
-        基数排序：按十进制位从低到高排序，额外处理负数
-        时间复杂度: O(d * n)
-        空间复杂度: O(n)
-        """
+        if len(nums) <= 1:
+            return nums
+
         positives = [num for num in nums if num >= 0]
         negatives = [-num for num in nums if num < 0]
 
@@ -18,10 +19,10 @@ class Solution:
         if not nums:
             return
 
-        max_num = max(nums)
+        max_value = max(nums)
         exp = 1
 
-        while max_num // exp > 0:
+        while max_value // exp > 0:
             buckets = [[] for _ in range(10)]
 
             for num in nums:
@@ -40,14 +41,10 @@ class Solution:
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        [5, 2, 3, 1],
-        [5, 1, 1, 2, 0, 0],
-        [],
-        [1],
-        [-1, 5, 3, 4, 0],
-        [2, 2, 2],
-    ]
+    assert solution.sortArray([5, 2, 3, 1]) == [1, 2, 3, 5]
+    assert solution.sortArray([5, 1, 1, 2, 0, 0]) == [0, 0, 1, 1, 2, 5]
+    assert solution.sortArray([]) == []
+    assert solution.sortArray([-1, 5, 3, 4, 0]) == [-1, 0, 3, 4, 5]
+    assert solution.sortArray([-170, 45, -75, 90, 802, 24, 2, 66]) == [-170, -75, 2, 24, 45, 66, 90, 802]
 
-    for nums in test_cases:
-        print(f"nums = {nums}, result = {solution.sortArray(nums[:])}")
+    print("all tests passed")

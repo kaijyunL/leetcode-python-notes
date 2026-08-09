@@ -1,11 +1,9 @@
+# 方法8：计数排序
+
+
 class Solution:
     def sortArray(self, nums: list[int]) -> list[int]:
-        """
-        计数排序：统计每个数字出现次数后按顺序还原
-        时间复杂度: O(n + k)
-        空间复杂度: O(k)
-        """
-        if not nums:
+        if len(nums) <= 1:
             return nums
 
         min_num = min(nums)
@@ -28,14 +26,10 @@ class Solution:
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        [5, 2, 3, 1],
-        [5, 1, 1, 2, 0, 0],
-        [],
-        [1],
-        [-1, 5, 3, 4, 0],
-        [2, 2, 2],
-    ]
+    assert solution.sortArray([5, 2, 3, 1]) == [1, 2, 3, 5]
+    assert solution.sortArray([5, 1, 1, 2, 0, 0]) == [0, 0, 1, 1, 2, 5]
+    assert solution.sortArray([]) == []
+    assert solution.sortArray([-1, 5, 3, 4, 0]) == [-1, 0, 3, 4, 5]
+    assert solution.sortArray([-2, 3, -2, 1]) == [-2, -2, 1, 3]
 
-    for nums in test_cases:
-        print(f"nums = {nums}, result = {solution.sortArray(nums[:])}")
+    print("all tests passed")

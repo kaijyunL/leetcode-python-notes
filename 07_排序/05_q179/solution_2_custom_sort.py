@@ -4,39 +4,35 @@ from functools import cmp_to_key
 class Solution:
     def largestNumber(self, nums: list[int]) -> str:
         """
-        解法2：自定义排序比较 — 面试推荐
-        时间复杂度: O(n log n)
-        空间复杂度: O(n)
+        方法2：自定义排序比较（面试主推）
+        时间复杂度：O(n log n * k)
+        空间复杂度：O(n * k)
         """
-        strs = [str(x) for x in nums]
+        strings = [str(num) for num in nums]
 
-        def cmp(a: str, b: str) -> int:
+        def compare(a, b):
             if a + b > b + a:
                 return -1
-            elif a + b < b + a:
+            if a + b < b + a:
                 return 1
-            else:
-                return 0
+            return 0
 
-        strs.sort(key=cmp_to_key(cmp))
+        strings.sort(key=cmp_to_key(compare))
 
-        if strs[0] == "0":
+        if strings[0] == "0":
             return "0"
 
-        return "".join(strs)
+        return "".join(strings)
 
 
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        [10, 2],
-        [3, 30, 34, 5, 9],
-        [0, 0],
-        [1],
-        [10, 10],
-        [0, 1, 0, 9, 3],
-    ]
+    assert solution.largestNumber([10, 2]) == "210"
+    assert solution.largestNumber([3, 30, 34, 5, 9]) == "9534330"
+    assert solution.largestNumber([121, 12]) == "12121"
+    assert solution.largestNumber([0, 0, 0]) == "0"
+    assert solution.largestNumber([10, 10]) == "1010"
+    assert solution.largestNumber([0, 1, 0, 9, 3]) == "93100"
 
-    for nums in test_cases:
-        print(f"输入: {nums}, 输出: {solution.largestNumber(nums)}")
+    print("all tests passed")

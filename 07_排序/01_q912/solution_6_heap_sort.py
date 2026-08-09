@@ -1,10 +1,8 @@
+# 方法6：堆排序
+
+
 class Solution:
     def sortArray(self, nums: list[int]) -> list[int]:
-        """
-        堆排序：建最大堆后不断把堆顶放到末尾
-        时间复杂度: O(n log n)
-        空间复杂度: O(1)
-        """
         n = len(nums)
 
         def sift_down(root: int, heap_size: int) -> None:
@@ -14,6 +12,7 @@ class Solution:
                 if child >= heap_size:
                     break
 
+                # 选择两个孩子中较大的一个，与根比较。
                 if child + 1 < heap_size and nums[child + 1] > nums[child]:
                     child += 1
 
@@ -36,14 +35,10 @@ class Solution:
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        [5, 2, 3, 1],
-        [5, 1, 1, 2, 0, 0],
-        [],
-        [1],
-        [-1, 5, 3, 4, 0],
-        [2, 2, 2],
-    ]
+    assert solution.sortArray([5, 2, 3, 1]) == [1, 2, 3, 5]
+    assert solution.sortArray([5, 1, 1, 2, 0, 0]) == [0, 0, 1, 1, 2, 5]
+    assert solution.sortArray([]) == []
+    assert solution.sortArray([-1, 5, 3, 4, 0]) == [-1, 0, 3, 4, 5]
+    assert solution.sortArray([2, 2, 2]) == [2, 2, 2]
 
-    for nums in test_cases:
-        print(f"nums = {nums}, result = {solution.sortArray(nums[:])}")
+    print("all tests passed")

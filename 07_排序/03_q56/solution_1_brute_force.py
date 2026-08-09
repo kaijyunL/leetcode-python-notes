@@ -1,50 +1,48 @@
 class Solution:
     def merge(self, intervals: list[list[int]]) -> list[list[int]]:
         """
-        解法1：暴力两两合并
-        反复扫描，每次合并所有重叠区间对，直到没有可合并的
-        时间复杂度: O(n²)
-        空间复杂度: O(n)
+        方法1：暴力两两合并
+        时间复杂度：最坏 O(n^3)
+        空间复杂度：O(n)
         """
         intervals = [iv[:] for iv in intervals]
+        ans = []
 
-        changed = True
-        while changed:
-            changed = False
-            merged = []
-            used = [False] * len(intervals)
+        while intervals:
+            min_index = 0
+            for i in range(1, len(intervals)):
+                if intervals[i][0] < intervals[min_index][0]:
+                    min_index = i
 
-            for i in range(len(intervals)):
-                if used[i]:
-                    continue
-                cur = intervals[i][:]
+            start, end = intervals.pop(min_index)
+            changed = True
 
-                for j in range(i + 1, len(intervals)):
-                    if used[j]:
-                        continue
-                    if cur[1] >= intervals[j][0] and cur[0] <= intervals[j][1]:
-                        cur[0] = min(cur[0], intervals[j][0])
-                        cur[1] = max(cur[1], intervals[j][1])
-                        used[j] = True
+            while changed:
+                changed = False
+                remaining = []
+
+                for next_start, next_end in intervals:
+                    if next_start <= end and start <= next_end:
+                        start = min(start, next_start)
+                        end = max(end, next_end)
                         changed = True
+                    else:
+                        remaining.append([next_start, next_end])
 
-                merged.append(cur)
+                intervals = remaining
 
-            intervals = merged
+            ans.append([start, end])
 
-        return intervals
+        return ans
 
 
 if __name__ == "__main__":
     solution = Solution()
 
-    test_cases = [
-        [[1, 3], [2, 6], [8, 10], [15, 18]],
-        [[1, 4], [4, 5]],
-        [[1, 4], [0, 4]],
-        [[1, 4], [2, 3]],
-        [[1, 4], [0, 0]],
-    ]
+    assert solution.merge([[1, 3], [2, 6], [8, 10], [15, 18]]) == [[1, 6], [8, 10], [15, 18]]
+    assert solution.merge([[1, 4], [4, 5]]) == [[1, 5]]
+    assert solution.merge([[4, 5], [1, 2], [2, 4]]) == [[1, 5]]
+    assert solution.merge([[1, 4], [0, 4]]) == [[0, 4]]
+    assert solution.merge([]) == []
 
-    for intervals in test_cases:
-        print(f"输入: {intervals}, 输出: {solution.merge(intervals)}")
+    print("all tests passed")
