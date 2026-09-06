@@ -4,49 +4,59 @@ import random
 class Solution:
     def kClosest(self, points: list[list[int]], k: int) -> list[list[int]]:
         """
-        解法3：快速选择 — 面试推荐
-        时间复杂度: O(n) 平均
-        空间复杂度: O(1)
+        方法3：三路快速选择（复杂度优化主解）
+        时间复杂度：平均 O(n)，最坏 O(n^2)
+        空间复杂度：O(1) 额外空间
         """
+        def distance_squared(point):
+            return point[0] * point[0] + point[1] * point[1]
 
-        def dist(p):
-            return p[0] ** 2 + p[1] ** 2
-
+        target = k - 1
         left, right = 0, len(points) - 1
 
         while True:
-            pivot = dist(points[random.randint(left, right)])
-            lt, i, gt = left, left, right
+            pivot = points[random.randint(left, right)]
+            pivot_distance = distance_squared(pivot)
+            less_end = left
+            i = left
+            greater_start = right
 
-            while i <= gt:
-                if dist(points[i]) < pivot:
-                    points[lt], points[i] = points[i], points[lt]
-                    lt += 1
+            # 分区后：[left, less_end - 1] < pivot，
+            # [less_end, greater_start] == pivot，
+            # [greater_start + 1, right] > pivot。
+            while i <= greater_start:
+                current_distance = distance_squared(points[i])
+
+                if current_distance < pivot_distance:
+                    points[less_end], points[i] = points[i], points[less_end]
+                    less_end += 1
                     i += 1
-                elif dist(points[i]) > pivot:
-                    points[i], points[gt] = points[gt], points[i]
-                    gt -= 1
+                elif current_distance > pivot_distance:
+                    points[i], points[greater_start] = points[greater_start], points[i]
+                    greater_start -= 1
                 else:
                     i += 1
 
-            if k - 1 < lt:
-                right = lt - 1
-            elif k - 1 > gt:
-                left = gt + 1
+            if target < less_end:
+                right = less_end - 1
+            elif target > greater_start:
+                left = greater_start + 1
             else:
                 return points[:k]
-
-        return points[:k]
 
 
 if __name__ == "__main__":
     solution = Solution()
 
     test_cases = [
-        ([[1, 3], [-2, 2]], 1),
-        ([[3, 3], [5, -1], [-2, 4]], 2),
-        ([[0, 0], [1, 1]], 1),
+        ([[1, 3], [-2, 2]], 1, [[-2, 2]]),
+        ([[3, 3], [5, -1], [-2, 4]], 2, [[3, 3], [-2, 4]]),
+        ([[0, 0], [1, 1]], 1, [[0, 0]]),
+        ([[-2, 2], [3, 0], [1, 1]], 2, [[-2, 2], [1, 1]]),
     ]
 
-    for points, k in test_cases:
-        print(f"输入: {points}, k={k}, 输出: {solution.kClosest(points, k)}")
+    for points, k, expected in test_cases:
+        actual = solution.kClosest([point[:] for point in points], k)
+        assert sorted(actual) == sorted(expected)
+
+    print("all tests passed")
