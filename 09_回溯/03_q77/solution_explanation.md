@@ -355,13 +355,13 @@ num <= n - remaining + 1
 所以循环最大只需要到：
 
 ```python
-n - remaining + 1
+max_num = n - remaining + 1
 ```
 
 Python 的 `range` 右边界不包含，所以写成：
 
 ```python
-range(start, n - remaining + 2)
+range(start, max_num + 1)
 ```
 
 这就是剪枝版里最重要的一句。
@@ -425,7 +425,8 @@ class Solution:
                 return
 
             remaining = k - len(path)
-            for num in range(start, n - remaining + 2):
+            max_num = n - remaining + 1
+            for num in range(start, max_num + 1):
                 path.append(num)
                 backtrack(num + 1)
                 path.pop()
@@ -470,7 +471,8 @@ path.pop()
 
 ```python
 remaining = k - len(path)
-for num in range(start, n - remaining + 2):
+max_num = n - remaining + 1
+for num in range(start, max_num + 1):
 ```
 
 面试时可以这样讲：
@@ -501,7 +503,8 @@ if len(path) == k:
 
 ```python
 remaining = k - len(path)
-for num in range(start, n - remaining + 2):
+max_num = n - remaining + 1
+for num in range(start, max_num + 1):
 ```
 
 掌握这题后，后面的组合总和类题目会顺很多。

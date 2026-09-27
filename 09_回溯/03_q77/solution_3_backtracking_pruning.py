@@ -8,13 +8,14 @@ class Solution:
         ans = []
         path = []
 
-        def backtrack(start: int) -> None:
+        def backtrack(start):
             if len(path) == k:
                 ans.append(path[:])
                 return
 
             remaining = k - len(path)
-            for num in range(start, n - remaining + 2):
+            max_num = n - remaining + 1
+            for num in range(start, max_num + 1):
                 path.append(num)
                 backtrack(num + 1)
                 path.pop()

@@ -9,7 +9,7 @@ class Solution:
         ans = []
         path = []
 
-        def backtrack(start: int) -> None:
+        def backtrack(start):
             ans.append(path[:])
 
             for i in range(start, len(nums)):

@@ -10,7 +10,7 @@
 
 ```
 输入: nums = [1, 2, 3]
-输出: [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]
+输出: [[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]]
 ```
 
 也可以返回其他顺序，只要包含全部子集即可。
@@ -318,7 +318,96 @@ ans.append(path)
 [[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]
 ```
 
-顺序和示例可以不同，题目允许任意顺序返回。
+这就是这段回溯程序按照 DFS 顺序得到的结果。题目允许子集按照任意顺序返回，所以这个顺序也是正确的。
+
+### 显式执行过程
+
+```text
+backtrack(0)
+    把 [] 加入 ans
+
+    i = 0
+    path.append(1)
+    path = [1]
+
+    backtrack(1)
+        把 [1] 加入 ans
+
+        i = 1
+        path.append(2)
+        path = [1, 2]
+
+        backtrack(2)
+            把 [1, 2] 加入 ans
+
+            i = 2
+            path.append(3)
+            path = [1, 2, 3]
+
+            backtrack(3)
+                把 [1, 2, 3] 加入 ans
+                没有可选元素，返回
+
+            path.pop()
+            path = [1, 2]
+
+            backtrack(2) 循环结束，返回
+
+        path.pop()
+        path = [1]
+
+        i = 2
+        path.append(3)
+        path = [1, 3]
+
+        backtrack(3)
+            把 [1, 3] 加入 ans
+            没有可选元素，返回
+
+        path.pop()
+        path = [1]
+
+        backtrack(1) 循环结束，返回
+
+    path.pop()
+    path = []
+
+    i = 1
+    path.append(2)
+    path = [2]
+
+    backtrack(2)
+        把 [2] 加入 ans
+
+        i = 2
+        path.append(3)
+        path = [2, 3]
+
+        backtrack(3)
+            把 [2, 3] 加入 ans
+            没有可选元素，返回
+
+        path.pop()
+        path = [2]
+
+        backtrack(2) 循环结束，返回
+
+    path.pop()
+    path = []
+
+    i = 2
+    path.append(3)
+    path = [3]
+
+    backtrack(3)
+        把 [3] 加入 ans
+        没有可选元素，返回
+
+    path.pop()
+    path = []
+
+backtrack(0) 循环结束，返回
+```
 
 ### 代码
 
@@ -343,7 +432,6 @@ class Solution:
 ### 复杂度
 
 一共有 `2^n` 个子集。
-
 每次加入结果时要复制当前路径：
 
 ```python
