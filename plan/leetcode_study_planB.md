@@ -1,6 +1,6 @@
 # 🚀 LeetCode 高效刷题计划（高频题 + 模板题）
 
-> **制定日期**: 2026-03-07 | **仓库覆盖**: 212 / 246 | **总题数**: 246（唯一题号）
+> **制定日期**: 2026-03-07 | **仓库覆盖**: 218 / 246 | **总题数**: 246（唯一题号）
 > **策略**: 专题突破，由易到难，间隔复习
 
 ---
@@ -244,16 +244,16 @@
 | 15 | 3Sum | 🟡 | 排序+双指针去重 | ✅ |
 | 16 | 3Sum Closest | 🟡 | 排序+双指针 | ✅ |
 | 18 | 4Sum | 🟡 | 排序+多层双指针 | ✅ |
-| 209 | Minimum Size Subarray Sum | 🟡 | 可变窗口最短长度 | ⬜ |
+| 209 | Minimum Size Subarray Sum | 🟡 | 可变窗口最短长度 | ✅ |
 | 30 | Substring with Concatenation of All Words（选做） | 🔴 | 多起点滑窗 | ✅ |
 | 76 | Minimum Window Substring | 🔴 | 滑窗收缩模板 | ✅ |
 | 80 | Remove Duplicates from Sorted Array II | 🟡 | 通用覆盖写法 | ✅ |
 | 88 | Merge Sorted Array | 🟢 | 逆向双指针 | ✅ |
 | 167 | Two Sum II | 🟡 | 有序对撞指针 | ✅ |
-| 239 | Sliding Window Maximum | 🔴 | 单调队列 | ⬜ |
-| 424 | Longest Repeating Character Replacement | 🟡 | 滑窗 + 最大频次 | ⬜ |
-| 567 | Permutation in String | 🟡 | 固定窗口判断排列 | ⬜ |
-| 986 | Interval List Intersections | 🟡 | 双指针求区间交集 | ⬜ |
+| 239 | Sliding Window Maximum | 🔴 | 单调队列 | ✅ |
+| 424 | Longest Repeating Character Replacement | 🟡 | 滑窗 + 最大频次 | ✅ |
+| 567 | Permutation in String | 🟡 | 固定窗口判断排列 | ✅ |
+| 986 | Interval List Intersections | 🟡 | 双指针求区间交集 | ✅ |
 | **438** | **Find All Anagrams** 🏷️模板 | 🟡 | 固定窗口+计数 | ✅ |
 
 **📋 推荐刷题顺序：**
@@ -270,13 +270,13 @@
 | 6 | 16 | 3Sum Closest | 🟡 #15 的变体，紧跟做 | ✅ |
 | 7 | 18 | 4Sum | 🟡 多层双指针，#15/#16 的扩展 ✅ | ✅ |
 | 8 | 3 | Longest Substring Without Repeating | 🟡 **滑窗入门**，掌握「扩张+收缩」模式 | ✅ |
-| 9 | 209 | Minimum Size Subarray Sum | 🟡 最基础的可变窗口长度题 | ⬜ |
-| 10 | 567 | Permutation in String | 🟡 固定窗口判断是否存在排列 | ⬜ |
+| 9 | 209 | Minimum Size Subarray Sum | 🟡 最基础的可变窗口长度题 | ✅ |
+| 10 | 567 | Permutation in String | 🟡 固定窗口判断是否存在排列 | ✅ |
 | 11 | **438** | **Find All Anagrams** 🏷️ | 🟡 固定窗口 + 计数，滑窗模板题 | ✅ |
-| 12 | 424 | Longest Repeating Character Replacement | 🟡 高频滑窗，练窗口合法性维护 | ⬜ |
+| 12 | 424 | Longest Repeating Character Replacement | 🟡 高频滑窗，练窗口合法性维护 | ✅ |
 | 13 | 76 | Minimum Window Substring | 🔴 滑窗收缩模板，#3/#438 的终极版 | ✅ |
-| 14 | 239 | Sliding Window Maximum | 🔴 单调队列代表题，滑窗高频补全 | ⬜ |
-| 15 | 986 | Interval List Intersections | 🟡 两组有序区间列表的双指针推进 | ⬜ |
+| 14 | 239 | Sliding Window Maximum | 🔴 单调队列代表题，滑窗高频补全 | ✅ |
+| 15 | 986 | Interval List Intersections | 🟡 两组有序区间列表的双指针推进 | ✅ |
 | 16 | 30 | Substring with Concat of All Words（选做） | 🔴 多起点滑窗，#76 思路 + 更复杂约束 | ✅ |
 
 ### 2.2 二分查找（11 题）
@@ -293,7 +293,7 @@
 | 153 | Find Minimum in Rotated Sorted Array | 🟡 | 旋转数组极值 | ✅ |
 | 154 | Find Minimum in Rotated Sorted Array II（选做） | 🔴 | 含重复+最坏O(n) | ✅ |
 | 162 | Find Peak Element | 🟡 | 峰值二分 | ✅ |
-| 875 | Koko Eating Bananas | 🟡 | 答案二分 | ⬜ |
+| 875 | Koko Eating Bananas | 🟡 | 答案二分 | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -310,7 +310,7 @@
 | 7 | 153 | Find Minimum in Rotated Array | 🟡 旋转数组找极值，与 #33 互补 | ✅ |
 | 8 | 81 | Search in Rotated Array II | 🟡 #33 含重复元素版本 | ✅ |
 | 9 | 154 | Find Minimum in Rotated II（选做） | 🔴 #153 含重复版，最坏 O(n) | ✅ |
-| 10 | 875 | Koko Eating Bananas | 🟡 答案二分代表题，面试高频 | ⬜ |
+| 10 | 875 | Koko Eating Bananas | 🟡 答案二分代表题，面试高频 | ✅ |
 | 11 | 4 | Median of Two Sorted Arrays | 🔴 二分终极题，需前面功底 | ✅ |
 
 ### 2.3 排序（6 题）
@@ -819,8 +819,8 @@
 | 字符串 | 14 | 14 | 100% |
 | 链表 | 20 | 20 | 100% |
 | 栈 & 队列 | 10 | 10 | 100% |
-| 双指针 & 滑窗 | 16 | 11 | 69% |
-| 二分查找 | 11 | 10 | 91% |
+| 双指针 & 滑窗 | 16 | 16 | 100% |
+| 二分查找 | 11 | 11 | 100% |
 | 排序 | 6 | 6 | 100% |
 | Top K / 快速选择 / 堆 | 4 | 4 | 100% |
 | 回溯 | 15 | 15 | 100% |
@@ -836,9 +836,9 @@
 | 数学 | 12 | 10 | 83% |
 | 堆进阶 & 字典树 | 4 | 3 | 75% |
 | 设计题 / 数据结构设计专题 | 4 | 4 | 100% |
-| **总计（唯一题号）** | **246** | **212** | **86%** |
+| **总计（唯一题号）** | **246** | **218** | **89%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；"已覆盖"按仓库内该题已存在本地题解/代码目录统计，去重后共 **212 题**。
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；"已覆盖"按仓库内该题已存在本地题解/代码目录统计，去重后共 **218 题**。
 ---
 
 ## 🔑 代码模板区（完成专题后总结）

@@ -22,7 +22,7 @@ class Solution:
         ans = []
         path = []
 
-        def backtrack(index: int) -> None:
+        def backtrack(index):
             if index == len(digits):
                 ans.append("".join(path))
                 return

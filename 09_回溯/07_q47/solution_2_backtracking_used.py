@@ -10,7 +10,7 @@ class Solution:
         path = []
         used = [False] * len(nums)
 
-        def backtrack() -> None:
+        def backtrack():
             if len(path) == len(nums):
                 ans.append(path[:])
                 return
