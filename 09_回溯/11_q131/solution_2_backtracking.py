@@ -8,10 +8,10 @@ class Solution:
         ans = []
         path = []
 
-        def is_palindrome(part: str) -> bool:
+        def is_palindrome(part):
             return part == part[::-1]
 
-        def backtrack(start: int) -> None:
+        def backtrack(start):
             if start == len(s):
                 ans.append(path[:])
                 return

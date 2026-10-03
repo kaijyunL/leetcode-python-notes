@@ -1,26 +1,13 @@
-from collections import Counter
-
-
 class Solution:
     def exist(self, board: list[list[str]], word: str) -> bool:
         """
-        解法2：原地标记 + 预检查 — 面试推荐
+        解法2：原地标记 — 面试推荐
         时间复杂度: O(mn * 4^L)
         空间复杂度: O(L)
         """
         rows, cols = len(board), len(board[0])
 
-        if len(word) > rows * cols:
-            return False
-
-        board_count = Counter(ch for row in board for ch in row)
-        word_count = Counter(word)
-
-        for ch, count in word_count.items():
-            if board_count[ch] < count:
-                return False
-
-        def dfs(row: int, col: int, index: int) -> bool:
+        def dfs(row, col, index) -> bool:
             if index == len(word):
                 return True
 

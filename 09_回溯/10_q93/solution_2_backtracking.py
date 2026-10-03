@@ -11,12 +11,12 @@ class Solution:
         ans = []
         path = []
 
-        def is_valid(part: str) -> bool:
+        def is_valid(part):
             if len(part) > 1 and part[0] == "0":
                 return False
             return int(part) <= 255
 
-        def backtrack(start: int) -> None:
+        def backtrack(start):
             if len(path) == 4:
                 if start == len(s):
                     ans.append(".".join(path))
