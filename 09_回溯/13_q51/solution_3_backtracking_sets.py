@@ -11,7 +11,7 @@ class Solution:
         diag1 = set()
         diag2 = set()
 
-        def backtrack(row: int) -> None:
+        def backtrack(row):
             if row == n:
                 ans.append(["".join(line) for line in board])
                 return
