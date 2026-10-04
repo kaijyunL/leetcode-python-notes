@@ -23,7 +23,7 @@ class Solution:
         """
         ans = []
 
-        def dfs(node: Optional[TreeNode]) -> None:
+        def dfs(node):
             if node is None:
                 return
 
