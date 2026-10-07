@@ -743,7 +743,7 @@ cur.left = None
 ## 本题文件
 
 ```text
-10_二叉树/25_q114/solution.md
+10_二叉树/25_q114/solution_explanation.md
 10_二叉树/25_q114/solution_1_preorder_list.py
 10_二叉树/25_q114/solution_2_recursive.py
 10_二叉树/25_q114/solution_3_iterative.py

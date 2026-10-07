@@ -793,7 +793,7 @@ return node.val + max(left_gain, right_gain)
 ## 本题文件
 
 ```text
-10_二叉树/27_q124/solution.md
+10_二叉树/27_q124/solution_explanation.md
 10_二叉树/27_q124/solution_1_bruteforce_graph.py
 10_二叉树/27_q124/solution_2_enumerate_peak.py
 10_二叉树/27_q124/solution_3_dfs.py

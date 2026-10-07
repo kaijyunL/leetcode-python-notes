@@ -356,7 +356,7 @@ i = 8, ch = a, i == end
 ## 本题文件
 
 ```text
-17_贪心/06_q763/solution.md
+17_贪心/06_q763/solution_explanation.md
 17_贪心/06_q763/solution_1_interval_merge.py
 17_贪心/06_q763/solution_2_greedy.py
 ```

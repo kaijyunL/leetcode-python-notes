@@ -389,7 +389,7 @@ return True
 ## 本题文件
 
 ```text
-10_二叉树/07_q100/solution.md
+10_二叉树/07_q100/solution_explanation.md
 10_二叉树/07_q100/solution_1_serialize.py
 10_二叉树/07_q100/solution_2_recursive.py
 10_二叉树/07_q100/solution_3_iterative_queue.py

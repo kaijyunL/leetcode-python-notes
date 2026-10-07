@@ -366,7 +366,7 @@ BFS 每遍历完一层，depth 加 1
 
 ```text
 leetcode_104_maximum_depth.md
-10_二叉树/04_q104/solution.md
+10_二叉树/04_q104/solution_explanation.md
 10_二叉树/04_q104/solution_1_recursive.py
 10_二叉树/04_q104/solution_2_bfs.py
 ```

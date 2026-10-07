@@ -449,7 +449,7 @@ current = current * 10 + node.val
 ## 本题文件
 
 ```text
-10_二叉树/14_q129/solution.md
+10_二叉树/14_q129/solution_explanation.md
 10_二叉树/14_q129/solution_1_bruteforce.py
 10_二叉树/14_q129/solution_2_recursive.py
 10_二叉树/14_q129/solution_3_iterative_stack.py

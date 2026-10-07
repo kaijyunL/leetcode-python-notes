@@ -585,7 +585,7 @@ cur = dummy.next
 ## 本题文件
 
 ```text
-10_二叉树/21_q117/solution.md
+10_二叉树/21_q117/solution_explanation.md
 10_二叉树/21_q117/solution_1_bfs_queue.py
 10_二叉树/21_q117/solution_2_iterative_dummy.py
 ```

@@ -480,7 +480,7 @@ if i == level_size - 1:
 ## 本题文件
 
 ```text
-10_二叉树/19_q199/solution.md
+10_二叉树/19_q199/solution_explanation.md
 10_二叉树/19_q199/solution_1_bfs_level_values.py
 10_二叉树/19_q199/solution_2_bfs_last_node.py
 10_二叉树/19_q199/solution_3_dfs_right_first.py

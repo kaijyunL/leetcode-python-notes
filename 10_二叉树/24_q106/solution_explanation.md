@@ -845,7 +845,7 @@ root.right = build(
 ## 本题文件
 
 ```text
-10_二叉树/24_q106/solution.md
+10_二叉树/24_q106/solution_explanation.md
 10_二叉树/24_q106/solution_1_slice.py
 10_二叉树/24_q106/solution_2_index_hash.py
 ```

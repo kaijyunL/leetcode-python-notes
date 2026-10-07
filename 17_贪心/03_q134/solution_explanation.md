@@ -451,7 +451,7 @@ prefix[i] = diff[0] + diff[1] + ... + diff[i]
 ## 本题文件
 
 ```text
-17_贪心/03_q134/solution.md
+17_贪心/03_q134/solution_explanation.md
 17_贪心/03_q134/solution_1_brute_force.py
 17_贪心/03_q134/solution_2_greedy.py
 17_贪心/03_q134/solution_3_prefix_sum.py

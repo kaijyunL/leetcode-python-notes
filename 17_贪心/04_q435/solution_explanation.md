@@ -401,7 +401,7 @@ prev_end = 2
 ## 本题文件
 
 ```text
-17_贪心/04_q435/solution.md
+17_贪心/04_q435/solution_explanation.md
 17_贪心/04_q435/solution_1_dp.py
 17_贪心/04_q435/solution_2_greedy_keep_shorter.py
 17_贪心/04_q435/solution_3_greedy_by_end.py

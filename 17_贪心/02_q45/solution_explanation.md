@@ -239,7 +239,7 @@ current_end = farthest
 ## 本题文件
 
 ```text
-17_贪心/02_q45/solution.md
+17_贪心/02_q45/solution_explanation.md
 17_贪心/02_q45/solution_1_dp.py
 17_贪心/02_q45/solution_2_interval_jump.py
 17_贪心/02_q45/solution_3_greedy.py

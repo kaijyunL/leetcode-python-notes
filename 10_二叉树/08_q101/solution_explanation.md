@@ -448,7 +448,7 @@ while queue:
 ## 本题文件
 
 ```text
-10_二叉树/08_q101/solution.md
+10_二叉树/08_q101/solution_explanation.md
 10_二叉树/08_q101/solution_1_level_order.py
 10_二叉树/08_q101/solution_2_recursive.py
 10_二叉树/08_q101/solution_3_iterative_queue.py

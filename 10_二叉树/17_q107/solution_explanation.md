@@ -414,7 +414,7 @@ ans.reverse()
 ## 本题文件
 
 ```text
-10_二叉树/17_q107/solution.md
+10_二叉树/17_q107/solution_explanation.md
 10_二叉树/17_q107/solution_1_bfs_reverse.py
 10_二叉树/17_q107/solution_2_bfs_deque.py
 10_二叉树/17_q107/solution_3_dfs.py

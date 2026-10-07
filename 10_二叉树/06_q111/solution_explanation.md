@@ -405,7 +405,7 @@ left is None and right is None
 ## 本题文件
 
 ```text
-10_二叉树/06_q111/solution.md
+10_二叉树/06_q111/solution_explanation.md
 10_二叉树/06_q111/solution_1_recursive.py
 10_二叉树/06_q111/solution_2_bfs.py
 ```

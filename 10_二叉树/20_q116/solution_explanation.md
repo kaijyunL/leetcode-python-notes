@@ -592,7 +592,7 @@ node 沿 next 横向移动
 ## 本题文件
 
 ```text
-10_二叉树/20_q116/solution.md
+10_二叉树/20_q116/solution_explanation.md
 10_二叉树/20_q116/solution_1_bfs_queue.py
 10_二叉树/20_q116/solution_2_recursive_pair.py
 10_二叉树/20_q116/solution_3_iterative_o1.py

@@ -437,7 +437,7 @@ while queue 的每一轮，处理一整层
 ## 本题文件
 
 ```text
-10_二叉树/16_q102/solution.md
+10_二叉树/16_q102/solution_explanation.md
 10_二叉树/16_q102/solution_1_dfs_group.py
 10_二叉树/16_q102/solution_2_bfs.py
 10_二叉树/16_q102/solution_3_dfs_recursive.py

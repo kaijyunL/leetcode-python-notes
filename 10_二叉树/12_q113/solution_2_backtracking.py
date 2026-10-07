@@ -24,7 +24,7 @@ class Solution:
         ans = []
         path = []
 
-        def dfs(node: Optional[TreeNode], remain: int) -> None:
+        def dfs(node, remain):
             if node is None:
                 return
 

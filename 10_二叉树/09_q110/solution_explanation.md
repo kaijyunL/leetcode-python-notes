@@ -385,7 +385,7 @@ O(n)
 ## 本题文件
 
 ```text
-10_二叉树/09_q110/solution.md
+10_二叉树/09_q110/solution_explanation.md
 10_二叉树/09_q110/solution_1_top_down.py
 10_二叉树/09_q110/solution_2_postorder.py
 ```

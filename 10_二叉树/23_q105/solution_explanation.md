@@ -778,7 +778,7 @@ left_size = root_inorder_index - in_left
 ## 本题文件
 
 ```text
-10_二叉树/23_q105/solution.md
+10_二叉树/23_q105/solution_explanation.md
 10_二叉树/23_q105/solution_1_slice.py
 10_二叉树/23_q105/solution_2_index_hash.py
 ```

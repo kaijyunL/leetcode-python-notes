@@ -467,7 +467,7 @@ max(10, 8) = 10
 ## 本题文件
 
 ```text
-17_贪心/07_q621/solution.md
+17_贪心/07_q621/solution_explanation.md
 17_贪心/07_q621/solution_1_heap_simulation.py
 17_贪心/07_q621/solution_2_math_greedy.py
 ```

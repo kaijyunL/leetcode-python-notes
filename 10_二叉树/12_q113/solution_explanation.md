@@ -470,7 +470,7 @@ ans.append(path[:])
 ## 本题文件
 
 ```text
-10_二叉树/12_q113/solution.md
+10_二叉树/12_q113/solution_explanation.md
 10_二叉树/12_q113/solution_1_bruteforce.py
 10_二叉树/12_q113/solution_2_backtracking.py
 10_二叉树/12_q113/solution_3_iterative_stack.py

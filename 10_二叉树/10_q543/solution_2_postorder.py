@@ -15,31 +15,29 @@ class TreeNode:
 
 
 class Solution:
-    def isBalanced(self, root: Optional[TreeNode]) -> bool:
+    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
         """
-        解法2：后序 DFS（面试推荐）
+        解法2：后序 DFS + 全局最大值（面试推荐）
         时间复杂度：O(n)
         空间复杂度：O(h)
         """
+        ans = 0
 
         def height(node):
+            nonlocal ans
+
             if node is None:
                 return 0
 
             left_height = height(node.left)
-            if left_height == -1:
-                return -1
-
             right_height = height(node.right)
-            if right_height == -1:
-                return -1
 
-            if abs(left_height - right_height) > 1:
-                return -1
+            ans = max(ans, left_height + right_height)
 
             return 1 + max(left_height, right_height)
 
-        return height(root) != -1
+        height(root)
+        return ans
 
 
 def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
@@ -47,25 +45,25 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
         return None
 
     iter_values = iter(values)
-    root_val = next(iter_values)
-    if root_val is None:
+    root_value = next(iter_values)
+    if root_value is None:
         return None
 
-    root = TreeNode(root_val)
+    root = TreeNode(root_value)
     queue = deque([root])
 
     while queue:
         node = queue.popleft()
 
         try:
-            left_val = next(iter_values)
-            if left_val is not None:
-                node.left = TreeNode(left_val)
+            left_value = next(iter_values)
+            if left_value is not None:
+                node.left = TreeNode(left_value)
                 queue.append(node.left)
 
-            right_val = next(iter_values)
-            if right_val is not None:
-                node.right = TreeNode(right_val)
+            right_value = next(iter_values)
+            if right_value is not None:
+                node.right = TreeNode(right_value)
                 queue.append(node.right)
         except StopIteration:
             break
@@ -75,17 +73,15 @@ def build_tree(values: list[Optional[int]]) -> Optional[TreeNode]:
 
 if __name__ == "__main__":
     test_cases = [
-        ([3, 9, 20, None, None, 15, 7], True),
-        ([1, 2, 2, 3, 3, None, None, 4, 4], False),
-        ([1, 2, 2, 3, None, None, 3, 4, None, None, 4], False),
-        ([1], True),
-        ([], True),
+        ([1, 2, 3, 4, 5], 3),
+        ([1, 2], 1),
+        ([1], 0),
+        ([], 0),
     ]
 
     solution = Solution()
     for values, expected in test_cases:
         root = build_tree(values)
-        output = solution.isBalanced(root)
+        output = solution.diameterOfBinaryTree(root)
         print(f"输入: {values}, 输出: {output}, 期望: {expected}")
         assert output == expected
-

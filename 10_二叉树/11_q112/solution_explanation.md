@@ -460,7 +460,7 @@ left is None and right is None
 ## 本题文件
 
 ```text
-10_二叉树/11_q112/solution.md
+10_二叉树/11_q112/solution_explanation.md
 10_二叉树/11_q112/solution_1_bruteforce.py
 10_二叉树/11_q112/solution_2_recursive.py
 10_二叉树/11_q112/solution_3_iterative_stack.py

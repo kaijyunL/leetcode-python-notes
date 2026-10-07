@@ -372,7 +372,7 @@ arrow_pos = 6
 ## 本题文件
 
 ```text
-17_贪心/05_q452/solution.md
+17_贪心/05_q452/solution_explanation.md
 17_贪心/05_q452/solution_1_greedy_by_start.py
 17_贪心/05_q452/solution_2_greedy_by_end.py
 ```

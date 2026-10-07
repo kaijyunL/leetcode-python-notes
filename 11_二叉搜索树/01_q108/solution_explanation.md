@@ -647,7 +647,7 @@ BST 的中序遍历是升序
 ## 本题文件
 
 ```text
-11_二叉搜索树/01_q108/solution.md
+11_二叉搜索树/01_q108/solution_explanation.md
 11_二叉搜索树/01_q108/solution_1_slice.py
 11_二叉搜索树/01_q108/solution_2_index.py
 ```
