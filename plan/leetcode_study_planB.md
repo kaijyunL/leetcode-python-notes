@@ -1,6 +1,6 @@
 # 🚀 LeetCode 高效刷题计划（高频题 + 模板题）
 
-> **制定日期**: 2026-03-07 | **仓库覆盖**: 218 / 246 | **总题数**: 246（唯一题号）
+> **制定日期**: 2026-03-07 | **仓库覆盖**: 221 / 246 | **总题数**: 246（唯一题号）
 > **策略**: 专题突破，由易到难，间隔复习
 
 ---
@@ -428,12 +428,12 @@
 | 144 | Binary Tree Preorder Traversal | 🟢 | 前序(栈) | ✅ |
 | 145 | Binary Tree Postorder Traversal | 🟢 | 后序(栈) | ✅ |
 | 199 | Binary Tree Right Side View | 🟡 | BFS/DFS 取每层最右 | ✅ |
-| 226 | Invert Binary Tree | 🟢 | 递归/层序翻转 | ⬜ |
+| 226 | Invert Binary Tree | 🟢 | 递归/层序翻转 | ✅ |
 | 236 | Lowest Common Ancestor of a Binary Tree | 🟡 | 后序找分叉点 | ⬜ |
 | 297 | Serialize and Deserialize Binary Tree | 🔴 | BFS/DFS 编码与还原 | ⬜ |
 | 437 | Path Sum III | 🟡 | 前缀和 + 树 DFS | ⬜ |
-| 543 | Diameter of Binary Tree | 🟢 | 后序统计最长路径 | ⬜ |
-| 572 | Subtree of Another Tree | 🟢 | 子树匹配递归 | ⬜ |
+| 543 | Diameter of Binary Tree | 🟢 | 后序统计最长路径 | ✅ |
+| 572 | Subtree of Another Tree | 🟢 | 子树匹配递归 | ✅ |
 
 **📋 推荐刷题顺序：**
 
@@ -445,17 +445,17 @@
 | 2 | 94 | Binary Tree Inorder Traversal | 🟢 中序遍历，栈/Morris | ✅ |
 | 3 | 145 | Binary Tree Postorder Traversal | 🟢 后序遍历，三序全掌握 | ✅ |
 | 4 | 104 | Maximum Depth | 🟢 递归求深度，最简单的递归 | ✅ |
-| 5 | 226 | Invert Binary Tree | 🟢 递归翻转，面试极高频 | ⬜ |
+| 5 | 226 | Invert Binary Tree | 🟢 递归翻转，面试极高频 | ✅ |
 | 6 | 111 | Minimum Depth | 🟢 注意叶子节点边界，与 #104 对比 | ✅ |
 | 7 | 100 | Same Tree | 🟢 递归比较两棵树 | ✅ |
 | 8 | 101 | Symmetric Tree | 🟢 镜像递归，#100 的变体 | ✅ |
 | 9 | 110 | Balanced Binary Tree | 🟢 后序判高度，综合 #104 | ✅ |
-| 10 | 543 | Diameter of Binary Tree | 🟢 后序统计路径，树形 DP 入门 | ⬜ |
+| 10 | 543 | Diameter of Binary Tree | 🟢 后序统计路径，树形 DP 入门 | ✅ |
 | 11 | 112 | Path Sum | 🟢 根到叶递归 | ✅ |
 | 12 | 113 | Path Sum II | 🟡 DFS+回溯路径，#112 的进阶 | ✅ |
 | 13 | 437 | Path Sum III | 🟡 把前缀和从数组迁移到树，面试高频 | ⬜ |
 | 14 | 129 | Sum Root to Leaf Numbers | 🟡 路径数字求和，#112 类似 | ✅ |
-| 15 | 572 | Subtree of Another Tree | 🟢 子树匹配，树递归高频模式 | ⬜ |
+| 15 | 572 | Subtree of Another Tree | 🟢 子树匹配，树递归高频模式 | ✅ |
 | 16 | 102 | Level Order Traversal | 🟡 BFS 层序，层序系列基础 | ✅ |
 | 17 | 107 | Level Order II | 🟡 BFS + 翻转，#102 变体 | ✅ |
 | 18 | 103 | Zigzag Level Order | 🟡 之字形BFS，#102 变体 | ✅ |
@@ -824,7 +824,7 @@
 | 排序 | 6 | 6 | 100% |
 | Top K / 快速选择 / 堆 | 4 | 4 | 100% |
 | 回溯 | 15 | 15 | 100% |
-| 二叉树 | 27 | 21 | 78% |
+| 二叉树 | 27 | 24 | 89% |
 | BST | 9 | 9 | 100% |
 | 图论 | 14 | 7 | 50% |
 | 并查集 | 5 | 1 | 20% |
@@ -836,9 +836,9 @@
 | 数学 | 12 | 10 | 83% |
 | 堆进阶 & 字典树 | 4 | 3 | 75% |
 | 设计题 / 数据结构设计专题 | 4 | 4 | 100% |
-| **总计（唯一题号）** | **246** | **218** | **89%** |
+| **总计（唯一题号）** | **246** | **221** | **90%** |
 
-> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；"已覆盖"按仓库内该题已存在本地题解/代码目录统计，去重后共 **218 题**。
+> 当前统计按补全后的高频主线题单合计 **246 个唯一题号**；"已覆盖"按仓库内该题已存在本地题解/代码目录统计，去重后共 **221 题**。
 ---
 
 ## 🔑 代码模板区（完成专题后总结）

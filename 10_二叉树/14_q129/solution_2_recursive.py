@@ -22,7 +22,7 @@ class Solution:
         空间复杂度：O(h)
         """
 
-        def dfs(node: Optional[TreeNode], current: int) -> int:
+        def dfs(node, current):
             if node is None:
                 return 0
 
