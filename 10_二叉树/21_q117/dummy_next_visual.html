@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LeetCode 117 - dummy.next 动效</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #eef2f1;
+      --surface: #ffffff;
+      --ink: #17282d;
+      --muted: #647579;
+      --border: #ccd7d5;
+      --branch: #aab8b6;
+      --node: #edf2f1;
+      --node-border: #809597;
+      --current: #bb3e30;
+      --current-soft: #f9e4e0;
+      --dummy: #996500;
+      --dummy-soft: #fff0c4;
+      --linked: #19724a;
+      --linked-soft: #dff1e6;
+      --code-bg: #142126;
+      --code-ink: #dbe6e4;
+      --code-key: #78c5d0;
+      --code-name: #f2d17a;
+      --code-comment: #91aa9a;
+      --code-active: #314247;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button { font: inherit; }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(650px, 1.45fr) minmax(390px, 0.8fr);
+      width: min(1380px, calc(100% - 28px));
+      min-height: calc(100vh - 28px);
+      margin: 14px auto;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 10px 28px rgba(23, 40, 45, 0.08);
+    }
+
+    section {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+    }
+
+    .tree-panel { border-right: 1px solid var(--border); }
+
+    h1 {
+      margin: 0;
+      padding: 15px 18px 13px;
+      border-bottom: 1px solid var(--border);
+      font-size: 17px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .tree-scroll {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      overflow: auto;
+      background: #fbfcfc;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      min-width: 760px;
+      height: auto;
+    }
+
+    .branch {
+      fill: none;
+      stroke: var(--branch);
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .level-label {
+      fill: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .node circle {
+      fill: var(--node);
+      stroke: var(--node-border);
+      stroke-width: 2.5;
+      transition: fill 180ms ease, stroke 180ms ease, stroke-width 180ms ease;
+    }
+
+    .node text {
+      fill: var(--ink);
+      font-size: 25px;
+      font-weight: 750;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .node.current circle {
+      fill: var(--current-soft);
+      stroke: var(--current);
+      stroke-width: 4;
+    }
+
+    .node.linked circle {
+      fill: var(--linked-soft);
+      stroke: var(--linked);
+      stroke-width: 3.5;
+    }
+
+    .node.entry circle {
+      fill: var(--dummy-soft);
+      stroke: var(--dummy);
+      stroke-width: 4;
+    }
+
+    .dummy {
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+
+    .dummy.visible { opacity: 1; }
+
+    .dummy rect {
+      fill: var(--dummy-soft);
+      stroke: var(--dummy);
+      stroke-width: 3;
+      stroke-dasharray: 7 5;
+    }
+
+    .dummy text {
+      fill: #704a00;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 17px;
+      font-weight: 750;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .dummy.completed { opacity: 0.55; }
+
+    .next-edge,
+    .dummy-edge {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+      opacity: 0;
+      transition: opacity 180ms ease, stroke-width 180ms ease;
+    }
+
+    .next-edge { stroke: var(--linked); }
+    .dummy-edge { stroke: var(--dummy); }
+    .next-edge.visible,
+    .dummy-edge.visible { opacity: 1; }
+    .next-edge.active,
+    .dummy-edge.active { stroke-width: 7; }
+
+    .edge-label {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+      font-weight: 750;
+      text-anchor: middle;
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+
+    .edge-label.visible { opacity: 1; }
+    .edge-label.dummy-label { fill: var(--dummy); }
+    .edge-label.next-label { fill: var(--linked); }
+
+    .pointer {
+      opacity: 0;
+      transition: transform 220ms ease, opacity 120ms ease;
+    }
+
+    .pointer.visible { opacity: 1; }
+
+    .pointer path {
+      fill: none;
+      stroke-width: 3;
+    }
+
+    .pointer rect { rx: 5; }
+
+    .pointer text {
+      fill: #fff;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 14px;
+      font-weight: 750;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    #cur-pointer path { stroke: var(--current); }
+    #cur-pointer rect { fill: var(--current); }
+    #nxt-pointer path { stroke: var(--linked); }
+    #nxt-pointer rect { fill: var(--linked); }
+
+    .null-state {
+      fill: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+
+    .null-state.visible { opacity: 1; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(150px, 1fr) auto auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 70px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: #f8faf9;
+    }
+
+    .status {
+      min-width: 0;
+      color: var(--ink);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .step-count {
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid #aebfbd;
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--ink);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover:not(:disabled) {
+      border-color: #087f8c;
+      background: #eaf4f3;
+    }
+
+    button:focus-visible {
+      outline: 3px solid #62bbc2;
+      outline-offset: 2px;
+    }
+
+    button:disabled {
+      color: #99a6a7;
+      cursor: default;
+    }
+
+    .code-panel { background: var(--code-bg); }
+
+    .code-panel h1 {
+      border-color: #34464a;
+      color: #f5f8f7;
+    }
+
+    pre {
+      flex: 1;
+      margin: 0;
+      padding: 22px 0;
+      overflow: auto;
+      color: var(--code-ink);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 14px;
+      line-height: 1.85;
+      tab-size: 4;
+    }
+
+    code { display: block; min-width: max-content; }
+
+    .code-line {
+      display: block;
+      padding: 0 22px;
+      border-left: 4px solid transparent;
+      white-space: pre;
+    }
+
+    .code-line.active {
+      border-left-color: #f0bd45;
+      background: var(--code-active);
+      color: #fff5d8;
+    }
+
+    .kw { color: var(--code-key); }
+    .name { color: var(--code-name); }
+    .comment { color: var(--code-comment); }
+    .blank { color: transparent; }
+
+    @media (max-width: 980px) {
+      main {
+        grid-template-columns: 1fr;
+        min-height: 0;
+      }
+
+      .tree-panel { border-right: 0; border-bottom: 1px solid var(--border); }
+      .tree-scroll { min-height: 560px; }
+      .code-panel { min-height: 580px; }
+    }
+
+    @media (max-width: 620px) {
+      main {
+        width: calc(100% - 16px);
+        margin: 8px auto;
+      }
+
+      .controls { grid-template-columns: 1fr auto; }
+      .status { grid-column: 1 / -1; }
+      .step-count { grid-column: 1; }
+      .button-group { grid-column: 2; grid-row: 2; }
+      h1 { font-size: 16px; }
+      pre { font-size: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="tree-panel" aria-labelledby="tree-heading">
+      <h1 id="tree-heading">树</h1>
+      <div class="tree-scroll">
+        <svg viewBox="0 0 920 650" role="img" aria-labelledby="tree-title tree-desc">
+          <title id="tree-title">LeetCode 117 dummy.next 动画</title>
+          <desc id="tree-desc">从根节点开始，逐层创建 dummy，并连接下一层节点。</desc>
+          <defs>
+            <marker id="arrow-dummy" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#996500"></path></marker>
+            <marker id="arrow-next" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#19724a"></path></marker>
+            <marker id="arrow-cur" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#bb3e30"></path></marker>
+          </defs>
+
+          <text class="level-label" x="24" y="110">第 1 层</text>
+          <text class="level-label" x="42" y="246">第 2 层</text>
+          <text class="level-label" x="42" y="456">第 3 层</text>
+
+          <path class="branch" d="M447 135 L327 257"></path>
+          <path class="branch" d="M473 135 L623 257"></path>
+          <path class="branch" d="M305 323 L300 467"></path>
+          <path class="branch" d="M333 323 L460 467"></path>
+          <path class="branch" d="M650 323 L735 467"></path>
+
+          <path id="edge-d2-2" class="dummy-edge" d="M162 290 L287 290" marker-end="url(#arrow-dummy)"></path>
+          <text id="label-d2-2" class="edge-label dummy-label" x="224" y="272">dummy.next</text>
+          <path id="edge-2-3" class="next-edge" d="M351 290 C430 241 554 241 611 290" marker-end="url(#arrow-next)"></path>
+          <text id="label-2-3" class="edge-label next-label" x="480" y="245">next</text>
+
+          <path id="edge-d3-4" class="dummy-edge" d="M162 500 L268 500" marker-end="url(#arrow-dummy)"></path>
+          <text id="label-d3-4" class="edge-label dummy-label" x="215" y="481">dummy.next</text>
+          <path id="edge-4-5" class="next-edge" d="M332 500 L428 500" marker-end="url(#arrow-next)"></path>
+          <text id="label-4-5" class="edge-label next-label" x="380" y="481">next</text>
+          <path id="edge-5-7" class="next-edge" d="M492 500 C555 446 670 446 703 500" marker-end="url(#arrow-next)"></path>
+          <text id="label-5-7" class="edge-label next-label" x="602" y="450">next</text>
+
+          <g id="dummy-2" class="dummy" transform="translate(102 290)">
+            <rect x="-60" y="-25" width="120" height="50" rx="7"></rect><text y="1">dummy</text>
+          </g>
+          <g id="dummy-3" class="dummy" transform="translate(102 500)">
+            <rect x="-60" y="-25" width="120" height="50" rx="7"></rect><text y="1">dummy</text>
+          </g>
+
+          <g id="node-1" class="node" transform="translate(460 105)"><circle r="32"></circle><text y="1">1</text></g>
+          <g id="node-2" class="node" transform="translate(319 290)"><circle r="32"></circle><text y="1">2</text></g>
+          <g id="node-3" class="node" transform="translate(643 290)"><circle r="32"></circle><text y="1">3</text></g>
+          <g id="node-4" class="node" transform="translate(300 500)"><circle r="32"></circle><text y="1">4</text></g>
+          <g id="node-5" class="node" transform="translate(460 500)"><circle r="32"></circle><text y="1">5</text></g>
+          <g id="node-7" class="node" transform="translate(735 500)"><circle r="32"></circle><text y="1">7</text></g>
+
+          <g id="cur-pointer" class="pointer">
+            <rect x="-27" y="-69" width="54" height="26"></rect><text y="-55">cur</text><path d="M0 -42 L0 -35" marker-end="url(#arrow-cur)"></path>
+          </g>
+          <g id="nxt-pointer" class="pointer">
+            <path d="M0 28 L0 41" marker-end="url(#arrow-next)"></path><rect x="-27" y="45" width="54" height="26"></rect><text y="59">nxt</text>
+          </g>
+
+          <text id="cur-null" class="null-state" x="700" y="372">cur = None</text>
+          <text id="skip-left" class="null-state" x="670" y="372">3.left = None</text>
+        </svg>
+      </div>
+
+      <div class="controls">
+        <div class="status" id="status" aria-live="polite"></div>
+        <span class="step-count" id="step-count"></span>
+        <div class="button-group">
+          <button type="button" id="previous" title="上一步" aria-label="上一步">←</button>
+          <button type="button" id="play" title="播放或暂停">暂停</button>
+          <button type="button" id="next" title="下一步" aria-label="下一步">→</button>
+          <button type="button" id="restart" title="重新播放" aria-label="重新播放">↻</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="code-panel" aria-labelledby="code-heading">
+      <h1 id="code-heading">代码</h1>
+      <pre><code><span class="code-line" id="line-class"><span class="kw">class</span> <span class="name">Solution</span>:</span><span class="code-line" id="line-def">    <span class="kw">def</span> <span class="name">connect</span>(self, root):</span><span class="code-line" id="line-root">        cur = root</span><span class="code-line blank">.</span><span class="code-line" id="line-outer">        <span class="kw">while</span> cur:</span><span class="code-line" id="line-dummy">            dummy = Node(0)</span><span class="code-line" id="line-nxt-init">            nxt = dummy</span><span class="code-line blank">.</span><span class="code-line" id="line-inner">            <span class="kw">while</span> cur:</span><span class="code-line" id="line-if-left">                <span class="kw">if</span> cur.left:</span><span class="code-line" id="line-link-left">                    nxt.next = cur.left</span><span class="code-line" id="line-move-left">                    nxt = nxt.next</span><span class="code-line blank">.</span><span class="code-line" id="line-if-right">                <span class="kw">if</span> cur.right:</span><span class="code-line" id="line-link-right">                    nxt.next = cur.right</span><span class="code-line" id="line-move-right">                    nxt = nxt.next</span><span class="code-line blank">.</span><span class="code-line" id="line-move-cur">                cur = cur.next</span><span class="code-line blank">.</span><span class="code-line" id="line-next-level">            cur = dummy.next</span><span class="code-line blank">.</span><span class="code-line" id="line-return">        <span class="kw">return</span> root</span></code></pre>
+    </section>
+  </main>
+
+  <script>
+    const states = [
+      { label: "cur = root", code: ["line-root"], cur: "node-1", dummies: [], edges: [], linked: [] },
+      { label: "dummy = Node(0), nxt = dummy", code: ["line-dummy", "line-nxt-init"], cur: "node-1", nxt: "dummy-2", dummies: ["dummy-2"], edges: [], linked: [] },
+      { label: "nxt.next = cur.left  →  dummy.next = 2", code: ["line-if-left", "line-link-left"], cur: "node-1", nxt: "dummy-2", dummies: ["dummy-2"], edges: ["edge-d2-2"], activeEdge: "edge-d2-2", linked: ["node-2"] },
+      { label: "nxt = nxt.next  →  nxt = 2", code: ["line-move-left"], cur: "node-1", nxt: "node-2", dummies: ["dummy-2"], edges: ["edge-d2-2"], linked: ["node-2"] },
+      { label: "nxt.next = cur.right  →  2.next = 3", code: ["line-if-right", "line-link-right"], cur: "node-1", nxt: "node-2", dummies: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3"], activeEdge: "edge-2-3", linked: ["node-2", "node-3"] },
+      { label: "nxt = nxt.next  →  nxt = 3", code: ["line-move-right"], cur: "node-1", nxt: "node-3", dummies: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3"], linked: ["node-2", "node-3"] },
+      { label: "cur = cur.next  →  None", code: ["line-move-cur"], cur: null, nxt: "node-3", dummies: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3"], linked: ["node-2", "node-3"], curNull: true },
+      { label: "cur = dummy.next  →  cur = 2", code: ["line-next-level"], cur: "node-2", nxt: "node-3", dummies: ["dummy-2"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3"], linked: ["node-2", "node-3"], entry: "node-2" },
+      { label: "新一轮：dummy = Node(0), nxt = dummy", code: ["line-dummy", "line-nxt-init"], cur: "node-2", nxt: "dummy-3", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3"], linked: ["node-2", "node-3"] },
+      { label: "nxt.next = cur.left  →  dummy.next = 4", code: ["line-if-left", "line-link-left"], cur: "node-2", nxt: "dummy-3", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4"], activeEdge: "edge-d3-4", linked: ["node-2", "node-3", "node-4"] },
+      { label: "nxt = nxt.next  →  nxt = 4", code: ["line-move-left"], cur: "node-2", nxt: "node-4", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4"], linked: ["node-2", "node-3", "node-4"] },
+      { label: "nxt.next = cur.right  →  4.next = 5", code: ["line-if-right", "line-link-right"], cur: "node-2", nxt: "node-4", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4", "edge-4-5"], activeEdge: "edge-4-5", linked: ["node-2", "node-3", "node-4", "node-5"] },
+      { label: "nxt = nxt.next  →  nxt = 5", code: ["line-move-right"], cur: "node-2", nxt: "node-5", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4", "edge-4-5"], linked: ["node-2", "node-3", "node-4", "node-5"] },
+      { label: "cur = cur.next  →  cur = 3", code: ["line-move-cur"], cur: "node-3", nxt: "node-5", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4", "edge-4-5"], linked: ["node-2", "node-3", "node-4", "node-5"] },
+      { label: "cur.left = None，跳过", code: ["line-if-left"], cur: "node-3", nxt: "node-5", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4", "edge-4-5"], linked: ["node-2", "node-3", "node-4", "node-5"], skipLeft: true },
+      { label: "nxt.next = cur.right  →  5.next = 7", code: ["line-if-right", "line-link-right"], cur: "node-3", nxt: "node-5", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4", "edge-4-5", "edge-5-7"], activeEdge: "edge-5-7", linked: ["node-2", "node-3", "node-4", "node-5", "node-7"] },
+      { label: "nxt = nxt.next  →  nxt = 7", code: ["line-move-right"], cur: "node-3", nxt: "node-7", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4", "edge-4-5", "edge-5-7"], linked: ["node-2", "node-3", "node-4", "node-5", "node-7"] },
+      { label: "cur = cur.next  →  None", code: ["line-move-cur"], cur: null, nxt: "node-7", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4", "edge-4-5", "edge-5-7"], linked: ["node-2", "node-3", "node-4", "node-5", "node-7"], curNull: true },
+      { label: "cur = dummy.next  →  cur = 4", code: ["line-next-level"], cur: "node-4", nxt: "node-7", dummies: ["dummy-2", "dummy-3"], completed: ["dummy-2", "dummy-3"], edges: ["edge-d2-2", "edge-2-3", "edge-d3-4", "edge-4-5", "edge-5-7"], linked: ["node-2", "node-3", "node-4", "node-5", "node-7"], entry: "node-4" }
+    ];
+
+    const positions = {
+      "node-1": [460, 105],
+      "node-2": [319, 290],
+      "node-3": [643, 290],
+      "node-4": [300, 500],
+      "node-5": [460, 500],
+      "node-7": [735, 500],
+      "dummy-2": [102, 290],
+      "dummy-3": [102, 500]
+    };
+
+    const edgeLabels = {
+      "edge-d2-2": "label-d2-2",
+      "edge-2-3": "label-2-3",
+      "edge-d3-4": "label-d3-4",
+      "edge-4-5": "label-4-5",
+      "edge-5-7": "label-5-7"
+    };
+
+    const byId = (id) => document.getElementById(id);
+    let index = 0;
+    let timer = null;
+
+    function movePointer(pointerId, targetId) {
+      const [x, y] = positions[targetId];
+      byId(pointerId).setAttribute("transform", `translate(${x} ${y})`);
+      byId(pointerId).classList.add("visible");
+    }
+
+    function render() {
+      const state = states[index];
+
+      document.querySelectorAll(".code-line").forEach((line) => line.classList.remove("active"));
+      state.code.forEach((id) => byId(id).classList.add("active"));
+
+      document.querySelectorAll(".node").forEach((node) => node.classList.remove("current", "linked", "entry"));
+      state.linked.forEach((id) => byId(id).classList.add("linked"));
+      if (state.cur) {
+        byId(state.cur).classList.add("current");
+        movePointer("cur-pointer", state.cur);
+      } else {
+        byId("cur-pointer").classList.remove("visible");
+      }
+      if (state.entry) {
+        byId(state.entry).classList.remove("current", "linked");
+        byId(state.entry).classList.add("entry");
+      }
+
+      document.querySelectorAll(".dummy").forEach((dummy) => dummy.classList.remove("visible", "completed"));
+      state.dummies.forEach((id) => byId(id).classList.add("visible"));
+      (state.completed || []).forEach((id) => byId(id).classList.add("completed"));
+
+      if (state.nxt) movePointer("nxt-pointer", state.nxt);
+      else byId("nxt-pointer").classList.remove("visible");
+
+      Object.keys(edgeLabels).forEach((edgeId) => {
+        byId(edgeId).classList.remove("visible", "active");
+        byId(edgeLabels[edgeId]).classList.remove("visible");
+      });
+      state.edges.forEach((edgeId) => {
+        byId(edgeId).classList.add("visible");
+        byId(edgeLabels[edgeId]).classList.add("visible");
+      });
+      if (state.activeEdge) byId(state.activeEdge).classList.add("active");
+
+      byId("cur-null").classList.toggle("visible", Boolean(state.curNull));
+      byId("skip-left").classList.toggle("visible", Boolean(state.skipLeft));
+      byId("status").textContent = state.label;
+      byId("step-count").textContent = `${index + 1} / ${states.length}`;
+      byId("previous").disabled = index === 0;
+      byId("next").disabled = index === states.length - 1;
+    }
+
+    function stop() {
+      if (timer) window.clearInterval(timer);
+      timer = null;
+      byId("play").textContent = "播放";
+    }
+
+    function play() {
+      if (index === states.length - 1) index = 0;
+      if (timer) return;
+      byId("play").textContent = "暂停";
+      timer = window.setInterval(() => {
+        if (index === states.length - 1) {
+          stop();
+          return;
+        }
+        index += 1;
+        render();
+      }, 1050);
+      render();
+    }
+
+    function step(delta) {
+      stop();
+      index = Math.max(0, Math.min(states.length - 1, index + delta));
+      render();
+    }
+
+    byId("previous").addEventListener("click", () => step(-1));
+    byId("next").addEventListener("click", () => step(1));
+    byId("play").addEventListener("click", () => timer ? stop() : play());
+    byId("restart").addEventListener("click", () => {
+      stop();
+      index = 0;
+      render();
+      play();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") step(-1);
+      if (event.key === "ArrowRight") step(1);
+      if (event.key === " ") {
+        event.preventDefault();
+        timer ? stop() : play();
+      }
+    });
+
+    render();
+    window.setTimeout(play, 500);
+  </script>
+</body>
+</html>

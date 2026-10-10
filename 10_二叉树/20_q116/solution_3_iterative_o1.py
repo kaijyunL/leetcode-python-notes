@@ -28,9 +28,11 @@ class Solution:
 
         leftmost = root
 
+        # 迭代每一层
         while leftmost.left:
             node = leftmost
 
+            # 连接当前层的节点
             while node:
                 node.left.next = node.right
 
