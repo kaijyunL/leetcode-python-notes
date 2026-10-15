@@ -185,6 +185,15 @@ post_right - 1
 
 最直观的方法是直接把数组切开。
 
+递归出口检查 `postorder` 是否为空：
+
+```python
+if not postorder:
+    return None
+```
+
+因为当前子树的根取自后序数组的最后一个元素；`postorder` 为空时，当前子树不存在，也就不能访问 `postorder[-1]`。
+
 后序最后一个值是根：
 
 ```python

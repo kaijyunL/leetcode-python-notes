@@ -25,12 +25,15 @@ class Solution:
 
         while cur:
             if cur.left:
+                # 找到左子树的最右节点
                 predecessor = cur.left
-
                 while predecessor.right:
                     predecessor = predecessor.right
 
+                # 把右子树接到左子树末尾
                 predecessor.right = cur.right
+
+                # 再将左子树移到右边
                 cur.right = cur.left
                 cur.left = None
 

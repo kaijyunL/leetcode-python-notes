@@ -28,10 +28,10 @@ class Solution:
         if not preorder:
             return None
 
+        # 根节点值->创建根节点->在中序遍历中找到根节点位置
         root_val = preorder[0]
         root = TreeNode(root_val)
         root_inorder_index = inorder.index(root_val)
-
         left_size = root_inorder_index
 
         root.left = self.buildTree(
