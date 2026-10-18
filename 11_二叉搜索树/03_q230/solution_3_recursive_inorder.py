@@ -43,10 +43,6 @@ class Solution:
             inorder(node.right)
 
         inorder(root)
-
-        if answer is None:
-            raise ValueError("k 超出节点数量")
-
         return answer
 
 

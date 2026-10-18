@@ -345,6 +345,14 @@ dfs(node, lower, upper)
 lower < node.val < upper
 ```
 
+其中 `lower` 是下界，`upper` 是上界。根节点没有祖先的限制，所以初始调用是：
+
+```python
+return dfs(root, float("-inf"), float("inf"))
+```
+
+`float("-inf")` 表示负无穷，`float("inf")` 表示正无穷。题目中的任意整数都在这个范围内，所以根节点的值不会被初始边界排除。后续递归再根据节点值收紧范围。
+
 然后分三步：
 
 ### 第一步：当前节点为空
@@ -352,7 +360,7 @@ lower < node.val < upper
 空树当然是合法 BST：
 
 ```python
-if not node:
+if node is None:
     return True
 ```
 
@@ -361,18 +369,18 @@ if not node:
 如果当前节点不在合法范围里，直接返回 `False`：
 
 ```python
-if lower is not None and node.val <= lower:
-    return False
-if upper is not None and node.val >= upper:
+if not lower < node.val < upper:
     return False
 ```
+
+这句判断表示：当前值只要小于等于下界，或者大于等于上界，就不合法。这里必须使用严格不等号，因为 BST 不允许重复值。
 
 ### 第三步：递归左右子树
 
 对于左子树：
 
 ```text
-它的上界变成当前节点值 node.val
+下界 lower 不变，上界变成当前节点值 node.val
 ```
 
 因为左子树所有节点都必须小于当前节点。
@@ -380,16 +388,23 @@ if upper is not None and node.val >= upper:
 对于右子树：
 
 ```text
-它的下界变成当前节点值 node.val
+下界变成当前节点值 node.val，上界 upper 不变
 ```
 
 因为右子树所有节点都必须大于当前节点。
 
+保留另一侧的边界，是为了继续满足祖先的限制。
+
 所以递归是：
 
 ```python
-return dfs(node.left, lower, node.val) and dfs(node.right, node.val, upper)
+return (
+    dfs(node.left, lower, node.val)
+    and dfs(node.right, node.val, upper)
+)
 ```
+
+左右子树都合法，当前子树才合法；`and` 左侧如果已经返回 `False`，就直接返回 `False`，不再检查右子树。
 
 ---
 
@@ -408,22 +423,19 @@ class TreeNode:
 
 class Solution:
     def isValidBST(self, root: Optional[TreeNode]) -> bool:
-        def dfs(
-            node: Optional[TreeNode],
-            lower: Optional[int],
-            upper: Optional[int],
-        ) -> bool:
-            if not node:
+        def dfs(node, lower, upper):
+            if node is None:
                 return True
 
-            if lower is not None and node.val <= lower:
-                return False
-            if upper is not None and node.val >= upper:
+            if not lower < node.val < upper:
                 return False
 
-            return dfs(node.left, lower, node.val) and dfs(node.right, node.val, upper)
+            return (
+                dfs(node.left, lower, node.val)
+                and dfs(node.right, node.val, upper)
+            )
 
-        return dfs(root, None, None)
+        return dfs(root, float("-inf"), float("inf"))
 ```
 
 ---
@@ -445,17 +457,17 @@ class Solution:
 调用：
 
 ```python
-dfs(5, None, None)
+dfs(5, float("-inf"), float("inf"))
 ```
 
-说明 `5` 没有上下界限制，合法。
+说明 `5` 必须处于负无穷和正无穷之间，它满足。
 
 ### 左子树 1
 
 调用：
 
 ```python
-dfs(1, None, 5)
+dfs(1, float("-inf"), 5)
 ```
 
 说明 `1` 必须小于 `5`，它满足。
@@ -465,7 +477,7 @@ dfs(1, None, 5)
 调用：
 
 ```python
-dfs(4, 5, None)
+dfs(4, 5, float("inf"))
 ```
 
 说明 `4` 必须大于 `5`。

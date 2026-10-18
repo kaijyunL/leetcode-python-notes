@@ -23,17 +23,18 @@ class Solution:
         """
 
         def dfs(node, lower, upper):
-            if not node:
+            if node is None:
                 return True
 
-            if lower is not None and node.val <= lower:
-                return False
-            if upper is not None and node.val >= upper:
+            if not lower < node.val < upper:
                 return False
 
-            return dfs(node.left, lower, node.val) and dfs(node.right, node.val, upper)
+            return (
+                dfs(node.left, lower, node.val)
+                and dfs(node.right, node.val, upper)
+            )
 
-        return dfs(root, None, None)
+        return dfs(root, float("-inf"), float("inf"))
 
 
 def build_tree(level_order: list[Optional[int]]) -> Optional[TreeNode]:
