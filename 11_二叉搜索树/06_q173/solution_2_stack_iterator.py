@@ -24,13 +24,13 @@ class BSTIterator:
             self.stack.append(node)
             node = node.left
 
-    def next(self) -> int:
+    def next(self):
         node = self.stack.pop()
         if node.right:
             self._push_left(node.right)
         return node.val
 
-    def hasNext(self) -> bool:
+    def hasNext(self):
         return bool(self.stack)
 
 

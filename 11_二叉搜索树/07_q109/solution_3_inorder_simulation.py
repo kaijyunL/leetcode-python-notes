@@ -22,9 +22,9 @@ class TreeNode:
 
 class Solution:
     def __init__(self) -> None:
-        self.current: Optional[ListNode] = None
+        self.current = None
 
-    def sortedListToBST(self, head: Optional[ListNode]) -> Optional[TreeNode]:
+    def sortedListToBST(self, head):
         """
         解法三：统计长度 + 中序模拟
         时间复杂度：O(n)
@@ -33,7 +33,7 @@ class Solution:
         self.current = head
         n = self.get_length(head)
 
-        def build(left: int, right: int) -> Optional[TreeNode]:
+        def build(left, right):
             if left > right:
                 return None
 
@@ -49,7 +49,7 @@ class Solution:
 
         return build(0, n - 1)
 
-    def get_length(self, head: Optional[ListNode]) -> int:
+    def get_length(self, head):
         length = 0
         while head:
             length += 1
