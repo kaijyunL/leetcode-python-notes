@@ -21,27 +21,26 @@ class TreeNode:
 
 
 class Solution:
-    def __init__(self) -> None:
-        self.current = None
-
     def sortedListToBST(self, head):
         """
         解法三：统计长度 + 中序模拟
         时间复杂度：O(n)
         空间复杂度：O(log n)
         """
-        self.current = head
+        current = head
         n = self.get_length(head)
 
         def build(left, right):
+            nonlocal current
+
             if left > right:
                 return None
 
             mid = (left + right) // 2
             left_subtree = build(left, mid - 1)
 
-            root = TreeNode(self.current.val)
-            self.current = self.current.next
+            root = TreeNode(current.val)
+            current = current.next
 
             root.left = left_subtree
             root.right = build(mid + 1, right)

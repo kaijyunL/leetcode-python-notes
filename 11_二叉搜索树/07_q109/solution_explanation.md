@@ -324,7 +324,7 @@ BST 中序遍历时将要依次访问到的节点序列
 
 ---
 
-## 先建“形状”，再填“值”
+## 按节点数量确定树形，再填入链表值
 
 这是这题最关键的一层理解。
 
@@ -352,7 +352,9 @@ build(left, right)
 mid = (left + right) // 2
 ```
 
-然后递归顺序必须是：
+`current` 是方法内部的链表游标。嵌套的 `build` 通过 `nonlocal current` 共享并推进它，不需要把游标保存到 `Solution` 对象上。
+
+递归顺序是：
 
 ```python
 left_subtree = build(left, mid - 1)
@@ -428,7 +430,12 @@ def get_length(head):
         head = head.next
     return n
 
+current = head
+n = get_length(head)
+
 def build(left, right):
+    nonlocal current
+
     if left > right:
         return None
 
@@ -436,12 +443,14 @@ def build(left, right):
 
     left_subtree = build(left, mid - 1)
 
-    root = TreeNode(self.current.val)
-    self.current = self.current.next
+    root = TreeNode(current.val)
+    current = current.next
 
     root.left = left_subtree
     root.right = build(mid + 1, right)
     return root
+
+return build(0, n - 1)
 ```
 
 你会发现，这个递归函数根本没有去“找中点节点”。
@@ -523,7 +532,7 @@ def build(left, right):
 
 这个顺序不能错。
 
-### 3. `self.current` 移动时机写错
+### 3. `current` 移动时机写错
 
 必须在创建当前根节点之后再移动到下一个链表节点。
 

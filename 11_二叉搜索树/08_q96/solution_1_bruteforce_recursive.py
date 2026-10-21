@@ -1,5 +1,10 @@
 class Solution:
     def numTrees(self, n: int) -> int:
+        """
+        解法一：暴力递归
+        时间复杂度：指数级
+        空间复杂度：O(n)
+        """
         def count(nodes: int) -> int:
             if nodes <= 1:
                 return 1

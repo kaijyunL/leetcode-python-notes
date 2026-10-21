@@ -1,5 +1,10 @@
 class Solution:
     def numTrees(self, n: int) -> int:
+        """
+        解法三：动态规划（最适合面试）
+        时间复杂度：O(n^2)
+        空间复杂度：O(n)
+        """
         if n <= 1:
             return 1
 

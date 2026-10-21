@@ -1,5 +1,10 @@
 class Solution:
     def numTrees(self, n: int) -> int:
+        """
+        解法四：卡特兰数公式
+        时间复杂度：O(n)
+        空间复杂度：O(1)
+        """
         catalan = 1
 
         for i in range(n):

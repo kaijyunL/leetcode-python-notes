@@ -1,5 +1,10 @@
 class Solution:
     def numTrees(self, n: int) -> int:
+        """
+        解法二：记忆化搜索
+        时间复杂度：O(n^2)
+        空间复杂度：O(n)
+        """
         memo = {0: 1, 1: 1}
 
         def count(nodes: int) -> int:
