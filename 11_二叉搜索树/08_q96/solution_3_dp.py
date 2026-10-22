@@ -8,7 +8,6 @@ class Solution:
         if n <= 1:
             return 1
 
-        # dp[i] 表示 i 个节点能组成多少种 BST
         dp = [0] * (n + 1)
         dp[0] = 1
         dp[1] = 1

@@ -19,12 +19,11 @@ class Solution:
         if n == 0:
             return []
 
-        def build(left: int, right: int) -> List[Optional[TreeNode]]:
+        def build(left, right):
             if left > right:
-                # 空树也要算一种合法选择，方便后面做组合
                 return [None]
 
-            trees: List[Optional[TreeNode]] = []
+            trees = []
 
             for root_val in range(left, right + 1):
                 left_trees = build(left, root_val - 1)
