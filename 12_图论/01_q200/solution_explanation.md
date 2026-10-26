@@ -54,7 +54,7 @@
 - 空间复杂度：`O(mn)`
 
 #### 代码文件
-- `solution_brute_force.py`
+- `solution_1_brute_force.py`
 
 ---
 
@@ -138,7 +138,7 @@
   主要是 `visited` 矩阵。
 
 #### 代码文件
-- `solution_dfs_visited.py`
+- `solution_2_dfs_visited.py`
 
 ---
 
@@ -188,7 +188,7 @@
 这句话很加分，因为你不仅会优化，还知道优化的代价。
 
 #### 代码文件
-- `solution_dfs_inplace.py`
+- `solution_3_dfs_inplace.py`
 
 ---
 
