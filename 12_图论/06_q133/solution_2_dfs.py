@@ -19,7 +19,6 @@ class Solution:
             if old in visited:
                 return visited[old]
 
-            # 先登记，再递归，避免环导致死循环
             new = Node(old.val)
             visited[old] = new
             for nei in old.neighbors:
